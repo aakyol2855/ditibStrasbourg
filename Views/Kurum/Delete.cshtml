@@ -23,6 +23,18 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Adres)
         </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Sehir)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Sehir)
+        </dd>
+        <dt class="col-sm-2">
+            Üst Kurum
+        </dt>
+        <dd class="col-sm-10">
+            @(Model.UstKurum != null ? Model.UstKurum.Ad : "-")
+        </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Tip)
         </dt>

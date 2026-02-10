@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DitibStasbourg.Data;
 using DitibStasbourg.Models;
+using DitibStasbourg.Models.ViewModels;
 using ClosedXML.Excel;
 
 namespace DitibStasbourg.Controllers
@@ -16,55 +17,89 @@ namespace DitibStasbourg.Controllers
             _context = context;
         }
 
-        // GET: Gorevlendirme
-        public async Task<IActionResult> Index(
-            int? year, 
-            KurumTip? tip, 
-            int? gorevliId, 
-            int? kurumId, 
-            DateTime? startDate, 
-            DateTime? endDate,
-            string sortOrder,
-            int? pageNumber)
+        // GET: Gorevlendirme - Accordion based with filtering
+        public async Task<IActionResult> Index(GorevlendirmeFilterViewModel filter, int page = 1)
         {
-            ViewData["CurrentSort"] = sortOrder;
-            ViewData["DateSortParm"] = String.IsNullOrEmpty(sortOrder) ? "date_asc" : "";
+            await PrepareFilterDropdowns(filter);
             
             var query = _context.Gorevlendirme
                 .Include(g => g.Gorevli)
+                    .ThenInclude(gov => gov.GorevliDurumBilgisi)
+                .Include(g => g.Gorevli)
+                    .ThenInclude(gov => gov.GorevliNotlari)
                 .Include(g => g.Kurum)
+                .Include(g => g.YerineGelecekGorevli)
+                .Include(g => g.GorevlendirmeNotlari)
                 .AsQueryable();
 
-            if (year.HasValue) query = query.Where(g => g.Tarih.Year == year.Value);
-            if (tip.HasValue) query = query.Where(g => g.Kurum.Tip == tip.Value);
-            if (gorevliId.HasValue) query = query.Where(g => g.GorevliId == gorevliId.Value);
-            if (kurumId.HasValue) query = query.Where(g => g.KurumId == kurumId.Value);
-            if (startDate.HasValue) query = query.Where(g => g.Tarih >= startDate.Value);
-            if (endDate.HasValue) query = query.Where(g => g.Tarih <= endDate.Value);
-
-            switch (sortOrder)
+            // Apply filters
+            if (filter.GorevliId.HasValue)
             {
-                case "date_asc":
-                    query = query.OrderBy(g => g.Tarih);
-                    break;
-                default:
-                    query = query.OrderByDescending(g => g.Tarih);
-                    break;
+                query = query.Where(g => g.GorevliId == filter.GorevliId.Value);
             }
 
-            ViewBag.Years = await _context.Gorevlendirme.Select(g => g.Tarih.Year).Distinct().OrderByDescending(y => y).ToListAsync();
-            ViewData["GorevliId"] = new SelectList(_context.Gorevli, "Id", "AdSoyad", gorevliId);
-            ViewData["KurumId"] = new SelectList(_context.Kurum, "Id", "Isim", kurumId);
-            
-            ViewData["CurrentYear"] = year;
-            ViewData["CurrentTip"] = tip;
-            ViewData["CurrentGorevliId"] = gorevliId;
-            ViewData["CurrentKurumId"] = kurumId;
-            ViewData["CurrentStartDate"] = startDate?.ToString("yyyy-MM-dd");
-            ViewData["CurrentEndDate"] = endDate?.ToString("yyyy-MM-dd");
+            if (filter.KurumId.HasValue)
+            {
+                query = query.Where(g => g.KurumId == filter.KurumId.Value);
+            }
 
-            int pageSize = 15;
-            return View(await PaginatedList<Gorevlendirme>.CreateAsync(query.AsNoTracking(), pageNumber ?? 1, pageSize));
+            if (filter.BaslangicTarihi.HasValue)
+            {
+                query = query.Where(g => g.Tarih >= filter.BaslangicTarihi.Value);
+            }
+
+            if (filter.BitisTarihi.HasValue)
+            {
+                query = query.Where(g => g.Tarih <= filter.BitisTarihi.Value);
+            }
+
+            if (!string.IsNullOrEmpty(filter.Sehir))
+            {
+                query = query.Where(g => g.Kurum.Sehir == filter.Sehir);
+            }
+
+            // DurumFilter: aktif, pasif, tümü
+            var today = DateTime.Today;
+            if (!string.IsNullOrEmpty(filter.DurumFilter))
+            {
+                if (filter.DurumFilter == "aktif")
+                {
+                    query = query.Where(g => g.Tarih <= today && (g.BitisTarihi == null || g.BitisTarihi >= today));
+                }
+                else if (filter.DurumFilter == "pasif")
+                {
+                    query = query.Where(g => g.BitisTarihi != null && g.BitisTarihi < today);
+                }
+                // "tümü" için filtre yok
+            }
+
+            query = query.OrderByDescending(g => g.Tarih);
+
+            ViewData["Filter"] = filter;
+            
+            int pageSize = 20;
+            var paginatedList = await PaginatedList<Gorevlendirme>.CreateAsync(query, page, pageSize);
+            
+            return View(paginatedList);
+        }
+
+        private async Task PrepareFilterDropdowns(GorevlendirmeFilterViewModel filter)
+        {
+            ViewBag.Gorevliler = await _context.Gorevli
+                .OrderBy(g => g.Ad)
+                .ThenBy(g => g.Soyad)
+                .ToListAsync();
+            
+            ViewBag.Kurumlar = await _context.Kurum
+                .OrderBy(k => k.Isim)
+                .ToListAsync();
+            
+            ViewBag.Sehirler = await _context.Kurum
+                .Where(k => k.Sehir != null)
+                .Select(k => k.Sehir)
+                .Distinct()
+                .OrderBy(s => s)
+                .ToListAsync();
         }
 
         // GET: Gorevlendirme/Details/5
@@ -86,13 +121,14 @@ namespace DitibStasbourg.Controllers
         {
             ViewData["GorevliId"] = new SelectList(_context.Gorevli, "Id", "AdSoyad");
             ViewData["KurumId"] = new SelectList(_context.Kurum, "Id", "Isim");
+            ViewData["YerineGelecekGorevliId"] = new SelectList(_context.Gorevli, "Id", "AdSoyad");
             return View();
         }
 
         // POST: Gorevlendirme/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,GorevliId,KurumId,Tarih,BitisTarihi")] Gorevlendirme gorevlendirme)
+        public async Task<IActionResult> Create([Bind("Id,GorevliId,KurumId,Tarih,BitisTarihi,YerineGelecekGorevliId,YerineGelisPlanlananTarih,YerineGelisPlanlananBitisTarih")] Gorevlendirme gorevlendirme)
         {
             if (ModelState.IsValid)
             {
@@ -102,6 +138,7 @@ namespace DitibStasbourg.Controllers
             }
             ViewData["GorevliId"] = new SelectList(_context.Gorevli, "Id", "AdSoyad", gorevlendirme.GorevliId);
             ViewData["KurumId"] = new SelectList(_context.Kurum, "Id", "Isim", gorevlendirme.KurumId);
+            ViewData["YerineGelecekGorevliId"] = new SelectList(_context.Gorevli, "Id", "AdSoyad", gorevlendirme.YerineGelecekGorevliId);
             return View(gorevlendirme);
         }
 
@@ -112,16 +149,17 @@ namespace DitibStasbourg.Controllers
 
             var gorevlendirme = await _context.Gorevlendirme.FindAsync(id);
             if (gorevlendirme == null) return NotFound();
-
+            
             ViewData["GorevliId"] = new SelectList(_context.Gorevli, "Id", "AdSoyad", gorevlendirme.GorevliId);
             ViewData["KurumId"] = new SelectList(_context.Kurum, "Id", "Isim", gorevlendirme.KurumId);
+            ViewData["YerineGelecekGorevliId"] = new SelectList(_context.Gorevli, "Id", "AdSoyad", gorevlendirme.YerineGelecekGorevliId);
             return View(gorevlendirme);
         }
 
         // POST: Gorevlendirme/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,GorevliId,KurumId,Tarih,BitisTarihi")] Gorevlendirme gorevlendirme)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,GorevliId,KurumId,Tarih,BitisTarihi,YerineGelecekGorevliId,YerineGelisPlanlananTarih,YerineGelisPlanlananBitisTarih")] Gorevlendirme gorevlendirme)
         {
             if (id != gorevlendirme.Id) return NotFound();
 
@@ -141,6 +179,7 @@ namespace DitibStasbourg.Controllers
             }
             ViewData["GorevliId"] = new SelectList(_context.Gorevli, "Id", "AdSoyad", gorevlendirme.GorevliId);
             ViewData["KurumId"] = new SelectList(_context.Kurum, "Id", "Isim", gorevlendirme.KurumId);
+            ViewData["YerineGelecekGorevliId"] = new SelectList(_context.Gorevli, "Id", "AdSoyad", gorevlendirme.YerineGelecekGorevliId);
             return View(gorevlendirme);
         }
 
@@ -240,6 +279,51 @@ namespace DitibStasbourg.Controllers
         private bool GorevlendirmeExists(int id)
         {
             return _context.Gorevlendirme.Any(e => e.Id == id);
+        }
+
+        // Note Management
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddNote(int gorevlendirmeId, string notIcerik)
+        {
+            try
+            {
+                var not = new GorevlendirmeNot
+                {
+                    GorevlendirmeId = gorevlendirmeId,
+                    NotIcerik = notIcerik,
+                    Tarih = DateTime.Now
+                };
+
+                _context.GorevlendirmeNotlari.Add(not);
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteNote(int id)
+        {
+            try
+            {
+                var not = await _context.GorevlendirmeNotlari.FindAsync(id);
+                if (not == null) return Json(new { success = false });
+
+                _context.GorevlendirmeNotlari.Remove(not);
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
     }
 }

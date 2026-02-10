@@ -42,6 +42,18 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9TZXRQYXNzd29yZC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/DernekIslemleri/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRGVybmVrSXNsZW1sZXJpL0NyZWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/DernekIslemleri/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRGVybmVrSXNsZW1sZXJpL0luZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/DernekIslemleri/_DernekDetayPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRGVybmVrSXNsZW1sZXJpL19EZXJuZWtEZXRheVBhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Gorevlendirme/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvR29yZXZsZW5kaXJtZS9DcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
@@ -76,6 +88,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Gorevli/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvR29yZXZsaS9FZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Gorevli/Import.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvR29yZXZsaS9JbXBvcnQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Gorevli/Index.cshtml]
@@ -124,6 +140,154 @@ build_metadata.AdditionalFiles.CssScope =
 
 [/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/AskerlikDurumuCreate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0Fza2VybGlrRHVydW11Q3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/AskerlikDurumuDelete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0Fza2VybGlrRHVydW11RGVsZXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/AskerlikDurumuEdit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0Fza2VybGlrRHVydW11RWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/AskerlikDurumuList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0Fza2VybGlrRHVydW11TGlzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/EgitimDurumuCreate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0VnaXRpbUR1cnVtdUNyZWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/EgitimDurumuDelete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0VnaXRpbUR1cnVtdURlbGV0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/EgitimDurumuEdit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0VnaXRpbUR1cnVtdUVkaXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/EgitimDurumuList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0VnaXRpbUR1cnVtdUxpc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/GorevliDurumCreate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0dvcmV2bGlEdXJ1bUNyZWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/GorevliDurumDelete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0dvcmV2bGlEdXJ1bURlbGV0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/GorevliDurumEdit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0dvcmV2bGlEdXJ1bUVkaXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/GorevliDurumList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0dvcmV2bGlEdXJ1bUxpc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/HafizlikDurumuCreate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0hhZml6bGlrRHVydW11Q3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/HafizlikDurumuDelete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0hhZml6bGlrRHVydW11RGVsZXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/HafizlikDurumuEdit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0hhZml6bGlrRHVydW11RWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/HafizlikDurumuList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0hhZml6bGlrRHVydW11TGlzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0luZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/KadroTuruCreate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0thZHJvVHVydUNyZWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/KadroTuruDelete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0thZHJvVHVydURlbGV0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/KadroTuruEdit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0thZHJvVHVydUVkaXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/KadroTuruList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0thZHJvVHVydUxpc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/KanGrubuCreate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0thbkdydWJ1Q3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/KanGrubuDelete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0thbkdydWJ1RGVsZXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/KanGrubuEdit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0thbkdydWJ1RWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/KanGrubuList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0thbkdydWJ1TGlzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/KurumTuruCreate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0t1cnVtVHVydUNyZWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/KurumTuruDelete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0t1cnVtVHVydURlbGV0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/KurumTuruEdit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0t1cnVtVHVydUVkaXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/KurumTuruList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL0t1cnVtVHVydUxpc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/SozlesmeTipCreate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL1Nvemxlc21lVGlwQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/SozlesmeTipDelete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL1Nvemxlc21lVGlwRGVsZXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/SozlesmeTipEdit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL1Nvemxlc21lVGlwRWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/SozlesmeTipList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL1Nvemxlc21lVGlwTGlzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/UnvanCreate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL1VudmFuQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/UnvanDelete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL1VudmFuRGVsZXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/UnvanEdit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL1VudmFuRWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/Tanimlamalar/UnvanList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFuaW1sYW1hbGFyL1VudmFuTGlzdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Views/UserManagement/Create.cshtml]

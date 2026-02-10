@@ -1,0 +1,249 @@
+@model IEnumerable<DitibStasbourg.Models.Kurum>
+
+@{
+    ViewData["Title"] = "Dernek İşlemleri";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">Dernek İşlemleri</h1>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Yeni Dernek Ekle
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle" id="dernekTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Dernek Adı</th>
+                            <th>Başkonsolosluk Bölgesi</th>
+                            <th>Bölge</th>
+                            <th>Şehir</th>
+                            <th>Bağlı Kurum</th>
+                            <th>CRM Form Durumu</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="fw-bold">@item.Isim</td>
+                                <td>@item.BaskonsoloslukBolgesi</td>
+                                <td>@item.Bolge</td>
+                                <td>@item.Sehir</td>
+                                <td>@item.UstKurum?.Ad</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.CrmUyelikFormDurumu))
+                                    {
+                                        <span class="badge bg-info text-dark">@item.CrmUyelikFormDurumu</span>
+                                    }
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" type="button" onclick="toggleDetails(@item.Id)">
+                                        <i class="fas fa-chevron-down"></i> Detay / İşlemler
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr id="details-row-@item.Id" style="display: none;">
+                                <td colspan="7" class="p-0">
+                                    <div id="details-content-@item.Id" class="p-3 bg-light border-bottom">
+                                        <div class="text-center">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Yükleniyor...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleDetails(id) {
+            var row = document.getElementById('details-row-' + id);
+            var contentDiv = document.getElementById('details-content-' + id);
+            
+            if (row.style.display === 'none') {
+                row.style.display = 'table-row';
+                // Load content via AJAX if empty
+                 if (contentDiv.innerHTML.trim().length < 200 || contentDiv.querySelector('.spinner-border')) {
+                    fetch('/DernekIslemleri/GetDetay/' + id)
+                        .then(response => response.text())
+                        .then(html => {
+                            contentDiv.innerHTML = html;
+                        });
+                }
+            } else {
+                row.style.display = 'none';
+            }
+        }
+        
+        // Reload partial after updates
+        function reloadDetails(id) {
+             var contentDiv = document.getElementById('details-content-' + id);
+             fetch('/DernekIslemleri/GetDetay/' + id)
+                .then(response => response.text())
+                .then(html => {
+                    contentDiv.innerHTML = html;
+                });
+        }
+        
+        function toggleAddMember(id) {
+            var form = document.getElementById('add-member-form-' + id);
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function submitUpdateForm(formElement, dernekId, sectionName) {
+            var formData = new FormData(formElement);
+            
+            // Determine action based on form ID - use getAttribute to safely get string
+            var formId = formElement.getAttribute('id') || '';
+            var action = formId.includes('baskan') 
+                ? '/DernekIslemleri/UpdateBaskan'
+                : '/DernekIslemleri/UpdateDinGorevlisi';
+            
+            fetch(action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('success', sectionName + ' başarıyla güncellendi!');
+                    setTimeout(() => reloadDetails(dernekId), 500);
+                } else {
+                    showToast('error', 'Güncelleme sırasında hata oluştu.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('error', 'Güncelleme sırasında hata oluştu.');
+            });
+        }
+
+        function submitForm(formElement, dernekId) {
+            var formData = new FormData(formElement);
+            fetch(formElement.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    showToast('success', 'İşlem başarılı!');
+                    reloadDetails(dernekId);
+                } else {
+                    showToast('error', 'Hata oluştu.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('error', 'Hata oluştu.');
+            });
+        }
+        
+        function showToast(type, message) {
+            if (type === 'success') {
+                alert('✓ ' + message);
+            } else {
+                alert('✗ ' + message);
+            }
+        }
+        
+        function toggleEditMember(uyeId) {
+            // Hide display spans, show input fields
+            document.getElementById('display-adsoyad-' + uyeId).style.display = 'none';
+            document.getElementById('display-iletisim-' + uyeId).style.display = 'none';
+            document.getElementById('display-ailesayisi-' + uyeId).style.display = 'none';
+            document.getElementById('edit-adsoyad-' + uyeId).style.display = 'inline-block';
+            document.getElementById('edit-iletisim-' + uyeId).style.display = 'inline-block';
+            document.getElementById('edit-ailesayisi-' + uyeId).style.display = 'inline-block';
+            
+            // Toggle buttons
+            document.getElementById('btn-edit-' + uyeId).style.display = 'none';
+            document.getElementById('btn-save-' + uyeId).style.display = 'inline-block';
+            document.getElementById('btn-cancel-' + uyeId).style.display = 'inline-block';
+        }
+        
+        function cancelEditMember(uyeId) {
+            // Show display spans, hide input fields
+            document.getElementById('display-adsoyad-' + uyeId).style.display = 'inline';
+            document.getElementById('display-iletisim-' + uyeId).style.display = 'inline';
+            document.getElementById('display-ailesayisi-' + uyeId).style.display = 'inline';
+            document.getElementById('edit-adsoyad-' + uyeId).style.display = 'none';
+            document.getElementById('edit-iletisim-' + uyeId).style.display = 'none';
+            document.getElementById('edit-ailesayisi-' + uyeId).style.display = 'none';
+            
+            // Toggle buttons
+            document.getElementById('btn-edit-' + uyeId).style.display = 'inline-block';
+            document.getElementById('btn-save-' + uyeId).style.display = 'none';
+            document.getElementById('btn-cancel-' + uyeId).style.display = 'none';
+        }
+        
+        function saveMember(uyeId, dernekId) {
+            var adSoyad = document.getElementById('edit-adsoyad-' + uyeId).value;
+            var iletisim = document.getElementById('edit-iletisim-' + uyeId).value;
+            var aileSayisi = document.getElementById('edit-ailesayisi-' + uyeId).value;
+            
+            var formData = new FormData();
+            formData.append('id', uyeId);
+            formData.append('adSoyad', adSoyad);
+            formData.append('iletisim', iletisim);
+            formData.append('aileUyeSayisi', aileSayisi);
+            formData.append('kurumId', dernekId);
+            
+            // Get antiforgery token
+            var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            formData.append('__RequestVerificationToken', token);
+            
+            fetch('/DernekIslemleri/UpdateUye', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('success', 'Üye bilgileri güncellendi!');
+                    setTimeout(() => reloadDetails(dernekId), 500);
+                } else {
+                    showToast('error', 'Güncelleme başarısız.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('error', 'Bir hata oluştu.');
+            });
+        }
+        
+        function submitUpdateDernek(formElement, dernekId) {
+            var formData = new FormData(formElement);
+            
+            fetch('/DernekIslemleri/UpdateDernek', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('success', 'Dernek bilgileri güncellendi!');
+                    setTimeout(() => reloadDetails(dernekId), 500);
+                } else {
+                    showToast('error', 'Güncelleme başarısız.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('error', 'Bir hata oluştu.');
+            });
+        }
+    </script>
+}

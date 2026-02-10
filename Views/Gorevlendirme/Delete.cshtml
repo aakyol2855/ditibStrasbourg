@@ -18,6 +18,12 @@
             @Model.Tarih.ToShortDateString()
         </dd>
         <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.BitisTarihi)
+        </dt>
+        <dd class = "col-sm-10">
+            @(Model.BitisTarihi.HasValue ? Model.BitisTarihi.Value.ToShortDateString() : "-")
+        </dd>
+        <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Gorevli)
         </dt>
         <dd class = "col-sm-10">

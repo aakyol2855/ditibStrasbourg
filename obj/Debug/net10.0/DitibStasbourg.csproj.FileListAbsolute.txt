@@ -14,6 +14,8 @@
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/bin/Debug/net10.0/ClosedXML.Parser.dll
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/bin/Debug/net10.0/DocumentFormat.OpenXml.dll
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/bin/Debug/net10.0/DocumentFormat.OpenXml.Framework.dll
+/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/bin/Debug/net10.0/EPPlus.dll
+/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/bin/Debug/net10.0/EPPlus.Interfaces.dll
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/bin/Debug/net10.0/ExcelNumberFormat.dll
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/bin/Debug/net10.0/Humanizer.dll
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/bin/Debug/net10.0/Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore.dll
@@ -45,6 +47,7 @@
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/bin/Debug/net10.0/Microsoft.IdentityModel.Protocols.dll
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/bin/Debug/net10.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/bin/Debug/net10.0/Microsoft.IdentityModel.Tokens.dll
+/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/bin/Debug/net10.0/Microsoft.IO.RecyclableMemoryStream.dll
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/bin/Debug/net10.0/Microsoft.SqlServer.Server.dll
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/bin/Debug/net10.0/Microsoft.VisualStudio.SolutionPersistence.dll
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/bin/Debug/net10.0/Mono.TextTemplating.dll
@@ -182,6 +185,7 @@
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/DitibStasbourg.MvcApplicationPartsAssemblyInfo.cache
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/DitibStasbourg.RazorAssemblyInfo.cache
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/DitibStasbourg.RazorAssemblyInfo.cs
+/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/DitibStasbourg.sourcelink.json
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/rjimswa.dswa.cache.json
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/rjsmrazor.dswa.cache.json
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json
@@ -250,6 +254,7 @@
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/compressed/nezrqnk58p-{0}-muycvpuwrr-muycvpuwrr.gz
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/compressed/v0zgfp0y55-{0}-87fc7y1x7t-87fc7y1x7t.gz
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/compressed/yfc7ypekbg-{0}-mlv21k5csn-mlv21k5csn.gz
+/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/compressed/2tgqt6bjes-{0}-xnc7kmedw3-xnc7kmedw3.gz
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/compressed/6mbzvqr28c-{0}-61n19gt1b8-61n19gt1b8.gz
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/compressed/d0s0wodx65-{0}-fr7q2aak1r-fr7q2aak1r.gz
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/compressed/f622921lj2-{0}-bqjiyaj88i-bqjiyaj88i.gz
@@ -324,7 +329,3 @@
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/DitibStasbourg.pdb
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/DitibStasbourg.genruntimeconfig.cache
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/ref/DitibStasbourg.dll
-/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/bin/Debug/net10.0/EPPlus.dll
-/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/bin/Debug/net10.0/EPPlus.Interfaces.dll
-/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/bin/Debug/net10.0/Microsoft.IO.RecyclableMemoryStream.dll
-/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/compressed/2tgqt6bjes-{0}-xnc7kmedw3-xnc7kmedw3.gz

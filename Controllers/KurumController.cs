@@ -2,9 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DitibStasbourg.Data;
 using DitibStasbourg.Models;
+using DitibStasbourg.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DitibStasbourg.Controllers
 {
+    [Authorize(Roles = "SuperAdmin")]
     public class KurumController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -15,9 +18,70 @@ namespace DitibStasbourg.Controllers
         }
 
         // GET: Kurum
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(KurumFilterViewModel filter, int page = 1)
         {
-            return View(await _context.Kurum.ToListAsync());
+            await PrepareFilterDropdowns(filter);
+            
+            var query = _context.Kurum
+                .Include(k => k.UstKurum)
+                .Include(k => k.Gorevlendirmeler)
+                    .ThenInclude(g => g.Gorevli)
+                    .ThenInclude(gov => gov.GorevliDurumBilgisi)
+                .Include(k => k.Gorevlendirmeler)
+                    .ThenInclude(g => g.Gorevli)
+                    .ThenInclude(gov => gov.GorevliNotlari)
+                .AsQueryable();
+
+            // Apply filters
+            if (!string.IsNullOrEmpty(filter.SearchString))
+            {
+                query = query.Where(k => k.Isim.Contains(filter.SearchString) || 
+                                        (k.Adres != null && k.Adres.Contains(filter.SearchString)));
+            }
+
+            if (filter.Tip.HasValue)
+            {
+                query = query.Where(k => k.Tip == filter.Tip.Value);
+            }
+
+            if (!string.IsNullOrEmpty(filter.Sehir))
+            {
+                query = query.Where(k => k.Sehir == filter.Sehir);
+            }
+
+            if (filter.AktifMi.HasValue)
+            {
+                query = query.Where(k => k.AktifMi == filter.AktifMi.Value);
+            }
+
+            if (filter.UstKurumId.HasValue)
+            {
+                query = query.Where(k => k.UstKurumId == filter.UstKurumId.Value);
+            }
+
+            query = query.OrderBy(k => k.Isim);
+
+            ViewData["Filter"] = filter;
+            
+            int pageSize = 20;
+            var paginatedList = await PaginatedList<Kurum>.CreateAsync(query, page, pageSize);
+            
+            return View(paginatedList);
+        }
+
+        private async Task PrepareFilterDropdowns(KurumFilterViewModel filter)
+        {
+            ViewBag.Sehirler = await _context.Kurum
+                .Where(k => k.Sehir != null)
+                .Select(k => k.Sehir)
+                .Distinct()
+                .OrderBy(s => s)
+                .ToListAsync();
+            
+            ViewBag.UstKurumlar = await _context.Ref_KurumTurus
+                .Where(k => !k.IsDeleted)
+                .OrderBy(k => k.Ad)
+                .ToListAsync();
         }
 
         // GET: Kurum/Details/5
@@ -29,6 +93,10 @@ namespace DitibStasbourg.Controllers
             }
 
             var kurum = await _context.Kurum
+                .Include(k => k.UstKurum)
+                .Include(k => k.Gorevlendirmeler)
+                .ThenInclude(g => g.Gorevli)
+                .ThenInclude(gov => gov.GorevliDurumBilgisi)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (kurum == null)
             {
@@ -41,13 +109,14 @@ namespace DitibStasbourg.Controllers
         // GET: Kurum/Create
         public IActionResult Create()
         {
+            ViewData["UstKurumId"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(_context.Ref_KurumTurus, "Id", "Ad");
             return View();
         }
 
         // POST: Kurum/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Isim,Adres,Tip")] Kurum kurum)
+        public async Task<IActionResult> Create([Bind("Id,Isim,Adres,Tip,Sehir,AktifMi,UstKurumId")] Kurum kurum)
         {
             if (ModelState.IsValid)
             {
@@ -71,13 +140,14 @@ namespace DitibStasbourg.Controllers
             {
                 return NotFound();
             }
+            ViewData["UstKurumId"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(_context.Ref_KurumTurus, "Id", "Ad", kurum.UstKurumId);
             return View(kurum);
         }
 
         // POST: Kurum/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Isim,Adres,Tip")] Kurum kurum)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Isim,Adres,Tip,Sehir,AktifMi,UstKurumId")] Kurum kurum)
         {
             if (id != kurum.Id)
             {

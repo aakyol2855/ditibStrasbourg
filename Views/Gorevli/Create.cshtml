@@ -9,32 +9,262 @@
 <h4>Görevli Bilgileri</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-12">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group mb-3">
-                <label asp-for="Ad" class="control-label"></label>
-                <input asp-for="Ad" class="form-control" />
-                <span asp-validation-for="Ad" class="text-danger"></span>
+
+            <div class="row">
+                <!-- Temel Bilgiler -->
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Temel Bilgiler</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 form-group mb-3">
+                                    <label asp-for="Ad" class="control-label"></label>
+                                    <input asp-for="Ad" class="form-control" />
+                                    <span asp-validation-for="Ad" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6 form-group mb-3">
+                                    <label asp-for="Soyad" class="control-label"></label>
+                                    <input asp-for="Soyad" class="form-control" />
+                                    <span asp-validation-for="Soyad" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label asp-for="Email" class="control-label"></label>
+                                <input asp-for="Email" class="form-control" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 form-group mb-3">
+                                    <label asp-for="GorevliDurumId" class="control-label"></label>
+                                    <select asp-for="GorevliDurumId" class="form-control" asp-items="@(new SelectList(ViewBag.Durumlar, "Id", "Ad"))">
+                                        <option value="">Seçiniz</option>
+                                    </select>
+                                    <span asp-validation-for="GorevliDurumId" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6 form-group mb-3">
+                                    <label asp-for="SozlesmeTipId" class="control-label"></label>
+                                    <select asp-for="SozlesmeTipId" class="form-control" asp-items="@(new SelectList(ViewBag.SozlesmeTipleri, "Id", "Ad"))">
+                                        <option value="">Seçiniz</option>
+                                    </select>
+                                    <span asp-validation-for="SozlesmeTipId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 form-group mb-3">
+                                    <label asp-for="Cinsiyet" class="control-label"></label>
+                                    <select asp-for="Cinsiyet" class="form-control">
+                                        <option value="">Seçiniz</option>
+                                        <option value="E">Erkek</option>
+                                        <option value="K">Kadın</option>
+                                    </select>
+                                    <span asp-validation-for="Cinsiyet" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6 form-group mb-3">
+                                    <label asp-for="FotografYolu" class="control-label"></label>
+                                    <input asp-for="FotografYolu" class="form-control" placeholder="Dosya Yolu (Şimdilik)" />
+                                    <span asp-validation-for="FotografYolu" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kimlik & İletişim -->
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">Kimlik ve İletişim</h5>
+                        </div>
+                        <div class="card-body">
+                             <div class="form-group mb-3">
+                                <label asp-for="TCKimlikNo" class="control-label"></label>
+                                <input asp-for="TCKimlikNo" class="form-control" maxlength="11" />
+                                <span asp-validation-for="TCKimlikNo" class="text-danger"></span>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 form-group mb-3">
+                                    <label asp-for="BabaAdi" class="control-label"></label>
+                                    <input asp-for="BabaAdi" class="form-control" />
+                                    <span asp-validation-for="BabaAdi" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6 form-group mb-3">
+                                    <label asp-for="AnneAdi" class="control-label"></label>
+                                    <input asp-for="AnneAdi" class="form-control" />
+                                    <span asp-validation-for="AnneAdi" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 form-group mb-3">
+                                    <label asp-for="DogumYeri" class="control-label"></label>
+                                    <input asp-for="DogumYeri" class="form-control" />
+                                    <span asp-validation-for="DogumYeri" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6 form-group mb-3">
+                                    <label asp-for="DogumTarihi" class="control-label"></label>
+                                    <input asp-for="DogumTarihi" class="form-control" type="date" />
+                                    <span asp-validation-for="DogumTarihi" class="text-danger"></span>
+                                </div>
+                            </div>
+                             <div class="row">
+                                <div class="col-md-6 form-group mb-3">
+                                    <label asp-for="CepTelefonu" class="control-label"></label>
+                                    <input asp-for="CepTelefonu" class="form-control" />
+                                    <span asp-validation-for="CepTelefonu" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6 form-group mb-3">
+                                    <label asp-for="EvTelefonu" class="control-label"></label>
+                                    <input asp-for="EvTelefonu" class="form-control" />
+                                    <span asp-validation-for="EvTelefonu" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Görev ve Kadro -->
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0">Görev ve Kadro Bilgileri</h5>
+                        </div>
+                        <div class="card-body">
+                             <div class="row">
+                                <div class="col-md-6 form-group mb-3">
+                                    <label asp-for="UnvanId" class="control-label"></label>
+                                    <select asp-for="UnvanId" class="form-control" asp-items="@(new SelectList(ViewBag.Unvanlar, "Id", "Ad"))">
+                                        <option value="">Seçiniz</option>
+                                    </select>
+                                    <span asp-validation-for="UnvanId" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6 form-group mb-3">
+                                    <label asp-for="KadroTuruId" class="control-label"></label>
+                                    <select asp-for="KadroTuruId" class="form-control" asp-items="@(new SelectList(ViewBag.KadroTurleri, "Id", "Ad"))">
+                                        <option value="">Seçiniz</option>
+                                    </select>
+                                    <span asp-validation-for="KadroTuruId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 form-group mb-3">
+                                    <label asp-for="AskerlikDurumuId" class="control-label"></label>
+                                   <select asp-for="AskerlikDurumuId" class="form-control" asp-items="@(new SelectList(ViewBag.AskerlikDurumlari, "Id", "Ad"))">
+                                        <option value="">Seçiniz</option>
+                                    </select>
+                                    <span asp-validation-for="AskerlikDurumuId" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6 form-group mb-3">
+                                    <label asp-for="KanGrubuId" class="control-label"></label>
+                                    <select asp-for="KanGrubuId" class="form-control" asp-items="@(new SelectList(ViewBag.KanGruplari, "Id", "Ad"))">
+                                        <option value="">Seçiniz</option>
+                                    </select>
+                                    <span asp-validation-for="KanGrubuId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Eğitim Bilgileri -->
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">Eğitim Bilgileri</h5>
+                        </div>
+                        <div class="card-body">
+                             <div class="row">
+                                <div class="col-md-6 form-group mb-3">
+                                    <label asp-for="EgitimDurumuId" class="control-label"></label>
+                                    <select asp-for="EgitimDurumuId" class="form-control" asp-items="@(new SelectList(ViewBag.EgitimDurumlari, "Id", "Ad"))">
+                                        <option value="">Seçiniz</option>
+                                    </select>
+                                    <span asp-validation-for="EgitimDurumuId" class="text-danger"></span>
+                                </div>
+                                 <div class="col-md-6 form-group mb-3">
+                                    <label asp-for="HafizlikDurumuId" class="control-label"></label>
+                                    <select asp-for="HafizlikDurumuId" class="form-control" asp-items="@(new SelectList(ViewBag.HafizlikDurumlari, "Id", "Ad"))">
+                                        <option value="">Seçiniz</option>
+                                    </select>
+                                    <span asp-validation-for="HafizlikDurumuId" class="text-danger"></span>
+                                </div>
+                            </div>
+                             <div class="form-group mb-3">
+                                <label asp-for="MezuniyetOkul" class="control-label"></label>
+                                <input asp-for="MezuniyetOkul" class="form-control" />
+                                <span asp-validation-for="MezuniyetOkul" class="text-danger"></span>
+                            </div>
+                             <div class="form-group mb-3">
+                                <label asp-for="MezuniyetBolum" class="control-label"></label>
+                                <input asp-for="MezuniyetBolum" class="form-control" />
+                                <span asp-validation-for="MezuniyetBolum" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                 <!-- Kariyer Bilgileri -->
+                <div class="col-md-12 mb-4">
+                    <div class="card">
+                        <div class="card-header bg-secondary text-white">
+                            <h5 class="mb-0">Kariyer Bilgileri</h5>
+                        </div>
+                         <div class="card-body">
+                             <div class="row">
+                                <div class="col-md-3 form-group mb-3">
+                                    <label asp-for="Derece" class="control-label"></label>
+                                    <input asp-for="Derece" class="form-control" />
+                                    <span asp-validation-for="Derece" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-3 form-group mb-3">
+                                    <label asp-for="Kademe" class="control-label"></label>
+                                    <input asp-for="Kademe" class="form-control" />
+                                    <span asp-validation-for="Kademe" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6 form-group mb-3">
+                                    <label asp-for="IlkGoreveBaslamaTarihi" class="control-label"></label>
+                                    <input asp-for="IlkGoreveBaslamaTarihi" class="form-control" type="date" />
+                                    <span asp-validation-for="IlkGoreveBaslamaTarihi" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6 form-group mb-3">
+                                    <label asp-for="EmeklilikTarihi" class="control-label"></label>
+                                    <input asp-for="EmeklilikTarihi" class="form-control" type="date" />
+                                    <span asp-validation-for="EmeklilikTarihi" class="text-danger"></span>
+                                    <small class="text-muted">Emekli görevliler de görevlendirilebilir</small>
+                                </div>
+                            </div>
+                            <div class="form-group mb-3">
+                                    <label asp-for="DiyanetGirisTarihi" class="control-label"></label>
+                                    <input asp-for="DiyanetGirisTarihi" class="form-control" type="date" />
+                                    <span asp-validation-for="DiyanetGirisTarihi" class="text-danger"></span>
+                                </div>
+                         </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group mb-3">
-                <label asp-for="Soyad" class="control-label"></label>
-                <input asp-for="Soyad" class="form-control" />
-                <span asp-validation-for="Soyad" class="text-danger"></span>
+
+            <!-- Notlar -->
+            <div class="col-md-12 mb-4">
+                <div class="card">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0"><i class="fas fa-sticky-note me-2"></i>Notlar (İsteğe Bağlı)</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="IlkNot" class="control-label">İlk Not</label>
+                            <textarea name="IlkNot" id="IlkNot" class="form-control" rows="4" placeholder="Görevli hakkında ek bilgiler veya notlar ekleyebilirsiniz..."></textarea>
+                            <small class="text-muted">Bu alan isteğe bağlıdır. Görevli kaydı oluşturulurken eklenecek bir notunuz varsa buraya yazabilirsiniz.</small>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group mb-3">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="Durum" class="control-label">Durum</label>
-                <select asp-for="Durum" class="form-control" asp-items="Html.GetEnumSelectList<DitibStasbourg.Models.GorevliDurum>()"></select>
-                <span asp-validation-for="Durum" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Ekle" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">Listeye Dön</a>
+
+            <div class="form-group text-center mt-3">
+                <input type="submit" value="Kaydet" class="btn btn-primary btn-lg px-5" />
+                <a asp-action="Index" class="btn btn-secondary btn-lg">İptal</a>
             </div>
         </form>
     </div>

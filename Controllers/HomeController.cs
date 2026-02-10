@@ -39,6 +39,21 @@ public class HomeController : Controller
         return View();
     }
 
+    public async Task<IActionResult> SeedTestData()
+    {
+        try
+        {
+            await TestDataSeeder.SeedTestDataAsync(_context);
+            return Content("✅ Test verileri başarıyla eklendi!\n\n" +
+                "5 Cami, 8 Görevli, 8 Görevlendirme, 3 Dernek + Üyeler\n\n" +
+                "Sistemi test edebilirsiniz!");
+        }
+        catch (Exception ex)
+        {
+            return Content($"❌ Hata: {ex.Message}");
+        }
+    }
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {

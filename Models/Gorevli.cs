@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DitibStasbourg.Models
 {
@@ -21,8 +22,116 @@ namespace DitibStasbourg.Models
         [Display(Name = "Ad Soyad")]
         public string AdSoyad => $"{Ad} {Soyad}";
 
+        [Display(Name = "Cinsiyet")]
+        public string? Cinsiyet { get; set; } // 'E' or 'K'
+
+        [Display(Name = "Görevli Durumu")]
+        public int? GorevliDurumId { get; set; }
+
+        [ForeignKey("GorevliDurumId")]
+        public Ref_GorevliDurum? GorevliDurumBilgisi { get; set; }
+
+        [Display(Name = "Sözleşme Tipi")]
+        public int? SozlesmeTipId { get; set; }
+
+        [ForeignKey("SozlesmeTipId")]
+        public Ref_SozlesmeTip? SozlesmeTip { get; set; }
+
+        // Identity
+        [Display(Name = "TC Kimlik No")]
+        [StringLength(11)]
+        public string? TCKimlikNo { get; set; }
+
+        [Display(Name = "Baba Adı")]
+        public string? BabaAdi { get; set; }
+
+        [Display(Name = "Anne Adı")]
+        public string? AnneAdi { get; set; }
+
+        [Display(Name = "Doğum Yeri")]
+        public string? DogumYeri { get; set; }
+
+        [Display(Name = "Doğum Tarihi")]
+        [DataType(DataType.Date)]
+        public DateTime? DogumTarihi { get; set; }
+
+        // Contact
+        [Display(Name = "Cep Telefonu")]
+        public string? CepTelefonu { get; set; }
+
+        [Display(Name = "Ev Telefonu")]
+        public string? EvTelefonu { get; set; }
+
+        [Display(Name = "Adres")]
+        [StringLength(500)]
+        public string? Adres { get; set; }
+
+        // Education
+        [Display(Name = "Eğitim Durumu")]
+        public int? EgitimDurumuId { get; set; }
+        [ForeignKey("EgitimDurumuId")]
+        public Ref_EgitimDurumu? EgitimDurumu { get; set; }
+
+        [Display(Name = "Mezuniyet Okul")]
+        public string? MezuniyetOkul { get; set; }
+
+        [Display(Name = "Mezuniyet Bölüm")]
+        public string? MezuniyetBolum { get; set; }
+
+        [Display(Name = "Hafızlık Durumu")]
+        public int? HafizlikDurumuId { get; set; }
+        [ForeignKey("HafizlikDurumuId")]
+        public Ref_HafizlikDurumu? HafizlikDurumu { get; set; }
+
+        // Employment
+        [Display(Name = "Ünvan")]
+        public int? UnvanId { get; set; }
+        [ForeignKey("UnvanId")]
+        public Ref_Unvan? Unvan { get; set; }
+
+        [Display(Name = "Kadro Türü")]
+        public int? KadroTuruId { get; set; }
+        [ForeignKey("KadroTuruId")]
+        public Ref_KadroTuru? KadroTuru { get; set; }
+
+        [Display(Name = "Askerlik Durumu")]
+        public int? AskerlikDurumuId { get; set; }
+        [ForeignKey("AskerlikDurumuId")]
+        public Ref_AskerlikDurumu? AskerlikDurumu { get; set; }
+
+        [Display(Name = "Kan Grubu")]
+        public int? KanGrubuId { get; set; }
+        [ForeignKey("KanGrubuId")]
+        public Ref_KanGrubu? KanGrubu { get; set; }
+
+        // Career
+        [Display(Name = "Derece")]
+        public string? Derece { get; set; }
+
+        [Display(Name = "Kademe")]
+        public string? Kademe { get; set; }
+
+        [Display(Name = "İlk Göreve Başlama Tarihi")]
+        [DataType(DataType.Date)]
+        public DateTime? IlkGoreveBaslamaTarihi { get; set; }
+
+        [Display(Name = "Emeklilik Tarihi")]
+        [DataType(DataType.Date)]
+        public DateTime? EmeklilikTarihi { get; set; }
+
+        [Display(Name = "Diyanet Giriş Tarihi")]
+        [DataType(DataType.Date)]
+        public DateTime? DiyanetGirisTarihi { get; set; }
+
+        // Other
+        [Display(Name = "Fotoğraf Yolu")]
+        public string? FotografYolu { get; set; }
+
         // Navigation property for assignments
         public ICollection<Gorevlendirme> Gorevlendirmeler { get; set; } = new List<Gorevlendirme>();
+
+        public ICollection<GorevGecmisi> GorevGecmisleri { get; set; } = new List<GorevGecmisi>();
+        public ICollection<GorevliNot> GorevliNotlari { get; set; } = new List<GorevliNot>();
 
         [System.ComponentModel.DataAnnotations.Schema.NotMapped]
         [Display(Name = "Görevde mi?")]
@@ -30,7 +139,7 @@ namespace DitibStasbourg.Models
                       DateTime.Now.Date >= g.Tarih.Date && 
                       (!g.BitisTarihi.HasValue || DateTime.Now.Date <= g.BitisTarihi.Value.Date));
         
-        [Display(Name = "Durum")]
+        [Display(Name = "Eski Durum (Deprecated)")]
         public GorevliDurum Durum { get; set; } = GorevliDurum.Notr;
     }
 

@@ -29,5 +29,23 @@ namespace DitibStasbourg.Models
         [Display(Name = "Bitiş Tarihi")]
         [DataType(DataType.Date)]
         public DateTime? BitisTarihi { get; set; }
+
+        // Replacement Planning
+        [Display(Name = "Yerine Gelecek Görevli")]
+        public int? YerineGelecekGorevliId { get; set; }
+
+        [ForeignKey("YerineGelecekGorevliId")]
+        public Gorevli? YerineGelecekGorevli { get; set; }
+
+        [Display(Name = "Yerine Geliş Planlanan Tarih")]
+        [DataType(DataType.Date)]
+        public DateTime? YerineGelisPlanlananTarih { get; set; }
+
+        [Display(Name = "Yerine Gelen Görev Bitiş Tarihi")]
+        [DataType(DataType.Date)]
+        public DateTime? YerineGelisPlanlananBitisTarih { get; set; }
+
+        // Navigation
+        public ICollection<GorevlendirmeNot>? GorevlendirmeNotlari { get; set; }
     }
 }

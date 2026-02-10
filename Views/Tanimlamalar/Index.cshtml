@@ -1,0 +1,102 @@
+@{
+    ViewData["Title"] = "Tanımlamalar";
+}
+
+<h1>Sistem Tanımlamaları</h1>
+<p class="lead">
+    Bu sayfadan sistemdeki dinamik referans tablolarını yönetebilirsiniz.
+</p>
+
+<div class="row mt-4 g-4">
+
+    <div class="col-md-4 col-lg-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Görevli Durumları</h5>
+                <p class="card-text">Personel durum tanımları (Yeşil, Kırmızı, Pasif vb.)</p>
+                <a asp-action="GorevliDurumList" class="btn btn-primary">Yönet</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 col-lg-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Sözleşme Tipleri</h5>
+                <p class="card-text">Sözleşme türleri (Dernek, Vakıf vb.)</p>
+                <a asp-action="SozlesmeTipList" class="btn btn-primary">Yönet</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 col-lg-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Kurum Türleri</h5>
+                <p class="card-text">Kurum üst yapıları ve türleri.</p>
+                <a asp-action="KurumTuruList" class="btn btn-primary">Yönet</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 col-lg-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Ünvanlar</h5>
+                <p class="card-text">İmam, Müezzin vb.</p>
+                <a asp-action="UnvanList" class="btn btn-primary">Yönet</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 col-lg-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Eğitim Durumları</h5>
+                <p class="card-text">Lisans, Lise vb.</p>
+                <a asp-action="EgitimDurumuList" class="btn btn-primary">Yönet</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 col-lg-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Hafızlık Durumları</h5>
+                <p class="card-text">Hafızlık bilgisi.</p>
+                <a asp-action="HafizlikDurumuList" class="btn btn-primary">Yönet</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 col-lg-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Kadro Türleri</h5>
+                <p class="card-text">İstihdam türleri.</p>
+                <a asp-action="KadroTuruList" class="btn btn-primary">Yönet</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 col-lg-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Askerlik Durumları</h5>
+                <p class="card-text">Askerlik durumu.</p>
+                <a asp-action="AskerlikDurumuList" class="btn btn-primary">Yönet</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 col-lg-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Kan Grupları</h5>
+                <p class="card-text">Kan grubu tanımları.</p>
+                <a asp-action="KanGrubuList" class="btn btn-primary">Yönet</a>
+            </div>
+        </div>
+    </div>
+
+</div>

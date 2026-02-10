@@ -29,6 +29,24 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Email)
         </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.GorevliDurumBilgisi)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.GorevliDurumBilgisi.Ad)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SozlesmeTip)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SozlesmeTip.Ad)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Cinsiyet)
+        </dt>
+        <dd class="col-sm-10">
+            @(Model.Cinsiyet == "E" ? "Erkek" : Model.Cinsiyet == "K" ? "Kadın" : "-")
+        </dd>
 
     </dl>
     

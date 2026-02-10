@@ -8,25 +8,141 @@
 }
 
 <style>
-    .status-yesil { border-left: 5px solid #28a745 !important; background-color: #f0fff4; }
-    .status-turuncu { border-left: 5px solid #fd7e14 !important; background-color: #fff9f0; }
-    .status-kirmizi { border-left: 5px solid #dc3545 !important; background-color: #fff0f0; }
-    .status-notr { border-left: 5px solid #6c757d !important; background-color: #f8f9fa; }
     .accordion-button:not(.collapsed) { background-color: #e7f1ff; }
 </style>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1>Görevliler</h1>
-    <a asp-action="Create" class="btn btn-primary"><i class="fas fa-plus"></i> Yeni Ekle</a>
+    <div>
+        <button type="button" id="btnExportExcel" class="btn btn-success me-2">
+            <i class="fas fa-file-excel me-2"></i>Excel'e Aktar
+        </button>
+        @if (User.IsInRole("SuperAdmin"))
+        {
+            <a asp-action="Import" class="btn btn-success me-2"><i class="fas fa-file-excel"></i> Excel'den Yükle</a>
+        }
+        <a asp-action="Create" class="btn btn-primary"><i class="fas fa-plus"></i> Yeni Ekle</a>
+    </div>
 </div>
 
-<form asp-action="Index" method="get" class="mb-4">
-    <div class="input-group">
-        <input type="text" name="SearchString" class="form-control" placeholder="İsim veya E-posta ara..." value="@ViewData["CurrentFilter"]" />
-        <button class="btn btn-outline-secondary" type="submit">Ara</button>
-        <a asp-action="Index" class="btn btn-outline-secondary">Tümünü Gör</a>
+@{
+    var filter = ViewData["Filter"] as DitibStasbourg.Models.ViewModels.GorevliFilterViewModel ?? new DitibStasbourg.Models.ViewModels.GorevliFilterViewModel();
+}
+
+<div class="accordion mb-4" id="filterAccordion">
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="headingFilter">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
+                <i class="fas fa-filter me-2"></i> Gelişmiş Filtreleme
+            </button>
+        </h2>
+        <div id="collapseFilter" class="accordion-collapse collapse @(!string.IsNullOrEmpty(filter.SearchString) || filter.GorevliDurumIds?.Any() == true ? "show" : "")" aria-labelledby="headingFilter" data-bs-parent="#filterAccordion">
+            <div class="accordion-body">
+                <form asp-action="Index" method="get">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Arama (İsim, Soyad, E-posta)</label>
+                            <select name="StaffIds" id="staffSearch" class="form-select" multiple="multiple">
+                                <!-- Options will be loaded via AJAX autocomplete -->
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Kurum</label>
+                            <select name="KurumId" class="form-select" asp-items="@(new SelectList(ViewBag.Kurumlar, "Id", "Isim", filter.KurumId))">
+                                <option value="">Tümü</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Şehir</label>
+                            <select name="Sehir" class="form-select" asp-items="@(new SelectList(ViewBag.Sehirler, filter.Sehir))">
+                                <option value="">Tümü</option>
+                            </select>
+                        </div>
+                        
+                         <div class="col-md-3">
+                            <label class="form-label">Sözleşme Tipi</label>
+                            <select name="SozlesmeTipId" class="form-select" asp-items="@(new SelectList(ViewBag.SozlesmeTipleri, "Id", "Ad", filter.SozlesmeTipId))">
+                                <option value="">Tümü</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Cinsiyet</label>
+                            <select name="Cinsiyet" class="form-select">
+                                <option value="">Tümü</option>
+                                <option value="E" selected="@(filter.Cinsiyet == "E")">Erkek</option>
+                                <option value="K" selected="@(filter.Cinsiyet == "K")">Kadın</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Aktiflik</label>
+                            <select name="IsActive" class="form-select">
+                                <option value="">Hepsi</option>
+                                <option value="true" selected="@(filter.IsActive == true)">Aktif Görevde</option>
+                                <option value="false" selected="@(filter.IsActive == false)">Pasif / Görevde Değil</option>
+                            </select>
+                        </div>
+
+                        <!-- Yeni Filtreler -->
+                        <div class="col-md-3">
+                            <label class="form-label">Ünvan</label>
+                            <select name="UnvanIds" class="form-select" multiple asp-items="@(new SelectList(ViewBag.Unvanlar, "Id", "Ad", filter.UnvanIds))">
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Eğitim Durumu</label>
+                            <select name="EgitimDurumuIds" class="form-select" multiple asp-items="@(new SelectList(ViewBag.EgitimDurumlari, "Id", "Ad", filter.EgitimDurumuIds))">
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Hafızlık</label>
+                            <select name="HafizlikDurumuIds" class="form-select" multiple asp-items="@(new SelectList(ViewBag.HafizlikDurumlari, "Id", "Ad", filter.HafizlikDurumuIds))">
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Kadro Türü</label>
+                            <select name="KadroTuruIds" class="form-select" multiple asp-items="@(new SelectList(ViewBag.KadroTurleri, "Id", "Ad", filter.KadroTuruIds))">
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Kan Grubu</label>
+                            <select name="KanGrubuIds" class="form-select" multiple asp-items="@(new SelectList(ViewBag.KanGruplari, "Id", "Ad", filter.KanGrubuIds))">
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                             <label class="form-label">Askerlik Durumu</label>
+                             <select name="AskerlikDurumuIds" class="form-select" multiple asp-items="@(new SelectList(ViewBag.AskerlikDurumlari, "Id", "Ad", filter.AskerlikDurumuIds))">
+                             </select>
+                        </div>
+                        
+                         <div class="col-md-12">
+                            <label class="form-label d-block">Görevli Durumu</label>
+                            <div class="d-flex flex-wrap gap-3">
+                                @if (ViewBag.Durumlar != null)
+                                {
+                                    foreach (var durum in (List<DitibStasbourg.Models.Ref_GorevliDurum>)ViewBag.Durumlar)
+                                    {
+                                        var isChecked = filter.GorevliDurumIds != null && filter.GorevliDurumIds.Contains(durum.Id);
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="GorevliDurumIds" value="@durum.Id" id="status_@durum.Id" @(isChecked ? "checked" : "")>
+                                            <label class="form-check-label badge" style="background-color: @(durum.Renk ?? "gray"); color: white; cursor: pointer;" for="status_@durum.Id">
+                                                @durum.Ad
+                                            </label>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 text-end">
+                            <a asp-action="Index" class="btn btn-outline-secondary me-2">Temizle</a>
+                            <button type="submit" class="btn btn-primary">Filtrele</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-</form>
+</div>
 
 <div class="row mb-2 fw-bold text-muted border-bottom pb-2 d-none d-md-flex">
     <div class="col-md-3">
@@ -57,17 +173,36 @@
         var earliestStart = item.Gorevlendirmeler.OrderBy(g => g.Tarih).FirstOrDefault()?.Tarih;
         var latestEnd = item.Gorevlendirmeler.OrderByDescending(g => g.BitisTarihi).FirstOrDefault()?.BitisTarihi;
         
-        <div class="accordion-item mb-2 shadow-sm border-0 @statusClass">
+        <div class="accordion-item mb-2 shadow-sm border-0" style="border-left: 5px solid @(item.GorevliDurumBilgisi?.Renk ?? "#6c757d") !important;">
             <h2 class="accordion-header" id="heading-@item.Id">
                 <button class="accordion-button collapsed py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@item.Id" aria-expanded="false" aria-controls="collapse-@item.Id">
                     <div class="container-fluid p-0">
                         <div class="row align-items-center">
-                            <div class="col-md-3 fw-bold">@item.AdSoyad</div>
+                            <div class="col-md-3 fw-bold">@item.AdSoyad <br/>
+                                <small class="text-muted">@(item.Cinsiyet == "E" ? "Erkek" : item.Cinsiyet == "K" ? "Kadın" : "")</small>
+                                <br />
+                                @if (item.Unvan != null)
+                                {
+                                    <span class="badge bg-light text-dark border">@item.Unvan.Ad</span>
+                                }
+                                @if (item.GorevliNotlari != null && item.GorevliNotlari.Any())
+                                {
+                                    <i class="fas fa-sticky-note text-warning ms-2" title="Not Mevcut"></i>
+                                }
+                            </div>
                             <div class="col-md-2">
-                                @if (item.Durum == GorevliDurum.Yesil) { <span class="badge bg-success">Olumlu</span> }
-                                else if (item.Durum == GorevliDurum.Turuncu) { <span class="badge bg-warning text-dark">Kararsız</span> }
-                                else if (item.Durum == GorevliDurum.Kirmizi) { <span class="badge bg-danger">Olumsuz</span> }
-                                else { <span class="badge bg-secondary">Nötr</span> }
+                                @if (item.GorevliDurumBilgisi != null)
+                                {
+                                    <span class="badge" style="background-color: @(item.GorevliDurumBilgisi.Renk ?? "#6c757d"); color: white;">@item.GorevliDurumBilgisi.Ad</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Tanımsız</span>
+                                }
+                                @if (item.SozlesmeTip != null)
+                                {
+                                    <br/><span class="badge bg-info text-dark mt-1">@item.SozlesmeTip.Ad</span>
+                                }
                             </div>
                             <div class="col-md-2 small text-muted">@lastPlace</div>
                             <div class="col-md-2 small text-muted">
@@ -127,6 +262,43 @@
                         <p class="text-muted fst-italic">Henüz görevlendirme yok.</p>
                     }
                     
+                    <h5 class="border-bottom pb-2 mt-4">Notlar</h5>
+                    @if (item.GorevliNotlari != null && item.GorevliNotlari.Any())
+                    {
+                        <div class="mb-3">
+                            @foreach(var not in item.GorevliNotlari.OrderByDescending(n => n.Tarih))
+                            {
+                                <div class="alert alert-light border-start border-warning border-3 mb-2">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <p class="mb-1">@not.NotIcerik</p>
+                                            <small class="text-muted">
+                                                <i class="fas fa-calendar me-1"></i>@not.Tarih.ToString("dd MMM yyyy HH:mm")
+                                            </small>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteNote(@not.Id, @item.Id)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted fst-italic small">Henüz not eklenmemiş.</p>
+                    }
+                    
+                    <form id="note-form-@item.Id" onsubmit="event.preventDefault(); addNote(@item.Id);" class="mb-3">
+                        @Html.AntiForgeryToken()
+                        <div class="input-group">
+                            <textarea id="note-input-@item.Id" name="notIcerik" class="form-control" rows="2" placeholder="Yeni not ekle..." required></textarea>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Ekle
+                            </button>
+                        </div>
+                    </form>
+                    
                     <div class="mt-3">
                         <strong>E-posta:</strong> <a href="mailto:@item.Email">@item.Email</a> <br/>
                         <strong>Toplam Görev Sayısı:</strong> @item.Gorevlendirmeler.Count
@@ -138,19 +310,220 @@
 </div>
 
 <div class="d-flex justify-content-between mt-4">
-    <a asp-action="Index"
-       asp-route-sortOrder="@ViewData["CurrentSort"]"
-       asp-route-pageNumber="@(Model.PageIndex - 1)"
-       asp-route-currentFilter="@ViewData["CurrentFilter"]"
-       class="btn btn-outline-secondary @prevDisabled">
-        &laquo; Önceki
-    </a>
-    <span>Sayfa @Model.PageIndex / @Model.TotalPages</span>
-    <a asp-action="Index"
-       asp-route-sortOrder="@ViewData["CurrentSort"]"
-       asp-route-pageNumber="@(Model.PageIndex + 1)"
-       asp-route-currentFilter="@ViewData["CurrentFilter"]"
-       class="btn btn-outline-secondary @nextDisabled">
-        Sonraki &raquo;
-    </a>
+    @{
+        var routeData = new Dictionary<string, string>
+        {
+            { "sortOrder", ViewData["CurrentSort"]?.ToString() ?? "" },
+            { "SearchString", filter.SearchString ?? "" },
+            { "Sehir", filter.Sehir ?? "" },
+            { "Cinsiyet", filter.Cinsiyet ?? "" },
+            { "SozlesmeTipId", filter.SozlesmeTipId?.ToString() ?? "" },
+            { "KurumId", filter.KurumId?.ToString() ?? "" },
+            { "IsActive", filter.IsActive?.ToString() ?? "" }
+        };
+        
+        // Handling list valid for GorevliDurumIds is tricky in Dictionary<string, string>. 
+        // ASP.NET Core expects repeats for lists. 
+        // We will construct the previous/next links manually or use a form-based pagination if strictly needed.
+        // For now, simpler implementation:
+    }
+    <!-- Simplified Pagination for Filtered Results -->
+    <!-- Ideally, use a TagHelper or JS to submit form with page number -->
+    
+    <nav aria-label="Page navigation">
+      <ul class="pagination">
+        <li class="page-item @prevDisabled">
+            <button class="page-link" onclick="changePage(@(Model.PageIndex - 1))">Previous</button>
+        </li>
+        <li class="page-item disabled"><span class="page-link">Sayfa @Model.PageIndex / @Model.TotalPages</span></li>
+        <li class="page-item @nextDisabled">
+            <button class="page-link" onclick="changePage(@(Model.PageIndex + 1))">Next</button>
+        </li>
+      </ul>
+    </nav>
+    
+    <script>
+        // Handle Excel export button
+        document.getElementById('btnExportExcel').addEventListener('click', function() {
+            var form = document.querySelector('#collapseFilter form');
+            if (form) {
+                // Create a temporary form to submit to ExportToExcel action
+                var exportForm = document.createElement('form');
+                exportForm.method = 'GET';
+                exportForm.action = '@Url.Action("ExportToExcel", "Gorevli")';
+                
+                console.log('=== Excel Export Debug ===');
+                
+                // Clone all input fields from the filter form
+                var inputs = form.querySelectorAll('input');
+                inputs.forEach(function(input) {
+                    if (input.name) {
+                        // Handle checkboxes
+                        if (input.type === 'checkbox') {
+                            if (input.checked) {
+                                console.log('Checkbox:', input.name, '=', input.value);
+                                var clonedInput = document.createElement('input');
+                                clonedInput.type = 'hidden';
+                                clonedInput.name = input.name;
+                                clonedInput.value = input.value;
+                                exportForm.appendChild(clonedInput);
+                            }
+                        }
+                        // Handle regular inputs
+                        else if (input.value) {
+                            console.log('Input:', input.name, '=', input.value);
+                            var clonedInput = document.createElement('input');
+                            clonedInput.type = 'hidden';
+                            clonedInput.name = input.name;
+                            clonedInput.value = input.value;
+                            exportForm.appendChild(clonedInput);
+                        }
+                    }
+                });
+                
+                // Handle select elements (including multiselect)
+                var selects = form.querySelectorAll('select');
+                selects.forEach(function(select) {
+                    if (select.name) {
+                        // For multiselect, get all selected options
+                        if (select.multiple) {
+                            Array.from(select.selectedOptions).forEach(function(option, index) {
+                                if (option.value) {
+                                    console.log('Multiselect:', select.name, '[' + index + '] =', option.value);
+                                    var clonedInput = document.createElement('input');
+                                    clonedInput.type = 'hidden';
+                                    // Use array syntax for ASP.NET Core model binding
+                                    clonedInput.name = select.name + '[' + index + ']';
+                                    clonedInput.value = option.value;
+                                    exportForm.appendChild(clonedInput);
+                                }
+                            });
+                        }
+                        // For single select
+                        else if (select.value) {
+                            console.log('Select:', select.name, '=', select.value);
+                            var clonedInput = document.createElement('input');
+                            clonedInput.type = 'hidden';
+                            clonedInput.name = select.name;
+                            clonedInput.value = select.value;
+                            exportForm.appendChild(clonedInput);
+                        }
+                    }
+                });
+                
+                console.log('=== End Debug ===');
+                
+                document.body.appendChild(exportForm);
+                exportForm.submit();
+                document.body.removeChild(exportForm);
+            } else {
+                // No filters, export all
+                console.log('No filter form found, exporting all');
+                window.location.href = '@Url.Action("ExportToExcel", "Gorevli")';
+            }
+        });
+    
+        function changePage(pageNum) {
+            // Find the filter form
+            var form = document.querySelector('#collapseFilter form');
+            if (form) {
+                // Create a hidden input for page number
+                var pageInput = document.createElement('input');
+                pageInput.type = 'hidden';
+                pageInput.name = 'PageNumber';
+                pageInput.value = pageNum;
+                form.appendChild(pageInput);
+                form.submit();
+            } else {
+                 // Fallback if form not found (should not happen)
+                 window.location.href = '?PageNumber=' + pageNum;
+            }
+        }
+    
+    // Note Management Functions
+    function addNote(gorevliId) {
+        const form = document.getElementById(`note-form-${gorevliId}`);
+        const textarea = document.getElementById(`note-input-${gorevliId}`);
+        const formData = new FormData(form);
+        formData.append('gorevliId', gorevliId);
+        
+        fetch('/Gorevli/AddNote', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                textarea.value = '';
+                location.reload(); // Reload to show new note
+            } else {
+                alert('Not eklenirken hata oluştu: ' + (data.message || 'Bilinmeyen hata'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Bir hata oluştu.');
+        });
+    }
+    
+    function deleteNote(notId, gorevliId) {
+        if (!confirm('Bu notu silmek istediğinizden emin misiniz?')) return;
+        
+        const formData = new FormData();
+        formData.append('id', notId);
+        formData.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]').value);
+        
+        fetch('/Gorevli/DeleteNote', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload(); // Reload to remove note
+            } else {
+                alert('Not silinirken hata oluştu: ' + (data.message || 'Bilinmeyen hata'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Bir hata oluştu.');
+        });
+    }
+</script>
 </div>
+
+@section Scripts {
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Initialize Select2 for staff search with AJAX
+            $('#staffSearch').select2({
+                ajax: {
+                    url: '@Url.Action("SearchStaff", "Gorevli")',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            term: params.term // search term
+                        };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data
+                        };
+                    },
+                    cache: true
+                },
+                placeholder: 'İsim, soyad veya e-posta ile arayın...',
+                minimumInputLength: 1,
+                allowClear: true,
+                width: '100%'
+            });
+        });
+    </script>
+}

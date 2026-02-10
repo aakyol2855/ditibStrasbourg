@@ -30,6 +30,29 @@
                 <input asp-for="BitisTarihi" class="form-control" />
                 <span asp-validation-for="BitisTarihi" class="text-danger"></span>
             </div>
+
+            <div class="card bg-light mb-3">
+                <div class="card-header">Yerine Gelecek Personel Planlaması</div>
+                <div class="card-body">
+                    <div class="form-group mb-3">
+                        <label asp-for="YerineGelecekGorevliId" class="control-label"></label>
+                        <select asp-for="YerineGelecekGorevliId" class ="form-control" asp-items="ViewBag.YerineGelecekGorevliId">
+                            <option value="">-- Seçiniz (Opsiyonel) --</option>
+                        </select>
+                        <span asp-validation-for="YerineGelecekGorevliId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label asp-for="YerineGelisPlanlananTarih" class="control-label"></label>
+                        <input asp-for="YerineGelisPlanlananTarih" class="form-control" />
+                        <span asp-validation-for="YerineGelisPlanlananTarih" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label asp-for="YerineGelisPlanlananBitisTarih" class="control-label"></label>
+                        <input asp-for="YerineGelisPlanlananBitisTarih" class="form-control" />
+                        <span asp-validation-for="YerineGelisPlanlananBitisTarih" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
             <div class="form-group">
                 <input type="submit" value="Ekle" class="btn btn-primary" />
                 <a asp-action="Index" class="btn btn-secondary">Listeye Dön</a>

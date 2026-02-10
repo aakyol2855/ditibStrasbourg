@@ -1,0 +1,143 @@
+@{
+    ViewData["Title"] = "Görevli Excel Import";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4><i class="fas fa-file-excel"></i> Görevli Toplu Yükleme (Excel)</h4>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.Message != null)
+                    {
+                        <div class="alert @(ViewBag.ErrorCount > 0 ? "alert-warning" : "alert-success")">
+                            @ViewBag.Message
+                        </div>
+                    }
+
+                    @if (ViewBag.ImportResults != null && ViewBag.ImportResults.Count > 0)
+                    {
+                        <div class="card mb-3">
+                            <div class="card-header bg-success text-white">
+                                <strong>Başarılı İşlemler (@ViewBag.SuccessCount)</strong>
+                            </div>
+                            <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                                <ul class="list-unstyled mb-0">
+                                    @foreach (var result in ViewBag.ImportResults as List<string>)
+                                    {
+                                        <li><small>@result</small></li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    }
+
+                    @if (ViewBag.Errors != null && ViewBag.Errors.Count > 0)
+                    {
+                        <div class="card mb-3">
+                            <div class="card-header bg-danger text-white">
+                                <strong>Hatalar (@ViewBag.ErrorCount)</strong>
+                            </div>
+                            <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                                <ul class="list-unstyled mb-0">
+                                    @foreach (var error in ViewBag.Errors as List<string>)
+                                    {
+                                        <li><small class="text-danger">@error</small></li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    }
+
+                    <form asp-action="ImportFromExcel" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Excel Dosyası Seçin</label>
+                            <input type="file" name="file" class="form-control" accept=".xlsx,.xls" required />
+                            <small class="text-muted">Excel (.xlsx veya .xls) formatında dosya yükleyin</small>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <strong><i class="fas fa-info-circle"></i> Önemli Notlar:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>İlk satır başlık satırı olmalı</li>
+                                <li><strong>Zorunlu alanlar:</strong> Ad, Soyad</li>
+                                <li><strong>Kolon adları esnek:</strong> "Ad", "Adı", "İsim", "Name" gibi farklı isimler kullanılabilir</li>
+                                <li><strong>Tanınan kolon adları:</strong>
+                                    <ul>
+                                        <li>Ad: ad, adı, isim, name, first name</li>
+                                        <li>Soyad: soyad, soyadı, surname, last name</li>
+                                        <li>Email: email, e-posta, eposta</li>
+                                        <li>TC: tc, tc kimlik no, tckimlikno</li>
+                                        <li>Cinsiyet: cinsiyet, gender</li>
+                                        <li>Telefon: cep telefonu, telefon, phone</li>
+                                        <li>Emeklilik Tarihi: emeklilik tarihi, emeklilik, retirement date</li>
+                                    </ul>
+                                </li>
+                                <li>Tarih formatı: Excel tarih formatı veya dd/MM/yyyy</li>
+                                <li>Emekli görevliler de eklenebilir</li>
+                            </ul>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-upload"></i> Excel'den Aktar
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Görevliler Listesine Dön
+                            </a>
+                        </div>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <strong>Örnek Excel Şablonu</strong>
+                        </div>
+                        <div class="card-body">
+                            <p>Aşağıdaki kolonları içeren bir Excel dosyası hazırlayın:</p>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Ad</th>
+                                            <th>Soyad</th>
+                                            <th>Email</th>
+                                            <th>TC Kimlik No</th>
+                                            <th>Cinsiyet</th>
+                                            <th>Cep Telefonu</th>
+                                            <th>Emeklilik Tarihi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Ahmet</td>
+                                            <td>Yılmaz</td>
+                                            <td>ahmet@example.com</td>
+                                            <td>12345678901</td>
+                                            <td>E</td>
+                                            <td>+33 6 12 34 56 78</td>
+                                            <td>01/01/2025</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Mehmet</td>
+                                            <td>Demir</td>
+                                            <td>mehmet@example.com</td>
+                                            <td>98765432109</td>
+                                            <td>E</td>
+                                            <td>+33 6 98 76 54 32</td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

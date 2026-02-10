@@ -29,10 +29,17 @@
                 <a class="list-group-item list-group-item-action list-group-item-light p-3" asp-controller="Gorevlendirme" asp-action="Index">
                     <i class="fas fa-calendar-check me-2"></i> Görevlendirmeler
                 </a>
+                <a class="list-group-item list-group-item-action list-group-item-light p-3" asp-controller="DernekIslemleri" asp-action="Index">
+                    <i class="fas fa-calendar-check me-2"></i> Dernek İşlemleri
+                </a>
                 @if (User.IsInRole("SuperAdmin"))
                 {
+                    <div class="sidebar-heading border-bottom bg-light mt-3 small text-uppercase text-muted p-3">Yönetici Araçları</div>
+                    <a class="list-group-item list-group-item-action list-group-item-light p-3" asp-controller="Tanimlamalar" asp-action="Index">
+                        <i class="fas fa-cogs me-2"></i> Sistem Tanımları
+                    </a>
                     <a class="list-group-item list-group-item-action list-group-item-light p-3" asp-controller="UserManagement" asp-action="Index">
-                        <i class="fas fa-user-cog me-2"></i> Kullanıcı Yönetimi
+                        <i class="fas fa-users-cog me-2"></i> Kullanıcı Yönetimi
                     </a>
                 }
             </div>
