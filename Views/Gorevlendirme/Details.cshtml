@@ -1,0 +1,36 @@
+@model DitibStasbourg.Models.Gorevlendirme
+
+@{
+    ViewData["Title"] = "Detaylar";
+}
+
+<h1>Detaylar</h1>
+
+<div>
+    <h4>Görevlendirme</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Tarih)
+        </dt>
+        <dd class = "col-sm-10">
+            @Model.Tarih.ToShortDateString()
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Gorevli)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Gorevli.AdSoyad)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Kurum)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Kurum.Isim)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Düzenle</a>
+    <a asp-action="Index" class="btn btn-secondary">Listeye Dön</a>
+</div>

@@ -1,0 +1,79 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - DitibStasbourg</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body>
+
+<div class="d-flex" id="wrapper">
+    <!-- Sidebar -->
+    @if (User.Identity?.IsAuthenticated ?? false)
+    {
+        <div class="border-end" id="sidebar-wrapper">
+            <div class="sidebar-heading border-bottom bg-transparent">DitibStasbourg</div>
+            <div class="list-group list-group-flush">
+                <a class="list-group-item list-group-item-action list-group-item-light p-3" asp-controller="Home" asp-action="Index">
+                    <i class="fas fa-home me-2"></i> Ana Sayfa
+                </a>
+                <a class="list-group-item list-group-item-action list-group-item-light p-3" asp-controller="Gorevli" asp-action="Index">
+                    <i class="fas fa-users me-2"></i> Görevliler
+                </a>
+                <a class="list-group-item list-group-item-action list-group-item-light p-3" asp-controller="Kurum" asp-action="Index">
+                    <i class="fas fa-mosque me-2"></i> Kurumlar
+                </a>
+                <a class="list-group-item list-group-item-action list-group-item-light p-3" asp-controller="Gorevlendirme" asp-action="Index">
+                    <i class="fas fa-calendar-check me-2"></i> Görevlendirmeler
+                </a>
+            </div>
+        </div>
+    }
+
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+            <div class="container-fluid">
+                @if (User.Identity?.IsAuthenticated ?? false)
+                {
+                    <button class="btn btn-primary" id="sidebarToggle">Menu</button>
+                }
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
+                        <partial name="_LoginPartial" />
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container-fluid p-4">
+            @RenderBody()
+        </div>
+        
+        <footer class="border-top footer text-center text-muted py-3">
+             &copy; 2026 - DitibStasbourg
+        </footer>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+
+<script>
+    $("#sidebarToggle").click(function(e) {
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+    });
+</script>
+
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,156 @@
+@using DitibStasbourg.Models
+@model PaginatedList<DitibStasbourg.Models.Gorevli>
+
+@{
+    ViewData["Title"] = "Görevliler";
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<style>
+    .status-yesil { border-left: 5px solid #28a745 !important; background-color: #f0fff4; }
+    .status-turuncu { border-left: 5px solid #fd7e14 !important; background-color: #fff9f0; }
+    .status-kirmizi { border-left: 5px solid #dc3545 !important; background-color: #fff0f0; }
+    .status-notr { border-left: 5px solid #6c757d !important; background-color: #f8f9fa; }
+    .accordion-button:not(.collapsed) { background-color: #e7f1ff; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Görevliler</h1>
+    <a asp-action="Create" class="btn btn-primary"><i class="fas fa-plus"></i> Yeni Ekle</a>
+</div>
+
+<form asp-action="Index" method="get" class="mb-4">
+    <div class="input-group">
+        <input type="text" name="SearchString" class="form-control" placeholder="İsim veya E-posta ara..." value="@ViewData["CurrentFilter"]" />
+        <button class="btn btn-outline-secondary" type="submit">Ara</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Tümünü Gör</a>
+    </div>
+</form>
+
+<div class="row mb-2 fw-bold text-muted border-bottom pb-2 d-none d-md-flex">
+    <div class="col-md-3">
+        <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]" class="text-decoration-none text-dark">Ad Soyad <i class="fas fa-sort"></i></a>
+    </div>
+    <div class="col-md-2">
+        <a asp-action="Index" asp-route-sortOrder="@ViewData["StatusSortParm"]" class="text-decoration-none text-dark">Referans Durumu <i class="fas fa-sort"></i></a>
+    </div>
+    <div class="col-md-2">Son Görev</div>
+    <div class="col-md-2">
+        <a asp-action="Index" asp-route-sortOrder="@ViewData["DateSortParm"]" class="text-decoration-none text-dark">Tarihler <i class="fas fa-sort"></i></a>
+    </div>
+    <div class="col-md-1 text-center">Aktif mi?</div>
+    <div class="col-md-2 text-end">İşlemler</div>
+</div>
+
+<div class="accordion" id="accordionGorevli">
+    @foreach (var item in Model) {
+        var statusClass = item.Durum switch {
+            GorevliDurum.Yesil => "status-yesil",
+            GorevliDurum.Turuncu => "status-turuncu",
+            GorevliDurum.Kirmizi => "status-kirmizi",
+            _ => "status-notr"
+        };
+        var lastAssignment = item.Gorevlendirmeler.OrderByDescending(g => g.Tarih).FirstOrDefault();
+        var lastPlace = lastAssignment?.Kurum?.Isim ?? "-";
+        
+        var earliestStart = item.Gorevlendirmeler.OrderBy(g => g.Tarih).FirstOrDefault()?.Tarih;
+        var latestEnd = item.Gorevlendirmeler.OrderByDescending(g => g.BitisTarihi).FirstOrDefault()?.BitisTarihi;
+        
+        <div class="accordion-item mb-2 shadow-sm border-0 @statusClass">
+            <h2 class="accordion-header" id="heading-@item.Id">
+                <button class="accordion-button collapsed py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@item.Id" aria-expanded="false" aria-controls="collapse-@item.Id">
+                    <div class="container-fluid p-0">
+                        <div class="row align-items-center">
+                            <div class="col-md-3 fw-bold">@item.AdSoyad</div>
+                            <div class="col-md-2">
+                                @if (item.Durum == GorevliDurum.Yesil) { <span class="badge bg-success">Olumlu</span> }
+                                else if (item.Durum == GorevliDurum.Turuncu) { <span class="badge bg-warning text-dark">Kararsız</span> }
+                                else if (item.Durum == GorevliDurum.Kirmizi) { <span class="badge bg-danger">Olumsuz</span> }
+                                else { <span class="badge bg-secondary">Nötr</span> }
+                            </div>
+                            <div class="col-md-2 small text-muted">@lastPlace</div>
+                            <div class="col-md-2 small text-muted">
+                                @if(earliestStart.HasValue) {
+                                    <div><small>Baş:</small> @earliestStart.Value.ToShortDateString()</div>
+                                } else {
+                                    <div><small>Baş:</small> -</div>
+                                }
+                                @if(latestEnd.HasValue) {
+                                    <div><small>Bit:</small> @latestEnd.Value.ToShortDateString()</div>
+                                }
+                            </div>
+                            <div class="col-md-1 text-center">
+                                @if (item.isActive) {
+                                    <span class="text-success" title="Şu an görevde"><i class="fas fa-check-circle fa-lg"></i></span>
+                                } else {
+                                    <span class="text-danger" title="Görevde değil"><i class="fas fa-times-circle fa-lg"></i></span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </button>
+            </h2>
+            <div id="collapse-@item.Id" class="accordion-collapse collapse" aria-labelledby="heading-@item.Id" data-bs-parent="#accordionGorevli">
+                <div class="accordion-body bg-white">
+                    <div class="d-flex justify-content-end mb-3">
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning me-2">Düzenle</a>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info me-2">Detay</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Sil</a>
+                    </div>
+                    
+                    <h5 class="border-bottom pb-2">Görev Geçmişi</h5>
+                    @if (item.Gorevlendirmeler.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Kurum</th>
+                                        <th>Tarih</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach(var gorev in item.Gorevlendirmeler.OrderByDescending(g => g.Tarih))
+                                    {
+                                        <tr>
+                                            <td>@gorev.Kurum?.Isim</td>
+                                            <td>@gorev.Tarih.ToShortDateString()</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted fst-italic">Henüz görevlendirme yok.</p>
+                    }
+                    
+                    <div class="mt-3">
+                        <strong>E-posta:</strong> <a href="mailto:@item.Email">@item.Email</a> <br/>
+                        <strong>Toplam Görev Sayısı:</strong> @item.Gorevlendirmeler.Count
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="d-flex justify-content-between mt-4">
+    <a asp-action="Index"
+       asp-route-sortOrder="@ViewData["CurrentSort"]"
+       asp-route-pageNumber="@(Model.PageIndex - 1)"
+       asp-route-currentFilter="@ViewData["CurrentFilter"]"
+       class="btn btn-outline-secondary @prevDisabled">
+        &laquo; Önceki
+    </a>
+    <span>Sayfa @Model.PageIndex / @Model.TotalPages</span>
+    <a asp-action="Index"
+       asp-route-sortOrder="@ViewData["CurrentSort"]"
+       asp-route-pageNumber="@(Model.PageIndex + 1)"
+       asp-route-currentFilter="@ViewData["CurrentFilter"]"
+       class="btn btn-outline-secondary @nextDisabled">
+        Sonraki &raquo;
+    </a>
+</div>

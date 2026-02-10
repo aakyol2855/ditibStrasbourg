@@ -1,0 +1,83 @@
+﻿@model DitibStasbourg.Models.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Ana Sayfa";
+}
+
+<div class="text-center mb-5">
+    <h1 class="display-4 fw-bold text-primary">DITIB Strasbourg</h1>
+    <p class="lead">Görevlendirme Yönetim Paneli</p>
+</div>
+
+<div class="row g-4">
+    <!-- Total Personnel -->
+    <div class="col-md-3">
+        <div class="card shadow-sm border-start border-4 border-primary h-100">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase fw-bold">Toplam Aktif Görevli</div>
+                <div class="display-5 fw-bold text-dark">@Model.ActiveGorevli</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Personnel -->
+    <div class="col-md-3">
+        <div class="card shadow-sm border-start border-4 border-success h-100">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase fw-bold">Memnun (Yeşil)</div>
+                <div class="display-5 fw-bold text-success">@Model.ActiveGorevli</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Institutions -->
+    <div class="col-md-3">
+        <div class="card shadow-sm border-start border-4 border-info h-100">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase fw-bold">Kayıtlı Kurum</div>
+                <div class="display-5 fw-bold text-dark">@Model.TotalKurum</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Assignments -->
+    <div class="col-md-3">
+        <div class="card shadow-sm border-start border-4 border-warning h-100">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase fw-bold">Toplam Görevlendirme</div>
+                <div class="display-5 fw-bold text-dark">@Model.TotalGorevlendirme</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-2">
+    <!-- This Year -->
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title text-muted">Bu Yıl Yapılan Görevler</h5>
+                <h2 class="display-6 fw-bold">@Model.GorevlendirmeThisYear</h2>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Upcoming -->
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title text-muted">Gelecek Görevler</h5>
+                <h2 class="display-6 fw-bold text-primary">@Model.UpcomingAssignments</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100 bg-light">
+            <div class="card-body d-flex flex-column justify-content-center">
+                <a asp-controller="Gorevlendirme" asp-action="Create" class="btn btn-primary mb-2 w-100">Yeni Görevlendirme Ekle</a>
+                <a asp-controller="Gorevli" asp-action="Create" class="btn btn-outline-secondary w-100">Yeni Görevli Ekle</a>
+            </div>
+        </div>
+    </div>
+</div>
