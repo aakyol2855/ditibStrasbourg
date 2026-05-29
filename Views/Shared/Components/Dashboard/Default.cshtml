@@ -1,0 +1,221 @@
+@model DitibStasbourg.Models.ViewModels.DashboardStatsViewModel
+
+<div class="dashboard-widgets">
+    <!-- Top Stats Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-primary text-white">
+                <div class="card-body p-4 d-flex align-items-center">
+                    <div class="bg-white bg-opacity-25 rounded-circle p-3 me-3">
+                        <i class="bi bi-building fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0 opacity-75">Toplam Dernek</h6>
+                        <h2 class="mb-0 fw-bold">@Model.TotalAssociations</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-success text-white">
+                <div class="card-body p-4 d-flex align-items-center">
+                    <div class="bg-white bg-opacity-25 rounded-circle p-3 me-3">
+                        <i class="bi bi-people fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0 opacity-75">Aktif Görevli</h6>
+                        <h2 class="mb-0 fw-bold">@Model.TotalPersonnel</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-info text-white">
+                <div class="card-body p-4 d-flex align-items-center">
+                    <div class="bg-white bg-opacity-25 rounded-circle p-3 me-3">
+                        <i class="bi bi-calendar-check fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0 opacity-75">Güncel Görevlendirme</h6>
+                        <h2 class="mb-0 fw-bold">@Model.TotalAssignments</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Interactive Map Column (Task 3: Alignment Fix) -->
+        @if (Model.Preferences.ShowRegionMap)
+        {
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-map me-2 text-primary"></i>Etkileşimli Bölge Haritası</h5>
+                </div>
+                    <div class="card-body p-0">
+                        <!-- Task 1 & 2: Inject the real interactive map component here -->
+                        @await Component.InvokeAsync("Map")
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Charts Column (col-lg-4 as requested) -->
+        <div class="@(Model.Preferences.ShowRegionMap ? "col-lg-4" : "col-12")">
+            <div class="row g-4">
+                @if (Model.Preferences.ShowPersonnelChart)
+                {
+                    <div class="col-12">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-white py-3">
+                                <h6 class="mb-0 fw-bold">Bölge Bazlı Personel Dağılımı</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="personnelChart" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @if (Model.Preferences.ShowKurbanChart)
+                {
+                    <div class="col-12">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-white py-3">
+                                <h6 class="mb-0 fw-bold">Kurban Hisse Doluluk Oranı (@Model.KurbanSummary.FillRate.ToString("F1")%)</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="progress mb-3" style="height: 20px;">
+                                    <div class="progress-bar bg-warning progress-bar-striped progress-bar-animated" style="width: @Model.KurbanSummary.FillRate%"></div>
+                                </div>
+                                <div class="row text-center small">
+                                    <div class="col">
+                                        <div class="fw-bold">@Model.KurbanSummary.TakenShares</div>
+                                        <div class="text-muted">Satılan Hisse</div>
+                                    </div>
+                                    <div class="col border-start">
+                                        <div class="fw-bold">@(Model.KurbanSummary.TotalShares - Model.KurbanSummary.TakenShares)</div>
+                                        <div class="text-muted">Boş Hisse</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dashboard Settings Modal -->
+<div class="modal fade" id="dashboardSettingsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Panel Ayarları</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small">Dashboard üzerinde görmek istediğiniz bileşenleri seçin.</p>
+                <form id="dashboardSettingsForm">
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="prefMap" @(Model.Preferences.ShowRegionMap ? "checked" : "")>
+                        <label class="form-check-label" for="prefMap">Bölgesel Harita</label>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="prefPersonnel" @(Model.Preferences.ShowPersonnelChart ? "checked" : "")>
+                        <label class="form-check-label" for="prefPersonnel">Personel Grafiği</label>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="prefKurban" @(Model.Preferences.ShowKurbanChart ? "checked" : "")>
+                        <label class="form-check-label" for="prefKurban">Kurban Doluluk Durumu</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary px-4" onclick="saveDashboardPreferences()">Değişiklikleri Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .region-path { cursor: pointer; transition: fill 0.2s; }
+    .region-path:hover { fill: var(--platform-primary) !important; }
+    .map-label { font-size: 14px; font-weight: 600; fill: #64748b; pointer-events: none; font-family: var(--font-family-heading); }
+    .hover-up:hover { transform: translateY(-5px); transition: all 0.3s; }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Initialize Personnel Chart
+        var personnelCtx = document.getElementById('personnelChart');
+        if (personnelCtx) {
+            new Chart(personnelCtx, {
+                type: 'bar',
+                data: {
+                    labels: @Html.Raw(Json.Serialize(Model.RegionStats.Select(s => s.RegionName))),
+                    datasets: [{
+                        label: 'Personel Sayısı',
+                        data: @Html.Raw(Json.Serialize(Model.RegionStats.Select(s => s.PersonnelCount))),
+                        backgroundColor: 'rgba(30, 64, 175, 0.8)',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, grid: { display: false } } }
+                }
+            });
+        }
+
+        // Map Interactions
+        var mapPaths = document.querySelectorAll('.region-path');
+        var infoBox = document.getElementById('mapInfoBox');
+        var regionData = @Html.Raw(Json.Serialize(Model.RegionStats));
+
+        mapPaths.forEach(path => {
+            path.addEventListener('click', function(e) {
+                var regionName = this.getAttribute('data-region');
+                var data = regionData.find(r => r.regionName === regionName) || { associationCount: 0, personnelCount: 0 };
+                
+                document.getElementById('infoRegionName').innerText = regionName;
+                document.getElementById('infoAssocCount').innerText = data.associationCount;
+                document.getElementById('infoStaffCount').innerText = data.personnelCount;
+
+                infoBox.classList.remove('d-none');
+                infoBox.style.left = (e.offsetX + 20) + 'px';
+                infoBox.style.top = (e.offsetY + 20) + 'px';
+            });
+        });
+
+        // Hide info box when clicking elsewhere
+        document.addEventListener('click', function(e) {
+            if (!e.target.classList.contains('region-path')) {
+                infoBox.classList.add('d-none');
+            }
+        });
+    });
+
+    function saveDashboardPreferences() {
+        var prefs = {
+            ShowRegionMap: document.getElementById('prefMap').checked,
+            ShowPersonnelChart: document.getElementById('prefPersonnel').checked,
+            ShowKurbanChart: document.getElementById('prefKurban').checked
+        };
+
+        fetch('/Home/SaveDashboardPreferences', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(prefs)
+        }).then(response => {
+            if (response.ok) {
+                window.location.reload();
+            }
+        });
+    }
+</script>

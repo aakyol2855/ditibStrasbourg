@@ -1,58 +1,53 @@
-﻿<!DOCTYPE html>
+<!-- Platform Architect: Abdulvahab Akyol -->
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - DitibStasbourg</title>
+    <title>@ViewData["Title"] - @Configuration["Branding:AppName"]</title>
+    <link rel="icon" type="image/x-icon" href="@Configuration["Branding:FaviconUrl"]" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
 </head>
-<body>
+<body class="overflow-hidden @(User.Identity?.IsAuthenticated == true ? "layout-authenticated" : "layout-guest")">
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+    string ActiveClass(string c) => controller == c ? "active" : "";
+    bool isAdminRoute = controller == "Tanimlamalar" || controller == "LookupAdmin" || controller == "UserManagement" || controller == "RoleTemplate";
+    bool isDernekGorevliOpen = controller == "Gorevli" || controller == "Gorevlendirme" || controller == "DernekIslemleri";
 
-<div class="d-flex" id="wrapper">
-    <!-- Sidebar -->
+    // DYNAMIC PERMISSION CHECKS
+    bool canViewHome = User.HasClaim("Permission", "Home-Index");
+    bool canViewGorevli = User.HasClaim("Permission", "Gorevli-Index");
+    bool canViewGorevlendirme = User.HasClaim("Permission", "Gorevlendirme-Index");
+    bool canViewDernek = User.HasClaim("Permission", "DernekIslemleri-Index");
+    bool canViewTanimlamalar = User.HasClaim("Permission", "Tanimlamalar-Index");
+    bool canViewLookup = User.HasClaim("Permission", "LookupAdmin-Index");
+    bool canViewUsers = User.HasClaim("Permission", "UserManagement-Index");
+    bool canViewRoleTemplates = User.HasClaim("Permission", "RoleTemplate-Index");
+    
+    bool hasAnyDernekMenu = canViewGorevli || canViewGorevlendirme || canViewDernek;
+    bool hasAnyAdminMenu = canViewTanimlamalar || canViewLookup || canViewUsers || canViewRoleTemplates;
+}
+<div id="wrapper">
+    <!-- Sidebar ViewComponent -->
     @if (User.Identity?.IsAuthenticated ?? false)
     {
-        <div class="border-end" id="sidebar-wrapper">
-            <div class="sidebar-heading border-bottom bg-transparent">DitibStasbourg</div>
-            <div class="list-group list-group-flush">
-                <a class="list-group-item list-group-item-action list-group-item-light p-3" asp-controller="Home" asp-action="Index">
-                    <i class="fas fa-home me-2"></i> Ana Sayfa
-                </a>
-                <a class="list-group-item list-group-item-action list-group-item-light p-3" asp-controller="Gorevli" asp-action="Index">
-                    <i class="fas fa-users me-2"></i> Görevliler
-                </a>
-                <a class="list-group-item list-group-item-action list-group-item-light p-3" asp-controller="Kurum" asp-action="Index">
-                    <i class="fas fa-mosque me-2"></i> Kurumlar
-                </a>
-                <a class="list-group-item list-group-item-action list-group-item-light p-3" asp-controller="Gorevlendirme" asp-action="Index">
-                    <i class="fas fa-calendar-check me-2"></i> Görevlendirmeler
-                </a>
-                <a class="list-group-item list-group-item-action list-group-item-light p-3" asp-controller="DernekIslemleri" asp-action="Index">
-                    <i class="fas fa-calendar-check me-2"></i> Dernek İşlemleri
-                </a>
-                @if (User.IsInRole("SuperAdmin"))
-                {
-                    <div class="sidebar-heading border-bottom bg-light mt-3 small text-uppercase text-muted p-3">Yönetici Araçları</div>
-                    <a class="list-group-item list-group-item-action list-group-item-light p-3" asp-controller="Tanimlamalar" asp-action="Index">
-                        <i class="fas fa-cogs me-2"></i> Sistem Tanımları
-                    </a>
-                    <a class="list-group-item list-group-item-action list-group-item-light p-3" asp-controller="UserManagement" asp-action="Index">
-                        <i class="fas fa-users-cog me-2"></i> Kullanıcı Yönetimi
-                    </a>
-                }
-            </div>
-        </div>
+        @await Component.InvokeAsync("Sidebar")
     }
 
     <!-- Page Content -->
     <div id="page-content-wrapper">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom navbar-sticky">
             <div class="container-fluid">
                 @if (User.Identity?.IsAuthenticated ?? false)
                 {
                     <button class="btn btn-primary" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+                    <span class="navbar-brand ms-3 d-lg-none fw-bold text-primary">@Configuration["Branding:AppName"]</span>
                 }
                 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,27 +61,35 @@
             </div>
         </nav>
 
-        <div class="container-fluid p-4">
-            @RenderBody()
+        <div class="content-scrollable">
+            <div class="container-fluid py-2 border-bottom bg-light">
+                @await Component.InvokeAsync("Breadcrumb")
+            </div>
+
+            <div class="container-fluid p-2 p-md-4">
+                <div id="globalModalContainer"></div>
+                @RenderBody()
+            </div>
         </div>
         
-        <footer class="border-top footer text-center text-muted py-3 mt-auto">
-             &copy; 2026 - DitibStasbourg
+        <footer class="border-top footer text-center text-muted py-3 mt-auto bg-white shadow-sm footer-sticky">
+             &copy; @DateTime.Now.Year - @Configuration["Branding:AppName"]
+             <div class="mt-1 dev-signature">
+                 <small>Developed by Abdulvahab Akyol (aakyol)</small>
+             </div>
         </footer>
     </div>
+    <!-- Sidebar Backdrop for Mobile -->
+    <div id="sidebar-backdrop"></div>
 </div>
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
+<script src="~/js/app-common.js" asp-append-version="true"></script>
 
-<script>
-    $("#sidebarToggle").click(function(e) {
-        e.preventDefault();
-        $("body").toggleClass("sb-sidenav-toggled");
-        $("#wrapper").toggleClass("toggled");
-    });
-</script>
+
 
 @await RenderSectionAsync("Scripts", required: false)
 </body>

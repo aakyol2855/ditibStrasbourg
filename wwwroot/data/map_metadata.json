@@ -1,0 +1,66 @@
+{
+  "RegionName": "Strasbourg & Grand Est",
+  "BaseViewBox": "0 0 800 600",
+  "Districts": [
+    {
+      "Id": "strasbourg-centre",
+      "Name": "Strasbourg Centre",
+      "SvgPath": "M 400 300 L 450 300 L 450 350 L 400 350 Z",
+      "CenterPoint": { "X": 425, "Y": 325 },
+      "Color": "#1a237e"
+    },
+    {
+      "Id": "schiltigheim",
+      "Name": "Schiltigheim",
+      "SvgPath": "M 400 250 L 450 250 L 450 300 L 400 300 Z",
+      "CenterPoint": { "X": 425, "Y": 275 },
+      "Color": "#283593"
+    },
+    {
+      "Id": "illkirch",
+      "Name": "Illkirch-Graffenstaden",
+      "SvgPath": "M 400 350 L 450 350 L 450 400 L 400 400 Z",
+      "CenterPoint": { "X": 425, "Y": 375 },
+      "Color": "#303f9f"
+    },
+    {
+      "Id": "bischheim",
+      "Name": "Bischheim",
+      "SvgPath": "M 450 250 L 500 250 L 500 300 L 450 300 Z",
+      "CenterPoint": { "X": 475, "Y": 275 },
+      "Color": "#3949ab"
+    },
+    {
+      "Id": "lingolsheim",
+      "Name": "Lingolsheim",
+      "SvgPath": "M 350 350 L 400 350 L 400 400 L 350 400 Z",
+      "CenterPoint": { "X": 375, "Y": 375 },
+      "Color": "#3f51b5"
+    },
+    {
+      "Id": "bas-rhin-north",
+      "Name": "Bas-Rhin (Kuzey)",
+      "SvgPath": "M 400 100 L 500 100 L 500 250 L 400 250 Z",
+      "CenterPoint": { "X": 450, "Y": 175 },
+      "Color": "#5c6bc0"
+    },
+    {
+      "Id": "haut-rhin",
+      "Name": "Haut-Rhin",
+      "SvgPath": "M 400 450 L 500 450 L 500 600 L 400 600 Z",
+      "CenterPoint": { "X": 450, "Y": 525 },
+      "Color": "#7986cb"
+    }
+  ],
+  "CityMapping": {
+    "Strasbourg": "strasbourg-centre",
+    "Schiltigheim": "schiltigheim",
+    "Illkirch": "illkirch",
+    "Bischheim": "bischheim",
+    "Lingolsheim": "lingolsheim",
+    "Haguenau": "bas-rhin-north",
+    "Selestat": "bas-rhin-north",
+    "Colmar": "haut-rhin",
+    "Mulhouse": "haut-rhin"
+  }
+}

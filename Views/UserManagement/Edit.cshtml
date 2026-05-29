@@ -1,11 +1,11 @@
 @model DitibStasbourg.Models.ViewModels.UserEditViewModel
-
 @{
-    ViewData["Title"] = "Kullanıcı Düzenle";
+    ViewData["Title"] = "Kullanıcı Yetkileri Düzenle";
+    var roleTemplates = ViewBag.RoleTemplates as List<DitibStasbourg.Models.Security.RoleTemplate> ?? new();
+    var allClaims = ViewBag.AllClaims as Dictionary<string, List<string>> ?? new();
 }
 
-<h1>Kullanıcı Düzenle</h1>
-<hr />
+<h2 class="text-primary mb-4"><i class="bi bi-person-gear me-2"></i> Kullanıcı ve Yetki Düzenle</h2>
 
 @if (TempData["Success"] != null)
 {
@@ -17,61 +17,152 @@
 }
 
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-4">
+        <!-- Basic Info & Role Template -->
         <div class="card shadow-sm mb-4">
-            <div class="card-header bg-light fw-bold">Kullanıcı Bilgileri ve Roller</div>
+            <div class="card-header bg-light fw-bold">Temel Bilgiler</div>
             <div class="card-body">
-                <form asp-action="Edit" method="post">
+                <form asp-action="Edit" method="post" id="userForm">
                     <input type="hidden" asp-for="Id" />
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    
                     <div class="mb-3">
                         <label asp-for="UserName" class="form-label">Kullanıcı Adı</label>
                         <input asp-for="UserName" class="form-control" />
-                        <span asp-validation-for="UserName" class="text-danger"></span>
                     </div>
-                    
                     <div class="mb-3">
                         <label asp-for="Email" class="form-label">Email</label>
                         <input asp-for="Email" class="form-control" />
-                        <span asp-validation-for="Email" class="text-danger"></span>
                     </div>
 
-                    <h5 class="mt-4">Rol Atama</h5>
-                    <div class="form-check form-switch mb-2">
-                        <input class="form-check-input" type="checkbox" asp-for="IsAdmin">
-                        <label class="form-check-label" asp-for="IsAdmin">Admin (Yönetici)</label>
-                    </div>
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input" type="checkbox" asp-for="IsSuperAdmin">
-                        <label class="form-check-label" asp-for="IsSuperAdmin">SuperAdmin (Tam Yetki)</label>
+                    <h5 class="mt-4 border-bottom pb-2">Rol Şablonu</h5>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Kullanıcının varsayılan yetkilerini belirler.</label>
+                        <select asp-for="RoleTemplateId" class="form-select">
+                            <option value="">-- Şablon Seçilmedi (Sıfır Yetki) --</option>
+                            @foreach (var rt in roleTemplates)
+                            {
+                                <option value="@rt.Id">@rt.Name</option>
+                            }
+                        </select>
                     </div>
 
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Değişiklikleri Kaydet</button>
-                    <a asp-action="Index" class="btn btn-secondary">İptal</a>
-                </form>            
+                    <button type="submit" class="btn btn-primary w-100 mt-3"><i class="bi bi-save me-2"></i> Kaydet</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary w-100 mt-2">İptal</a>
+                </form>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-danger">
+            <div class="card-header bg-danger text-white fw-bold">Şifre Sıfırla</div>
+            <div class="card-body">
+                <form asp-action="ResetPassword" method="post">
+                    <input type="hidden" name="userId" value="@Model.Id" />
+                    <div class="mb-3">
+                        <input type="text" name="newPassword" class="form-control" placeholder="Yeni şifreyi girin..." required />
+                    </div>
+                    <button type="submit" class="btn btn-danger w-100"><i class="bi bi-key"></i> Şifreyi Sıfırla</button>
+                </form>
             </div>
         </div>
     </div>
 
-    <div class="col-md-6">
-        <div class="card shadow-sm border-danger">
-            <div class="card-header bg-danger text-white fw-bold">Şifre Sıfırla</div>
-            <div class="card-body">
-                <p class="text-muted small">Kullanıcının şifresini yönetici olarak sıfırlayabilirsiniz.</p>
-                <form asp-action="ResetPassword" method="post">
-                    <input type="hidden" name="userId" value="@Model.Id" />
-                    <div class="mb-3">
-                        <label class="form-label">Yeni Şifre</label>
-                        <input type="text" name="newPassword" class="form-control" placeholder="Yeni şifreyi girin..." required />
-                    </div>
-                    <button type="submit" class="btn btn-danger w-100"><i class="fas fa-key"></i> Şifreyi Sıfırla</button>
-                </form>
+    <!-- CLAIM OVERRIDES -->
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <span class="fw-bold"><i class="bi bi-sliders me-2"></i> Bireysel Yetki Geçersiz Kılma (Overrides)</span>
+            </div>
+            <div class="card-body bg-light">
+                <p class="text-muted small mb-4">
+                    Kullanıcı, seçilen <strong>Rol Şablonundaki</strong> tüm yetkilere otomatik olarak sahip olur. 
+                    Ancak şablonda olmayan bir yetkiyi vermek için <strong>"Ekstra Ekle"</strong>yi; şablonda olan bir yetkiyi geri almak için <strong>"Yasakla"</strong>yı işaretleyebilirsiniz.
+                </p>
+
+                <div class="accordion" id="claimsAccordion">
+                    @foreach (var module in allClaims)
+                    {
+                        var modId = module.Key.Replace(" ", "");
+                        <div class="accordion-item border-0 mb-2 shadow-sm rounded">
+                            <h2 class="accordion-header" id="heading_@modId">
+                                <button class="accordion-button collapsed fw-bold text-uppercase d-flex justify-content-between align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_@modId">
+                                    <div class="flex-grow-1">
+                                        <i class="bi bi-folder2-open me-3 text-primary"></i> @module.Key Modülü
+                                    </div>
+                                    <div class="form-check form-switch me-3 mb-0" onclick="event.stopPropagation()">
+                                        @{
+                                            var wildcardClaim = $"{module.Key}-*";
+                                            var isWildcardAdded = Model.AddedClaims.Contains(wildcardClaim);
+                                        }
+                                        <input class="form-check-input" type="checkbox" name="AddedClaims" value="@wildcardClaim" id="wildcard_@modId" form="userForm" @(isWildcardAdded ? "checked" : "") onchange="toggleModuleOverrides('@modId', this)">
+                                        <label class="form-check-label small text-primary fw-normal" for="wildcard_@modId">Tümü (*)</label>
+                                    </div>
+                                </button>
+                            </h2>
+                            <div id="collapse_@modId" class="accordion-collapse collapse" data-bs-parent="#claimsAccordion">
+                                <div class="accordion-body bg-white p-0 module-claims-container-@modId">
+                                    <table class="table table-hover mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th class="ps-4">İşlem (Action)</th>
+                                                <th class="text-center text-success" style="width:120px;">Ekstra Ekle</th>
+                                                <th class="text-center text-danger" style="width:120px;">Yasakla</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var claim in module.Value)
+                                            {
+                                                var isAdded = Model.AddedClaims.Contains(claim);
+                                                var isDenied = Model.DeniedClaims.Contains(claim);
+                                                <tr class="claim-row-@modId">
+                                                    <td class="ps-4"><code class="text-dark @(isWildcardAdded ? "text-muted" : "")">@claim</code></td>
+                                                    <td class="text-center">
+                                                        <input class="form-check-input border-success" type="checkbox" name="AddedClaims" value="@claim" form="userForm" @(isAdded || isWildcardAdded ? "checked" : "") @(isWildcardAdded ? "disabled" : "") onclick="toggleOpposite(this, 'denied_@claim')">
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <input class="form-check-input border-danger" type="checkbox" name="DeniedClaims" value="@claim" id="denied_@claim" form="userForm" @(isDenied ? "checked" : "") @(isWildcardAdded ? "disabled" : "") onclick="toggleOpposite(this, 'added_@claim')">
+                                                        <input type="hidden" id="added_@claim" value="@claim" />
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
             </div>
         </div>
     </div>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function toggleOpposite(element, oppositeId) {
+            if (element.checked) {
+                var name = element.name;
+                var oppositeName = name === 'AddedClaims' ? 'DeniedClaims' : 'AddedClaims';
+                var oppositeCheckbox = $(element).closest('tr').find('input[name="' + oppositeName + '"]');
+                if (oppositeCheckbox.length) {
+                    oppositeCheckbox.prop('checked', false);
+                }
+            }
+        }
+
+        function toggleModuleOverrides(modId, wildcardCb) {
+            var container = document.querySelector('.module-claims-container-' + modId);
+            var checkboxes = container.querySelectorAll('input[type="checkbox"]');
+            var codes = container.querySelectorAll('code');
+            
+            checkboxes.forEach(function(cb) {
+                cb.checked = wildcardCb.checked;
+                cb.disabled = wildcardCb.checked;
+            });
+
+            codes.forEach(function(c) {
+                if (wildcardCb.checked) c.classList.add('text-muted');
+                else c.classList.remove('text-muted');
+            });
+        }
+    </script>
 }

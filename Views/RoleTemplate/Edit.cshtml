@@ -1,0 +1,83 @@
+@model DitibStasbourg.Models.Security.RoleTemplate
+@{
+    var claimsDict = ViewBag.AvailableClaims as Dictionary<string, List<string>>;
+    var isEdit = Model.Id > 0;
+    ViewData["Title"] = isEdit ? "Şablon Düzenle" : "Yeni Şablon";
+}
+
+<h2 class="text-primary mb-4"><i class="bi bi-shield-check me-2"></i> @ViewData["Title"]</h2>
+
+<form asp-action="@(isEdit ? "Edit" : "Create")" method="post">
+    @if (isEdit) { <input type="hidden" asp-for="Id" /> }
+    
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <div class="form-group mb-0">
+                <label asp-for="Name" class="form-label fw-bold"></label>
+                <input asp-for="Name" class="form-control form-control-lg" required />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="mb-3">Yetkiler (Claims)</h4>
+    <div class="row">
+        @if(claimsDict != null)
+        {
+            foreach (var module in claimsDict)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header bg-light fw-bold text-uppercase d-flex justify-content-between align-items-center">
+                            <span>@module.Key Modülü</span>
+                            <div class="form-check form-switch mb-0">
+                                @{
+                                    var wildcardClaim = $"{module.Key}-*";
+                                    var isWildcardChecked = Model.Claims.Any(c => c.ClaimValue == wildcardClaim);
+                                }
+                                <input class="form-check-input" type="checkbox" name="selectedClaims" value="@wildcardClaim" id="wildcard_@module.Key" @(isWildcardChecked ? "checked" : "") onchange="toggleModuleClaims('@module.Key', this)">
+                                <label class="form-check-label small text-primary" for="wildcard_@module.Key">Tümü (*)</label>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            @foreach (var claim in module.Value)
+                            {
+                                var isChecked = Model.Claims.Any(c => c.ClaimValue == claim);
+                                <div class="form-check mb-2 module-claim-@module.Key">
+                                    <input class="form-check-input" type="checkbox" name="selectedClaims" value="@claim" id="claim_@claim" @(isChecked || isWildcardChecked ? "checked" : "") @(isWildcardChecked ? "disabled" : "")>
+                                    <label class="form-check-label @(isWildcardChecked ? "text-muted" : "")" style="font-size:0.9rem;" for="claim_@claim">
+                                        @claim
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <div class="mt-4 mb-5">
+        <button type="submit" class="btn btn-primary btn-lg px-5"><i class="bi bi-save me-2"></i> Kaydet</button>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-lg ms-2">İptal</a>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        function toggleModuleClaims(moduleKey, wildcardCb) {
+            var checkboxes = document.querySelectorAll('.module-claim-' + moduleKey + ' input[type="checkbox"]');
+            var labels = document.querySelectorAll('.module-claim-' + moduleKey + ' label');
+            
+            checkboxes.forEach(function(cb) {
+                cb.checked = wildcardCb.checked;
+                cb.disabled = wildcardCb.checked;
+            });
+
+            labels.forEach(function(l) {
+                if (wildcardCb.checked) l.classList.add('text-muted');
+                else l.classList.remove('text-muted');
+            });
+        }
+    </script>
+}

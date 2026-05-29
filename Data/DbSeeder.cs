@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using DitibStasbourg.Models;
+using DitibStasbourg.Models.Security;
+using System.Reflection;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DitibStasbourg.Data;
 
@@ -24,12 +27,14 @@ public static class DbSeeder
         }
 
         // Create Admin User
-        var adminEmail = "AAKYOL28@OUTLOOK.COM";
+        var adminEmail = "aakyol28@outlook.com";
+        var devEmail = "aakyol28@gmail.com";
+        
         var adminUser = await userManager.FindByEmailAsync(adminEmail);
-        if (adminUser == null)
-        {
-            adminUser = await userManager.FindByNameAsync(adminEmail);
-        }
+        if (adminUser == null) adminUser = await userManager.FindByNameAsync(adminEmail);
+        
+        var devUser = await userManager.FindByEmailAsync(devEmail);
+        if (devUser == null) devUser = await userManager.FindByNameAsync(devEmail);
 
         if (adminUser == null)
         {
@@ -109,7 +114,73 @@ public static class DbSeeder
             {
                 await userManager.AddToRoleAsync(adminUser, "SuperAdmin");
             }
+            
+            // --- DYNAMIC SECURITY SEEDING ---
+            var superAdminTemplate = await context.RoleTemplates.Include(t => t.Claims)
+                .FirstOrDefaultAsync(t => t.Name == "SuperAdmin Template");
+                
+            if (superAdminTemplate == null)
+            {
+                superAdminTemplate = new RoleTemplate { Name = "SuperAdmin Template" };
+                context.RoleTemplates.Add(superAdminTemplate);
+                await context.SaveChangesAsync();
+            }
+
+            // Reflect all controllers and actions
+            var controllers = typeof(Program).Assembly.GetTypes()
+                .Where(t => typeof(Controller).IsAssignableFrom(t) && !t.IsAbstract)
+                .ToList();
+
+            foreach (var controller in controllers)
+            {
+                var actions = controller.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
+                    .Where(m => !m.IsSpecialName && !m.GetCustomAttributes(typeof(NonActionAttribute), true).Any())
+                    .Select(m => m.Name)
+                    .Distinct();
+
+                var controllerName = controller.Name.Replace("Controller", "");
+                foreach (var action in actions)
+                {
+                    var claimValue = $"{controllerName}-{action}";
+                    if (!superAdminTemplate.Claims.Any(c => c.ClaimValue == claimValue))
+                    {
+                        superAdminTemplate.Claims.Add(new RoleTemplateClaim { ClaimValue = claimValue });
+                    }
+                }
+            }
+            await context.SaveChangesAsync();
+
+            // Force Link Admin to SuperAdmin Template
+            var userTemplate = await context.UserRoleTemplates.FirstOrDefaultAsync(u => u.UserId == adminUser.Id);
+            if (userTemplate == null)
+            {
+                context.UserRoleTemplates.Add(new UserRoleTemplate { UserId = adminUser.Id, RoleTemplateId = superAdminTemplate.Id });
+            }
+            else
+            {
+                userTemplate.RoleTemplateId = superAdminTemplate.Id; // Force correct template
+            }
+
+            // Force Link Dev to SuperAdmin Template
+            if (devUser != null)
+            {
+                if (!await userManager.IsInRoleAsync(devUser, "SuperAdmin"))
+                {
+                    await userManager.AddToRoleAsync(devUser, "SuperAdmin");
+                }
+                
+                var devTemplate = await context.UserRoleTemplates.FirstOrDefaultAsync(u => u.UserId == devUser.Id);
+                if (devTemplate == null)
+                {
+                    context.UserRoleTemplates.Add(new UserRoleTemplate { UserId = devUser.Id, RoleTemplateId = superAdminTemplate.Id });
+                }
+                else
+                {
+                    devTemplate.RoleTemplateId = superAdminTemplate.Id; // Force correct template
+                }
+            }
         }
+        await context.SaveChangesAsync();
         
         // Seed Gorevli Data
         if (!context.Gorevli.Any(g => g.Id > 3)) 

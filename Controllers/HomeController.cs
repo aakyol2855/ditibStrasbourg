@@ -4,16 +4,21 @@ using Microsoft.EntityFrameworkCore;
 using DitibStasbourg.Data;
 using DitibStasbourg.Models;
 using DitibStasbourg.Models.ViewModels;
+using DitibStasbourg.Models.Dashboard;
+using DitibStasbourg.Services.Interfaces;
+using System.Security.Claims;
 
 namespace DitibStasbourg.Controllers;
 
 public class HomeController : Controller
 {
     private readonly ApplicationDbContext _context;
+    private readonly IDashboardPreferenceService _prefService;
 
-    public HomeController(ApplicationDbContext context)
+    public HomeController(ApplicationDbContext context, IDashboardPreferenceService prefService)
     {
         _context = context;
+        _prefService = prefService;
     }
 
     public async Task<IActionResult> Index()
@@ -34,7 +39,24 @@ public class HomeController : Controller
         return View(model);
     }
 
+    [HttpPost]
+    public async Task<IActionResult> SaveDashboardPreferences([FromBody] DashboardPreference preferences)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId != null)
+        {
+            await _prefService.SavePreferencesAsync(userId, preferences);
+            return Ok();
+        }
+        return BadRequest();
+    }
+
     public IActionResult Privacy()
+    {
+        return View();
+    }
+
+    public IActionResult Rehber()
     {
         return View();
     }

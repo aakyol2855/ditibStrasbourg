@@ -1,0 +1,50 @@
+@model List<DitibStasbourg.Models.Navigation.MenuItem>
+
+@if (Model != null && Model.Any())
+{
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                var item = Model[i];
+                var isLast = (i == Model.Count - 1);
+                
+                if (isLast)
+                {
+                    <li class="breadcrumb-item active" aria-current="page">
+                        @if (!string.IsNullOrEmpty(item.Icon))
+                        {
+                            <i class="@item.Icon"></i>
+                        }
+                        @item.Title
+                    </li>
+                }
+                else
+                {
+                    <li class="breadcrumb-item">
+                        @if (!string.IsNullOrEmpty(item.Controller))
+                        {
+                            <a asp-controller="@item.Controller" asp-action="@item.Action" class="text-decoration-none">
+                                @if (!string.IsNullOrEmpty(item.Icon))
+                                {
+                                    <i class="@item.Icon"></i>
+                                }
+                                @item.Title
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">
+                                @if (!string.IsNullOrEmpty(item.Icon))
+                                {
+                                    <i class="@item.Icon"></i>
+                                }
+                                @item.Title
+                            </span>
+                        }
+                    </li>
+                }
+            }
+        </ol>
+    </nav>
+}

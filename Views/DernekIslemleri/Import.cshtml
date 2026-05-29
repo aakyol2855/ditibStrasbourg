@@ -1,0 +1,68 @@
+@{
+    ViewData["Title"] = "Dernek Toplu İçe Aktar";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-lg">
+            <div class="card-header bg-white py-3">
+                <h4 class="mb-0 fw-bold text-primary"><i class="bi bi-file-earmark-excel me-2"></i>Dernek Toplu İçe Aktar</h4>
+            </div>
+            <div class="card-body p-5">
+                <div class="alert alert-info border-0 bg-light-primary mb-4">
+                    <h5 class="fw-bold"><i class="bi bi-info-circle me-2"></i>Önemli Bilgi</h5>
+                    <p class="mb-0">Toplu aktarım işlemi için hazırladığınız Excel dosyasının şablonumuza uygun olması gerekmektedir. Hatalı satır olması durumunda veri güvenliği için işlemin tamamı iptal edilir.</p>
+                </div>
+
+                <form asp-action="Import" method="post" enctype="multipart/form-data">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Excel Dosyası Seçin</label>
+                        <div class="input-group">
+                            <input type="file" name="file" class="form-control" accept=".xlsx" required />
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="bi bi-cloud-upload me-2"></i>Yüklemeyi Başlat
+                            </button>
+                        </div>
+                        <div class="form-text mt-2">Sadece .xlsx formatındaki dosyalar kabul edilir.</div>
+                    </div>
+                </form>
+
+                <div class="mt-5 pt-4 border-top">
+                    <h6 class="fw-bold mb-3">Gerekli Sütun Formatı:</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered text-center small bg-light">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>İsim</th>
+                                    <th>Şehir</th>
+                                    <th>Adres</th>
+                                    <th>Başkan Adı</th>
+                                    <th>Başkan İlt.</th>
+                                    <th>Din Gör. Adı</th>
+                                    <th>Din Gör. İlt.</th>
+                                    <th>Üst Kurum Adı</th>
+                                    <th>Bölge</th>
+                                    <th>Konsolosluk</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Örn Dernek</td>
+                                    <td>Strasbourg</td>
+                                    <td>...</td>
+                                    <td>Ahmet Bey</td>
+                                    <td>06...</td>
+                                    <td>Mehmet Hoc</td>
+                                    <td>07...</td>
+                                    <td>Birim 1</td>
+                                    <td>Alsace</td>
+                                    <td>Strasbourg</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

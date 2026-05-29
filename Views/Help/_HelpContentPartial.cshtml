@@ -1,0 +1,19 @@
+@model DitibStasbourg.Models.HelpTopic
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-4 help-content" id="helpContent">
+        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <div class="mb-4 text-center">
+                <img src="@Model.ImageUrl" class="img-fluid rounded shadow-sm border" alt="@Model.Title" />
+            </div>
+        }
+        @Html.Raw(Model.Content)
+    </div>
+</div>
+
+<style>
+    .help-content h3 { font-size: 1.3rem; margin-top: 1rem; margin-bottom: 0.8rem; color: var(--platform-primary); font-weight: 600; }
+    .help-content ul { padding-left: 1.1rem; }
+    .help-content li { margin-bottom: 0.4rem; }
+</style>

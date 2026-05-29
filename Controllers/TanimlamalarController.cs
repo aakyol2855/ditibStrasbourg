@@ -6,7 +6,6 @@ using DitibStasbourg.Models;
 
 namespace DitibStasbourg.Controllers
 {
-    [Authorize(Roles = "SuperAdmin")]
     public class TanimlamalarController : Controller
     {
         private readonly ApplicationDbContext _context;

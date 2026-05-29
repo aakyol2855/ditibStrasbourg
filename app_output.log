@@ -1,0 +1,2089 @@
+Using launch settings from /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/Properties/launchSettings.json...
+Building...
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (41ms) [Parameters=[@normalizedName='?' (Size = 256)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+      FROM [AspNetRoles] AS [a]
+      WHERE [a].[NormalizedName] = @normalizedName
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (6ms) [Parameters=[@normalizedName='?' (Size = 256)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+      FROM [AspNetRoles] AS [a]
+      WHERE [a].[NormalizedName] = @normalizedName
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@normalizedName='?' (Size = 256)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+      FROM [AspNetRoles] AS [a]
+      WHERE [a].[NormalizedName] = @normalizedName
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@normalizedEmail='?' (Size = 256)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName]
+      FROM [AspNetUsers] AS [a]
+      WHERE [a].[NormalizedEmail] = @normalizedEmail
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@normalizedEmail='?' (Size = 256)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName]
+      FROM [AspNetUsers] AS [a]
+      WHERE [a].[NormalizedEmail] = @normalizedEmail
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@normalizedUserName='?' (Size = 256)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName]
+      FROM [AspNetUsers] AS [a]
+      WHERE [a].[NormalizedUserName] = @normalizedUserName
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (6ms) [Parameters=[@p14='?' (Size = 450), @p0='?' (DbType = Int32), @p1='?' (Size = 4000), @p15='?' (Size = 4000), @p2='?' (Size = 256), @p3='?' (DbType = Boolean), @p4='?' (DbType = Boolean), @p5='?' (DbType = DateTimeOffset), @p6='?' (Size = 256), @p7='?' (Size = 256), @p8='?' (Size = 4000), @p9='?' (Size = 4000), @p10='?' (DbType = Boolean), @p11='?' (Size = 4000), @p12='?' (DbType = Boolean), @p13='?' (Size = 256)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      UPDATE [AspNetUsers] SET [AccessFailedCount] = @p0, [ConcurrencyStamp] = @p1, [Email] = @p2, [EmailConfirmed] = @p3, [LockoutEnabled] = @p4, [LockoutEnd] = @p5, [NormalizedEmail] = @p6, [NormalizedUserName] = @p7, [PasswordHash] = @p8, [PhoneNumber] = @p9, [PhoneNumberConfirmed] = @p10, [SecurityStamp] = @p11, [TwoFactorEnabled] = @p12, [UserName] = @p13
+      OUTPUT 1
+      WHERE [Id] = @p14 AND [ConcurrencyStamp] = @p15;
+[SEEDER] Updated UserName to aakyol28@outlook.com
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@normalizedUserName='?' (Size = 256)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName]
+      FROM [AspNetUsers] AS [a]
+      WHERE [a].[NormalizedUserName] = @normalizedUserName
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@p14='?' (Size = 450), @p0='?' (DbType = Int32), @p1='?' (Size = 4000), @p15='?' (Size = 4000), @p2='?' (Size = 256), @p3='?' (DbType = Boolean), @p4='?' (DbType = Boolean), @p5='?' (DbType = DateTimeOffset), @p6='?' (Size = 256), @p7='?' (Size = 256), @p8='?' (Size = 4000), @p9='?' (Size = 4000), @p10='?' (DbType = Boolean), @p11='?' (Size = 4000), @p12='?' (DbType = Boolean), @p13='?' (Size = 256)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      UPDATE [AspNetUsers] SET [AccessFailedCount] = @p0, [ConcurrencyStamp] = @p1, [Email] = @p2, [EmailConfirmed] = @p3, [LockoutEnabled] = @p4, [LockoutEnd] = @p5, [NormalizedEmail] = @p6, [NormalizedUserName] = @p7, [PasswordHash] = @p8, [PhoneNumber] = @p9, [PhoneNumberConfirmed] = @p10, [SecurityStamp] = @p11, [TwoFactorEnabled] = @p12, [UserName] = @p13
+      OUTPUT 1
+      WHERE [Id] = @p14 AND [ConcurrencyStamp] = @p15;
+Password reset successfully to Admin123!
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@normalizedRoleName='?' (Size = 256)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+      FROM [AspNetRoles] AS [a]
+      WHERE [a].[NormalizedName] = @normalizedRoleName
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p='?' (Size = 450), @p1='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [a].[UserId], [a].[RoleId]
+      FROM [AspNetUserRoles] AS [a]
+      WHERE [a].[UserId] = @p AND [a].[RoleId] = @p1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r1].[Id], [r1].[Name], [r0].[Id], [r0].[ClaimValue], [r0].[RoleTemplateId]
+      FROM (
+          SELECT TOP(1) [r].[Id], [r].[Name]
+          FROM [RoleTemplates] AS [r]
+          WHERE [r].[Name] = N'SuperAdmin Template'
+      ) AS [r1]
+      LEFT JOIN [RoleTemplateClaims] AS [r0] ON [r1].[Id] = [r0].[RoleTemplateId]
+      ORDER BY [r1].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@adminUser_Id='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [u].[UserId], [u].[RoleTemplateId]
+      FROM [UserRoleTemplates] AS [u]
+      WHERE [u].[UserId] = @adminUser_Id
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@normalizedRoleName='?' (Size = 256)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+      FROM [AspNetRoles] AS [a]
+      WHERE [a].[NormalizedName] = @normalizedRoleName
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p='?' (Size = 450), @p1='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [a].[UserId], [a].[RoleId]
+      FROM [AspNetUserRoles] AS [a]
+      WHERE [a].[UserId] = @p AND [a].[RoleId] = @p1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@devUser_Id='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [u].[UserId], [u].[RoleTemplateId]
+      FROM [UserRoleTemplates] AS [u]
+      WHERE [u].[UserId] = @devUser_Id
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [Gorevli] AS [g]
+              WHERE [g].[Id] > 3) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+[SEEDER] Personnel data already exists.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@code='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [l].[Id], [l].[Code], [l].[IsActive], [l].[Name]
+      FROM [LookupTypes] AS [l]
+      WHERE [l].[Code] = @code
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@typeId='?' (DbType = Int32), @value='?' (Size = 200)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [LookupValues] AS [l]
+              WHERE [l].[LookupTypeId] = @typeId AND [l].[Value] = @value) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@typeId='?' (DbType = Int32), @value='?' (Size = 200)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [LookupValues] AS [l]
+              WHERE [l].[LookupTypeId] = @typeId AND [l].[Value] = @value) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@typeId='?' (DbType = Int32), @value='?' (Size = 200)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [LookupValues] AS [l]
+              WHERE [l].[LookupTypeId] = @typeId AND [l].[Value] = @value) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@code='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [l].[Id], [l].[Code], [l].[IsActive], [l].[Name]
+      FROM [LookupTypes] AS [l]
+      WHERE [l].[Code] = @code
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@typeId='?' (DbType = Int32), @value='?' (Size = 200)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [LookupValues] AS [l]
+              WHERE [l].[LookupTypeId] = @typeId AND [l].[Value] = @value) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@typeId='?' (DbType = Int32), @value='?' (Size = 200)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [LookupValues] AS [l]
+              WHERE [l].[LookupTypeId] = @typeId AND [l].[Value] = @value) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@code='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [l].[Id], [l].[Code], [l].[IsActive], [l].[Name]
+      FROM [LookupTypes] AS [l]
+      WHERE [l].[Code] = @code
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@typeId='?' (DbType = Int32), @value='?' (Size = 200)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [LookupValues] AS [l]
+              WHERE [l].[LookupTypeId] = @typeId AND [l].[Value] = @value) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@typeId='?' (DbType = Int32), @value='?' (Size = 200)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [LookupValues] AS [l]
+              WHERE [l].[LookupTypeId] = @typeId AND [l].[Value] = @value) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@code='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [l].[Id], [l].[Code], [l].[IsActive], [l].[Name]
+      FROM [LookupTypes] AS [l]
+      WHERE [l].[Code] = @code
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@typeId='?' (DbType = Int32), @value='?' (Size = 200)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [LookupValues] AS [l]
+              WHERE [l].[LookupTypeId] = @typeId AND [l].[Value] = @value) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@typeId='?' (DbType = Int32), @value='?' (Size = 200)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [LookupValues] AS [l]
+              WHERE [l].[LookupTypeId] = @typeId AND [l].[Value] = @value) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@typeId='?' (DbType = Int32), @value='?' (Size = 200)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [LookupValues] AS [l]
+              WHERE [l].[LookupTypeId] = @typeId AND [l].[Value] = @value) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@topic_Title='?' (Size = 200)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [HelpTopics] AS [h]
+              WHERE [h].[Title] = @topic_Title) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@topic_Title='?' (Size = 200)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [h].[Id], [h].[Category], [h].[Content], [h].[CreatedAt], [h].[DisplayOrder], [h].[ImageUrl], [h].[RequiredClaim], [h].[Title], [h].[UpdatedAt]
+      FROM [HelpTopics] AS [h]
+      WHERE [h].[Title] = @topic_Title
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@topic_Title='?' (Size = 200)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [HelpTopics] AS [h]
+              WHERE [h].[Title] = @topic_Title) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@topic_Title='?' (Size = 200)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [h].[Id], [h].[Category], [h].[Content], [h].[CreatedAt], [h].[DisplayOrder], [h].[ImageUrl], [h].[RequiredClaim], [h].[Title], [h].[UpdatedAt]
+      FROM [HelpTopics] AS [h]
+      WHERE [h].[Title] = @topic_Title
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@topic_Title='?' (Size = 200)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [HelpTopics] AS [h]
+              WHERE [h].[Title] = @topic_Title) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@topic_Title='?' (Size = 200)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [h].[Id], [h].[Category], [h].[Content], [h].[CreatedAt], [h].[DisplayOrder], [h].[ImageUrl], [h].[RequiredClaim], [h].[Title], [h].[UpdatedAt]
+      FROM [HelpTopics] AS [h]
+      WHERE [h].[Title] = @topic_Title
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@topic_Title='?' (Size = 200)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [HelpTopics] AS [h]
+              WHERE [h].[Title] = @topic_Title) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@topic_Title='?' (Size = 200)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [h].[Id], [h].[Category], [h].[Content], [h].[CreatedAt], [h].[DisplayOrder], [h].[ImageUrl], [h].[RequiredClaim], [h].[Title], [h].[UpdatedAt]
+      FROM [HelpTopics] AS [h]
+      WHERE [h].[Title] = @topic_Title
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p1='?' (DbType = Int32), @p0='?' (DbType = DateTime2), @p3='?' (DbType = Int32), @p2='?' (DbType = DateTime2), @p5='?' (DbType = Int32), @p4='?' (DbType = DateTime2), @p7='?' (DbType = Int32), @p6='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      SET NOCOUNT ON;
+      UPDATE [HelpTopics] SET [UpdatedAt] = @p0
+      OUTPUT 1
+      WHERE [Id] = @p1;
+      UPDATE [HelpTopics] SET [UpdatedAt] = @p2
+      OUTPUT 1
+      WHERE [Id] = @p3;
+      UPDATE [HelpTopics] SET [UpdatedAt] = @p4
+      OUTPUT 1
+      WHERE [Id] = @p5;
+      UPDATE [HelpTopics] SET [UpdatedAt] = @p6
+      OUTPUT 1
+      WHERE [Id] = @p7;
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: http://0.0.0.0:5265
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg
+warn: Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware[3]
+      Failed to determine the https port for redirect.
+[DEBUG] Login POST received for Email: 'AAKYOL28@OUTLOOK.COM'
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@normalizedEmail='?' (Size = 256)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName]
+      FROM [AspNetUsers] AS [a]
+      WHERE [a].[NormalizedEmail] = @normalizedEmail
+[DEBUG] User Found: ID=a2dc8d2c-f0b8-45fa-b8ea-b893c56ab296, UserName=aakyol28@outlook.com, Email=AAKYOL28@OUTLOOK.COM, Confirmed=True
+[DEBUG] Password Input: 'Admin123!'
+[DEBUG] Password Check Result: True
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@normalizedUserName='?' (Size = 256)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName]
+      FROM [AspNetUsers] AS [a]
+      WHERE [a].[NormalizedUserName] = @normalizedUserName
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@user_Id='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [a].[Id], [a].[ClaimType], [a].[ClaimValue], [a].[UserId]
+      FROM [AspNetUserClaims] AS [a]
+      WHERE [a].[UserId] = @user_Id
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [a0].[Name]
+      FROM [AspNetUserRoles] AS [a]
+      INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+      WHERE [a].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@normalizedName='?' (Size = 256)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+      FROM [AspNetRoles] AS [a]
+      WHERE [a].[NormalizedName] = @normalizedName
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@role_Id='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [a].[ClaimType], [a].[ClaimValue]
+      FROM [AspNetRoleClaims] AS [a]
+      WHERE [a].[RoleId] = @role_Id
+[DEBUG] SignInManager Result: Succeeded
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [s].[UserId], [s].[RoleTemplateId], [s].[Id], [s].[Name], [r0].[Id], [r0].[ClaimValue], [r0].[RoleTemplateId]
+      FROM (
+          SELECT TOP(1) [u].[UserId], [u].[RoleTemplateId], [r].[Id], [r].[Name]
+          FROM [UserRoleTemplates] AS [u]
+          INNER JOIN [RoleTemplates] AS [r] ON [u].[RoleTemplateId] = [r].[Id]
+          WHERE [u].[UserId] = @userId
+      ) AS [s]
+      LEFT JOIN [RoleTemplateClaims] AS [r0] ON [s].[Id] = [r0].[RoleTemplateId]
+      ORDER BY [s].[UserId], [s].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SELECT [u].[Id], [u].[ClaimValue], [u].[IsDenied], [u].[UserId]
+      FROM [UserClaimOverrides] AS [u]
+      WHERE [u].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevli] AS [g]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@today='?' (DbType = DateTime2), @today1='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevli] AS [g]
+      WHERE EXISTS (
+          SELECT 1
+          FROM [Gorevlendirme] AS [g0]
+          WHERE [g].[Id] = [g0].[GorevliId] AND @today >= [g0].[Tarih] AND ([g0].[BitisTarihi] IS NULL OR @today1 <= [g0].[BitisTarihi]))
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Kurum] AS [k]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevlendirme] AS [g]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevlendirme] AS [g]
+      WHERE DATEPART(month, [g].[Tarih]) = DATEPART(month, GETDATE()) AND DATEPART(year, [g].[Tarih]) = DATEPART(year, GETDATE())
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevlendirme] AS [g]
+      WHERE DATEPART(year, [g].[Tarih]) = DATEPART(year, GETDATE())
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevlendirme] AS [g]
+      WHERE [g].[Tarih] >= GETDATE()
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Kurum] AS [k]
+      WHERE [k].[Tip] = 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevli] AS [g]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevlendirme] AS [g]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [d].[UserId], [d].[ShowAssignmentChart], [d].[ShowKurbanChart], [d].[ShowPersonnelChart], [d].[ShowRegionMap]
+      FROM [DashboardPreferences] AS [d]
+      WHERE [d].[UserId] = @p
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [k].[Bolge] AS [RegionName], COUNT(*) AS [AssociationCount], COUNT(*) * 2 AS [PersonnelCount]
+      FROM [Kurum] AS [k]
+      WHERE [k].[Bolge] IS NOT NULL AND [k].[Bolge] NOT LIKE N''
+      GROUP BY [k].[Bolge]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [k].[Id], [k].[CreatedAt], [k].[Price], [k].[RemainingShares], [k].[Species], [k].[Status], [k].[TagNumber], [k].[TotalShares], [k].[Weight]
+      FROM [Kurbanliklar] AS [k]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName]
+      FROM [AspNetUsers] AS [a]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [a0].[Name]
+      FROM [AspNetUserRoles] AS [a]
+      INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+      WHERE [a].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [a0].[Name]
+      FROM [AspNetUserRoles] AS [a]
+      INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+      WHERE [a].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@p='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName]
+      FROM [AspNetUsers] AS [a]
+      WHERE [a].[Id] = @p
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [u].[UserId], [u].[RoleTemplateId]
+      FROM [UserRoleTemplates] AS [u]
+      WHERE [u].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SELECT [u].[Id], [u].[ClaimValue], [u].[IsDenied], [u].[UserId]
+      FROM [UserClaimOverrides] AS [u]
+      WHERE [u].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Name]
+      FROM [RoleTemplates] AS [r]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName]
+      FROM [AspNetUsers] AS [a]
+      WHERE [a].[Id] = @p
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+      FROM [AspNetRoles] AS [a]
+      WHERE [a].[Name] = N'SuperAdmin'
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [r].[Id], [r].[Name]
+      FROM [RoleTemplates] AS [r]
+      WHERE [r].[Name] = N'SuperAdmin Template'
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@normalizedRoleName='?' (Size = 256)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+      FROM [AspNetRoles] AS [a]
+      WHERE [a].[NormalizedName] = @normalizedRoleName
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p='?' (Size = 450), @p1='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [a].[UserId], [a].[RoleId]
+      FROM [AspNetUserRoles] AS [a]
+      WHERE [a].[UserId] = @p AND [a].[RoleId] = @p1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@user_Id='?' (Size = 450), @superAdminTemplate_Id='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [UserRoleTemplates] AS [u]
+              WHERE [u].[UserId] = @user_Id AND [u].[RoleTemplateId] = @superAdminTemplate_Id) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@superAdminTemplate_Id='?' (DbType = Int32), @user_Id='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [UserRoleTemplates] AS [u]
+      WHERE [u].[RoleTemplateId] = @superAdminTemplate_Id AND [u].[UserId] <> @user_Id
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@normalizedUserName='?' (Size = 256)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName]
+      FROM [AspNetUsers] AS [a]
+      WHERE [a].[NormalizedUserName] = @normalizedUserName
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@p14='?' (Size = 450), @p0='?' (DbType = Int32), @p1='?' (Size = 4000), @p15='?' (Size = 4000), @p2='?' (Size = 256), @p3='?' (DbType = Boolean), @p4='?' (DbType = Boolean), @p5='?' (DbType = DateTimeOffset), @p6='?' (Size = 256), @p7='?' (Size = 256), @p8='?' (Size = 4000), @p9='?' (Size = 4000), @p10='?' (DbType = Boolean), @p11='?' (Size = 4000), @p12='?' (DbType = Boolean), @p13='?' (Size = 256)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      UPDATE [AspNetUsers] SET [AccessFailedCount] = @p0, [ConcurrencyStamp] = @p1, [Email] = @p2, [EmailConfirmed] = @p3, [LockoutEnabled] = @p4, [LockoutEnd] = @p5, [NormalizedEmail] = @p6, [NormalizedUserName] = @p7, [PasswordHash] = @p8, [PhoneNumber] = @p9, [PhoneNumberConfirmed] = @p10, [SecurityStamp] = @p11, [TwoFactorEnabled] = @p12, [UserName] = @p13
+      OUTPUT 1
+      WHERE [Id] = @p14 AND [ConcurrencyStamp] = @p15;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@model_Id='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [u].[UserId], [u].[RoleTemplateId]
+      FROM [UserRoleTemplates] AS [u]
+      WHERE [u].[UserId] = @model_Id
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@model_Id='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SELECT [u].[Id], [u].[ClaimValue], [u].[IsDenied], [u].[UserId]
+      FROM [UserClaimOverrides] AS [u]
+      WHERE [u].[UserId] = @model_Id
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (32ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Int32), @p2='?' (DbType = Int32), @p3='?' (DbType = Int32), @p4='?' (DbType = Int32), @p5='?' (DbType = Int32), @p6='?' (DbType = Int32), @p7='?' (DbType = Int32), @p8='?' (DbType = Int32), @p9='?' (DbType = Int32), @p10='?' (DbType = Int32), @p11='?' (DbType = Int32), @p12='?' (DbType = Int32), @p13='?' (DbType = Int32), @p14='?' (DbType = Int32), @p15='?' (DbType = Int32), @p16='?' (DbType = Int32), @p17='?' (DbType = Int32), @p18='?' (DbType = Int32), @p19='?' (DbType = Int32), @p20='?' (DbType = Int32), @p21='?' (DbType = Int32), @p22='?' (DbType = Int32), @p23='?' (DbType = Int32), @p24='?' (DbType = Int32), @p25='?' (DbType = Int32), @p26='?' (DbType = Int32), @p27='?' (DbType = Int32), @p28='?' (DbType = Int32), @p29='?' (DbType = Int32), @p30='?' (DbType = Int32), @p31='?' (DbType = Int32), @p32='?' (DbType = Int32), @p33='?' (DbType = Int32), @p34='?' (DbType = Int32), @p35='?' (DbType = Int32), @p36='?' (DbType = Int32), @p37='?' (DbType = Int32), @p38='?' (DbType = Int32), @p39='?' (DbType = Int32), @p40='?' (DbType = Int32), @p41='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SET NOCOUNT ON;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p0;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p1;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p2;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p3;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p4;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p5;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p6;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p7;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p8;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p9;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p10;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p11;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p12;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p13;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p14;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p15;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p16;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p17;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p18;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p19;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p20;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p21;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p22;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p23;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p24;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p25;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p26;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p27;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p28;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p29;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p30;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p31;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p32;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p33;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p34;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p35;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p36;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p37;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p38;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p39;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p40;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p41;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (15ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Int32), @p2='?' (DbType = Int32), @p3='?' (DbType = Int32), @p4='?' (DbType = Int32), @p5='?' (DbType = Int32), @p6='?' (DbType = Int32), @p7='?' (DbType = Int32), @p8='?' (Size = 450), @p9='?' (DbType = Int32), @p10='?' (Size = 100), @p11='?' (DbType = Boolean), @p12='?' (Size = 4000), @p13='?' (Size = 100), @p14='?' (DbType = Boolean), @p15='?' (Size = 4000), @p16='?' (Size = 100), @p17='?' (DbType = Boolean), @p18='?' (Size = 4000), @p19='?' (Size = 100), @p20='?' (DbType = Boolean), @p21='?' (Size = 4000), @p22='?' (Size = 100), @p23='?' (DbType = Boolean), @p24='?' (Size = 4000), @p25='?' (Size = 100), @p26='?' (DbType = Boolean), @p27='?' (Size = 4000), @p28='?' (Size = 100), @p29='?' (DbType = Boolean), @p30='?' (Size = 4000), @p31='?' (Size = 100), @p32='?' (DbType = Boolean), @p33='?' (Size = 4000), @p34='?' (Size = 100), @p35='?' (DbType = Boolean), @p36='?' (Size = 4000), @p37='?' (Size = 100), @p38='?' (DbType = Boolean), @p39='?' (Size = 4000), @p40='?' (Size = 100), @p41='?' (DbType = Boolean), @p42='?' (Size = 4000), @p43='?' (Size = 100), @p44='?' (DbType = Boolean), @p45='?' (Size = 4000), @p46='?' (Size = 100), @p47='?' (DbType = Boolean), @p48='?' (Size = 4000), @p49='?' (Size = 100), @p50='?' (DbType = Boolean), @p51='?' (Size = 4000), @p52='?' (Size = 100), @p53='?' (DbType = Boolean), @p54='?' (Size = 4000), @p55='?' (Size = 100), @p56='?' (DbType = Boolean), @p57='?' (Size = 4000), @p58='?' (Size = 100), @p59='?' (DbType = Boolean), @p60='?' (Size = 4000), @p61='?' (Size = 100), @p62='?' (DbType = Boolean), @p63='?' (Size = 4000), @p64='?' (Size = 100), @p65='?' (DbType = Boolean), @p66='?' (Size = 4000), @p67='?' (Size = 100), @p68='?' (DbType = Boolean), @p69='?' (Size = 4000), @p70='?' (Size = 100), @p71='?' (DbType = Boolean), @p72='?' (Size = 4000), @p73='?' (Size = 100), @p74='?' (DbType = Boolean), @p75='?' (Size = 4000), @p76='?' (Size = 100), @p77='?' (DbType = Boolean), @p78='?' (Size = 4000), @p79='?' (Size = 100), @p80='?' (DbType = Boolean), @p81='?' (Size = 4000), @p82='?' (Size = 100), @p83='?' (DbType = Boolean), @p84='?' (Size = 4000), @p85='?' (Size = 100), @p86='?' (DbType = Boolean), @p87='?' (Size = 4000), @p88='?' (Size = 100), @p89='?' (DbType = Boolean), @p90='?' (Size = 4000), @p91='?' (Size = 100), @p92='?' (DbType = Boolean), @p93='?' (Size = 4000), @p94='?' (Size = 100), @p95='?' (DbType = Boolean), @p96='?' (Size = 4000), @p97='?' (Size = 100), @p98='?' (DbType = Boolean), @p99='?' (Size = 4000), @p100='?' (Size = 100), @p101='?' (DbType = Boolean), @p102='?' (Size = 4000), @p103='?' (Size = 100), @p104='?' (DbType = Boolean), @p105='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SET NOCOUNT ON;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p0;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p1;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p2;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p3;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p4;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p5;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p6;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p7;
+      DELETE FROM [UserRoleTemplates]
+      OUTPUT 1
+      WHERE [UserId] = @p8;
+      DELETE FROM [UserClaimOverrides]
+      OUTPUT 1
+      WHERE [Id] = @p9;
+      MERGE [UserClaimOverrides] USING (
+      VALUES (@p10, @p11, @p12, 0),
+      (@p13, @p14, @p15, 1),
+      (@p16, @p17, @p18, 2),
+      (@p19, @p20, @p21, 3),
+      (@p22, @p23, @p24, 4),
+      (@p25, @p26, @p27, 5),
+      (@p28, @p29, @p30, 6),
+      (@p31, @p32, @p33, 7),
+      (@p34, @p35, @p36, 8),
+      (@p37, @p38, @p39, 9),
+      (@p40, @p41, @p42, 10),
+      (@p43, @p44, @p45, 11),
+      (@p46, @p47, @p48, 12),
+      (@p49, @p50, @p51, 13),
+      (@p52, @p53, @p54, 14),
+      (@p55, @p56, @p57, 15),
+      (@p58, @p59, @p60, 16),
+      (@p61, @p62, @p63, 17),
+      (@p64, @p65, @p66, 18),
+      (@p67, @p68, @p69, 19),
+      (@p70, @p71, @p72, 20),
+      (@p73, @p74, @p75, 21),
+      (@p76, @p77, @p78, 22),
+      (@p79, @p80, @p81, 23),
+      (@p82, @p83, @p84, 24),
+      (@p85, @p86, @p87, 25),
+      (@p88, @p89, @p90, 26),
+      (@p91, @p92, @p93, 27),
+      (@p94, @p95, @p96, 28),
+      (@p97, @p98, @p99, 29),
+      (@p100, @p101, @p102, 30),
+      (@p103, @p104, @p105, 31)) AS i ([ClaimValue], [IsDenied], [UserId], _Position) ON 1=0
+      WHEN NOT MATCHED THEN
+      INSERT ([ClaimValue], [IsDenied], [UserId])
+      VALUES (i.[ClaimValue], i.[IsDenied], i.[UserId])
+      OUTPUT INSERTED.[Id], i._Position;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (7ms) [Parameters=[@p0='?' (Size = 100), @p1='?' (DbType = Boolean), @p2='?' (Size = 4000), @p3='?' (Size = 100), @p4='?' (DbType = Boolean), @p5='?' (Size = 4000), @p6='?' (Size = 100), @p7='?' (DbType = Boolean), @p8='?' (Size = 4000), @p9='?' (Size = 100), @p10='?' (DbType = Boolean), @p11='?' (Size = 4000), @p12='?' (Size = 100), @p13='?' (DbType = Boolean), @p14='?' (Size = 4000), @p15='?' (Size = 100), @p16='?' (DbType = Boolean), @p17='?' (Size = 4000), @p18='?' (Size = 100), @p19='?' (DbType = Boolean), @p20='?' (Size = 4000), @p21='?' (Size = 100), @p22='?' (DbType = Boolean), @p23='?' (Size = 4000), @p24='?' (Size = 100), @p25='?' (DbType = Boolean), @p26='?' (Size = 4000), @p27='?' (Size = 100), @p28='?' (DbType = Boolean), @p29='?' (Size = 4000), @p30='?' (Size = 100), @p31='?' (DbType = Boolean), @p32='?' (Size = 4000), @p33='?' (Size = 100), @p34='?' (DbType = Boolean), @p35='?' (Size = 4000), @p36='?' (Size = 100), @p37='?' (DbType = Boolean), @p38='?' (Size = 4000), @p39='?' (Size = 100), @p40='?' (DbType = Boolean), @p41='?' (Size = 4000), @p42='?' (Size = 100), @p43='?' (DbType = Boolean), @p44='?' (Size = 4000), @p45='?' (Size = 100), @p46='?' (DbType = Boolean), @p47='?' (Size = 4000), @p48='?' (Size = 100), @p49='?' (DbType = Boolean), @p50='?' (Size = 4000), @p51='?' (Size = 100), @p52='?' (DbType = Boolean), @p53='?' (Size = 4000), @p54='?' (Size = 100), @p55='?' (DbType = Boolean), @p56='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      MERGE [UserClaimOverrides] USING (
+      VALUES (@p0, @p1, @p2, 0),
+      (@p3, @p4, @p5, 1),
+      (@p6, @p7, @p8, 2),
+      (@p9, @p10, @p11, 3),
+      (@p12, @p13, @p14, 4),
+      (@p15, @p16, @p17, 5),
+      (@p18, @p19, @p20, 6),
+      (@p21, @p22, @p23, 7),
+      (@p24, @p25, @p26, 8),
+      (@p27, @p28, @p29, 9),
+      (@p30, @p31, @p32, 10),
+      (@p33, @p34, @p35, 11),
+      (@p36, @p37, @p38, 12),
+      (@p39, @p40, @p41, 13),
+      (@p42, @p43, @p44, 14),
+      (@p45, @p46, @p47, 15),
+      (@p48, @p49, @p50, 16),
+      (@p51, @p52, @p53, 17),
+      (@p54, @p55, @p56, 18)) AS i ([ClaimValue], [IsDenied], [UserId], _Position) ON 1=0
+      WHEN NOT MATCHED THEN
+      INSERT ([ClaimValue], [IsDenied], [UserId])
+      VALUES (i.[ClaimValue], i.[IsDenied], i.[UserId])
+      OUTPUT INSERTED.[Id], i._Position;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName]
+      FROM [AspNetUsers] AS [a]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [a0].[Name]
+      FROM [AspNetUserRoles] AS [a]
+      INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+      WHERE [a].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [a0].[Name]
+      FROM [AspNetUserRoles] AS [a]
+      INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+      WHERE [a].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName]
+      FROM [AspNetUsers] AS [a]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@userId='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [a0].[Name]
+      FROM [AspNetUserRoles] AS [a]
+      INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+      WHERE [a].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [a0].[Name]
+      FROM [AspNetUserRoles] AS [a]
+      INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+      WHERE [a].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName]
+      FROM [AspNetUsers] AS [a]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [a0].[Name]
+      FROM [AspNetUserRoles] AS [a]
+      INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+      WHERE [a].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [a0].[Name]
+      FROM [AspNetUserRoles] AS [a]
+      INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+      WHERE [a].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName]
+      FROM [AspNetUsers] AS [a]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [a0].[Name]
+      FROM [AspNetUserRoles] AS [a]
+      INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+      WHERE [a].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [a0].[Name]
+      FROM [AspNetUserRoles] AS [a]
+      INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+      WHERE [a].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName]
+      FROM [AspNetUsers] AS [a]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@userId='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [a0].[Name]
+      FROM [AspNetUserRoles] AS [a]
+      INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+      WHERE [a].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@userId='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [a0].[Name]
+      FROM [AspNetUserRoles] AS [a]
+      INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+      WHERE [a].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName]
+      FROM [AspNetUsers] AS [a]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@userId='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [a0].[Name]
+      FROM [AspNetUserRoles] AS [a]
+      INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+      WHERE [a].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@userId='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [a0].[Name]
+      FROM [AspNetUserRoles] AS [a]
+      INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+      WHERE [a].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [l].[Id], [l].[Code], [l].[IsActive], [l].[Name]
+      FROM [LookupTypes] AS [l]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName]
+      FROM [AspNetUsers] AS [a]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [a0].[Name]
+      FROM [AspNetUserRoles] AS [a]
+      INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+      WHERE [a].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [a0].[Name]
+      FROM [AspNetUserRoles] AS [a]
+      INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+      WHERE [a].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName]
+      FROM [AspNetUsers] AS [a]
+      WHERE [a].[Id] = @p
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [u].[UserId], [u].[RoleTemplateId]
+      FROM [UserRoleTemplates] AS [u]
+      WHERE [u].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SELECT [u].[Id], [u].[ClaimValue], [u].[IsDenied], [u].[UserId]
+      FROM [UserClaimOverrides] AS [u]
+      WHERE [u].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Name]
+      FROM [RoleTemplates] AS [r]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@p='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName]
+      FROM [AspNetUsers] AS [a]
+      WHERE [a].[Id] = @p
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@userId='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [u].[UserId], [u].[RoleTemplateId]
+      FROM [UserRoleTemplates] AS [u]
+      WHERE [u].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@userId='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SELECT [u].[Id], [u].[ClaimValue], [u].[IsDenied], [u].[UserId]
+      FROM [UserClaimOverrides] AS [u]
+      WHERE [u].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Name]
+      FROM [RoleTemplates] AS [r]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevli] AS [g]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@today='?' (DbType = DateTime2), @today1='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevli] AS [g]
+      WHERE EXISTS (
+          SELECT 1
+          FROM [Gorevlendirme] AS [g0]
+          WHERE [g].[Id] = [g0].[GorevliId] AND @today >= [g0].[Tarih] AND ([g0].[BitisTarihi] IS NULL OR @today1 <= [g0].[BitisTarihi]))
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Kurum] AS [k]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevlendirme] AS [g]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevlendirme] AS [g]
+      WHERE DATEPART(month, [g].[Tarih]) = DATEPART(month, GETDATE()) AND DATEPART(year, [g].[Tarih]) = DATEPART(year, GETDATE())
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevlendirme] AS [g]
+      WHERE DATEPART(year, [g].[Tarih]) = DATEPART(year, GETDATE())
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevlendirme] AS [g]
+      WHERE [g].[Tarih] >= GETDATE()
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Kurum] AS [k]
+      WHERE [k].[Tip] = 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevli] AS [g]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevlendirme] AS [g]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [d].[UserId], [d].[ShowAssignmentChart], [d].[ShowKurbanChart], [d].[ShowPersonnelChart], [d].[ShowRegionMap]
+      FROM [DashboardPreferences] AS [d]
+      WHERE [d].[UserId] = @p
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [k].[Bolge] AS [RegionName], COUNT(*) AS [AssociationCount], COUNT(*) * 2 AS [PersonnelCount]
+      FROM [Kurum] AS [k]
+      WHERE [k].[Bolge] IS NOT NULL AND [k].[Bolge] NOT LIKE N''
+      GROUP BY [k].[Bolge]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [k].[Id], [k].[CreatedAt], [k].[Price], [k].[RemainingShares], [k].[Species], [k].[Status], [k].[TagNumber], [k].[TotalShares], [k].[Weight]
+      FROM [Kurbanliklar] AS [k]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [k].[Id], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId], [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Kurum] AS [k]
+      LEFT JOIN [Ref_KurumTurus] AS [r] ON [k].[UstKurumId] = [r].[Id]
+      WHERE [k].[Tip] = 1 AND [k].[AktifMi] = CAST(1 AS bit)
+      ORDER BY [k].[Isim]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[AktifMi], [r].[IsDeleted], [r].[Renk], [r].[Sira]
+      FROM [Ref_GorevliDurums] AS [r]
+      WHERE [r].[AktifMi] = CAST(1 AS bit) AND [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Sira]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_SozlesmeTips] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_Unvans] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_EgitimDurumlari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_HafizlikDurumlari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_KadroTurleri] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_AskerlikDurumlari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_KanGruplari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [k].[Id], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId]
+      FROM [Kurum] AS [k]
+      ORDER BY [k].[Isim]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevli] AS [g]
+warn: Microsoft.EntityFrameworkCore.Query[20504]
+      Compiling a query which loads related collections for more than one collection navigation, either via 'Include' or through projection, but no 'QuerySplittingBehavior' has been configured. By default, Entity Framework will use 'QuerySplittingBehavior.SingleQuery', which can potentially result in slow query performance. See https://go.microsoft.com/fwlink/?linkid=2134277 for more information. To identify the query that's triggering this warning call 'ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning))'.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@p='?' (DbType = Int32), @p1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [g0].[Id], [g0].[Ad], [g0].[Adres], [g0].[AnneAdi], [g0].[AskerlikDurumuId], [g0].[BabaAdi], [g0].[BasvuruTuruId], [g0].[CepTelefonu], [g0].[Cinsiyet], [g0].[Derece], [g0].[DiyanetGirisTarihi], [g0].[DogumTarihi], [g0].[DogumYeri], [g0].[Durum], [g0].[EgitimDurumuId], [g0].[Email], [g0].[EmeklilikTarihi], [g0].[EvTelefonu], [g0].[FotografYolu], [g0].[GorevliDurumId], [g0].[HafizlikDurumuId], [g0].[IlkGoreveBaslamaTarihi], [g0].[Kademe], [g0].[KadroTuruId], [g0].[KanGrubuId], [g0].[MezuniyetBolum], [g0].[MezuniyetOkul], [g0].[Soyad], [g0].[SozlesmeTipId], [g0].[TCKimlikNo], [g0].[UnvanId], [r].[Id], [r0].[Id], [r1].[Id], [r2].[Id], [r3].[Id], [r4].[Id], [r5].[Id], [r6].[Id], [s].[Id], [s].[BitisTarihi], [s].[GorevliId], [s].[KurumId], [s].[Tarih], [s].[YerineGelecekGorevliId], [s].[YerineGelisPlanlananBitisTarih], [s].[YerineGelisPlanlananTarih], [s].[Id0], [s].[Adres], [s].[AktifMi], [s].[BaskonsoloslukBolgesi], [s].[Bolge], [s].[CrmUyelikFormDurumu], [s].[DernekBaskaniAd], [s].[DernekBaskaniIletisim], [s].[DinGorevlisiAd], [s].[DinGorevlisiIletisim], [s].[Isim], [s].[KurulusKanunu], [s].[Sehir], [s].[Tip], [s].[UstKurumId], [r].[Ad], [r].[AktifMi], [r].[IsDeleted], [r].[Renk], [r].[Sira], [r0].[Ad], [r0].[IsDeleted], [r1].[Ad], [r1].[IsDeleted], [r2].[Ad], [r2].[IsDeleted], [r3].[Ad], [r3].[IsDeleted], [r4].[Ad], [r4].[IsDeleted], [r5].[Ad], [r5].[IsDeleted], [r6].[Ad], [r6].[IsDeleted], [g2].[Id], [g2].[GorevliId], [g2].[NotIcerik], [g2].[Tarih], [g2].[YazanKisiId]
+      FROM (
+          SELECT [g].[Id], [g].[Ad], [g].[Adres], [g].[AnneAdi], [g].[AskerlikDurumuId], [g].[BabaAdi], [g].[BasvuruTuruId], [g].[CepTelefonu], [g].[Cinsiyet], [g].[Derece], [g].[DiyanetGirisTarihi], [g].[DogumTarihi], [g].[DogumYeri], [g].[Durum], [g].[EgitimDurumuId], [g].[Email], [g].[EmeklilikTarihi], [g].[EvTelefonu], [g].[FotografYolu], [g].[GorevliDurumId], [g].[HafizlikDurumuId], [g].[IlkGoreveBaslamaTarihi], [g].[Kademe], [g].[KadroTuruId], [g].[KanGrubuId], [g].[MezuniyetBolum], [g].[MezuniyetOkul], [g].[Soyad], [g].[SozlesmeTipId], [g].[TCKimlikNo], [g].[UnvanId]
+          FROM [Gorevli] AS [g]
+          ORDER BY [g].[Ad]
+          OFFSET @p ROWS FETCH NEXT @p1 ROWS ONLY
+      ) AS [g0]
+      LEFT JOIN [Ref_GorevliDurums] AS [r] ON [g0].[GorevliDurumId] = [r].[Id]
+      LEFT JOIN [Ref_SozlesmeTips] AS [r0] ON [g0].[SozlesmeTipId] = [r0].[Id]
+      LEFT JOIN [Ref_Unvans] AS [r1] ON [g0].[UnvanId] = [r1].[Id]
+      LEFT JOIN [Ref_EgitimDurumlari] AS [r2] ON [g0].[EgitimDurumuId] = [r2].[Id]
+      LEFT JOIN [Ref_HafizlikDurumlari] AS [r3] ON [g0].[HafizlikDurumuId] = [r3].[Id]
+      LEFT JOIN [Ref_KadroTurleri] AS [r4] ON [g0].[KadroTuruId] = [r4].[Id]
+      LEFT JOIN [Ref_AskerlikDurumlari] AS [r5] ON [g0].[AskerlikDurumuId] = [r5].[Id]
+      LEFT JOIN [Ref_KanGruplari] AS [r6] ON [g0].[KanGrubuId] = [r6].[Id]
+      LEFT JOIN (
+          SELECT [g1].[Id], [g1].[BitisTarihi], [g1].[GorevliId], [g1].[KurumId], [g1].[Tarih], [g1].[YerineGelecekGorevliId], [g1].[YerineGelisPlanlananBitisTarih], [g1].[YerineGelisPlanlananTarih], [k].[Id] AS [Id0], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId]
+          FROM [Gorevlendirme] AS [g1]
+          INNER JOIN [Kurum] AS [k] ON [g1].[KurumId] = [k].[Id]
+      ) AS [s] ON [g0].[Id] = [s].[GorevliId]
+      LEFT JOIN [GorevliNotlari] AS [g2] ON [g0].[Id] = [g2].[GorevliId]
+      ORDER BY [g0].[Ad], [g0].[Id], [r].[Id], [r0].[Id], [r1].[Id], [r2].[Id], [r3].[Id], [r4].[Id], [r5].[Id], [r6].[Id], [s].[Id], [s].[Id0]
+warn: Microsoft.EntityFrameworkCore.Query[20504]
+      Compiling a query which loads related collections for more than one collection navigation, either via 'Include' or through projection, but no 'QuerySplittingBehavior' has been configured. By default, Entity Framework will use 'QuerySplittingBehavior.SingleQuery', which can potentially result in slow query performance. See https://go.microsoft.com/fwlink/?linkid=2134277 for more information. To identify the query that's triggering this warning call 'ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning))'.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (19ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [g].[Id], [g].[Ad], [g].[Adres], [g].[AnneAdi], [g].[AskerlikDurumuId], [g].[BabaAdi], [g].[BasvuruTuruId], [g].[CepTelefonu], [g].[Cinsiyet], [g].[Derece], [g].[DiyanetGirisTarihi], [g].[DogumTarihi], [g].[DogumYeri], [g].[Durum], [g].[EgitimDurumuId], [g].[Email], [g].[EmeklilikTarihi], [g].[EvTelefonu], [g].[FotografYolu], [g].[GorevliDurumId], [g].[HafizlikDurumuId], [g].[IlkGoreveBaslamaTarihi], [g].[Kademe], [g].[KadroTuruId], [g].[KanGrubuId], [g].[MezuniyetBolum], [g].[MezuniyetOkul], [g].[Soyad], [g].[SozlesmeTipId], [g].[TCKimlikNo], [g].[UnvanId], [r].[Id], [r0].[Id], [r1].[Id], [r2].[Id], [r3].[Id], [r4].[Id], [r5].[Id], [r6].[Id], [s].[Id], [s].[BitisTarihi], [s].[GorevliId], [s].[KurumId], [s].[Tarih], [s].[YerineGelecekGorevliId], [s].[YerineGelisPlanlananBitisTarih], [s].[YerineGelisPlanlananTarih], [s].[Id0], [s].[Adres], [s].[AktifMi], [s].[BaskonsoloslukBolgesi], [s].[Bolge], [s].[CrmUyelikFormDurumu], [s].[DernekBaskaniAd], [s].[DernekBaskaniIletisim], [s].[DinGorevlisiAd], [s].[DinGorevlisiIletisim], [s].[Isim], [s].[KurulusKanunu], [s].[Sehir], [s].[Tip], [s].[UstKurumId], [r].[Ad], [r].[AktifMi], [r].[IsDeleted], [r].[Renk], [r].[Sira], [r0].[Ad], [r0].[IsDeleted], [r1].[Ad], [r1].[IsDeleted], [r2].[Ad], [r2].[IsDeleted], [r3].[Ad], [r3].[IsDeleted], [r4].[Ad], [r4].[IsDeleted], [r5].[Ad], [r5].[IsDeleted], [r6].[Ad], [r6].[IsDeleted], [g1].[Id], [g1].[GorevliId], [g1].[NotIcerik], [g1].[Tarih], [g1].[YazanKisiId]
+      FROM [Gorevli] AS [g]
+      LEFT JOIN [Ref_GorevliDurums] AS [r] ON [g].[GorevliDurumId] = [r].[Id]
+      LEFT JOIN [Ref_SozlesmeTips] AS [r0] ON [g].[SozlesmeTipId] = [r0].[Id]
+      LEFT JOIN [Ref_Unvans] AS [r1] ON [g].[UnvanId] = [r1].[Id]
+      LEFT JOIN [Ref_EgitimDurumlari] AS [r2] ON [g].[EgitimDurumuId] = [r2].[Id]
+      LEFT JOIN [Ref_HafizlikDurumlari] AS [r3] ON [g].[HafizlikDurumuId] = [r3].[Id]
+      LEFT JOIN [Ref_KadroTurleri] AS [r4] ON [g].[KadroTuruId] = [r4].[Id]
+      LEFT JOIN [Ref_AskerlikDurumlari] AS [r5] ON [g].[AskerlikDurumuId] = [r5].[Id]
+      LEFT JOIN [Ref_KanGruplari] AS [r6] ON [g].[KanGrubuId] = [r6].[Id]
+      LEFT JOIN (
+          SELECT [g0].[Id], [g0].[BitisTarihi], [g0].[GorevliId], [g0].[KurumId], [g0].[Tarih], [g0].[YerineGelecekGorevliId], [g0].[YerineGelisPlanlananBitisTarih], [g0].[YerineGelisPlanlananTarih], [k].[Id] AS [Id0], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId]
+          FROM [Gorevlendirme] AS [g0]
+          INNER JOIN [Kurum] AS [k] ON [g0].[KurumId] = [k].[Id]
+      ) AS [s] ON [g].[Id] = [s].[GorevliId]
+      LEFT JOIN [GorevliNotlari] AS [g1] ON [g].[Id] = [g1].[GorevliId]
+      ORDER BY [g].[Ad], [g].[Id], [r].[Id], [r0].[Id], [r1].[Id], [r2].[Id], [r3].[Id], [r4].[Id], [r5].[Id], [r6].[Id], [s].[Id], [s].[Id0]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [g].[Id], [g].[Ad], [g].[Adres], [g].[AnneAdi], [g].[AskerlikDurumuId], [g].[BabaAdi], [g].[BasvuruTuruId], [g].[CepTelefonu], [g].[Cinsiyet], [g].[Derece], [g].[DiyanetGirisTarihi], [g].[DogumTarihi], [g].[DogumYeri], [g].[Durum], [g].[EgitimDurumuId], [g].[Email], [g].[EmeklilikTarihi], [g].[EvTelefonu], [g].[FotografYolu], [g].[GorevliDurumId], [g].[HafizlikDurumuId], [g].[IlkGoreveBaslamaTarihi], [g].[Kademe], [g].[KadroTuruId], [g].[KanGrubuId], [g].[MezuniyetBolum], [g].[MezuniyetOkul], [g].[Soyad], [g].[SozlesmeTipId], [g].[TCKimlikNo], [g].[UnvanId]
+      FROM [Gorevli] AS [g]
+      ORDER BY [g].[Ad], [g].[Soyad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [k].[Id], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId]
+      FROM [Kurum] AS [k]
+      ORDER BY [k].[Isim]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevlendirme] AS [g]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (6ms) [Parameters=[@p='?' (DbType = Int32), @p1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [g1].[Id], [g1].[BitisTarihi], [g1].[GorevliId], [g1].[KurumId], [g1].[Tarih], [g1].[YerineGelecekGorevliId], [g1].[YerineGelisPlanlananBitisTarih], [g1].[YerineGelisPlanlananTarih], [g0].[Id], [g0].[Ad], [g0].[Adres], [g0].[AnneAdi], [g0].[AskerlikDurumuId], [g0].[BabaAdi], [g0].[BasvuruTuruId], [g0].[CepTelefonu], [g0].[Cinsiyet], [g0].[Derece], [g0].[DiyanetGirisTarihi], [g0].[DogumTarihi], [g0].[DogumYeri], [g0].[Durum], [g0].[EgitimDurumuId], [g0].[Email], [g0].[EmeklilikTarihi], [g0].[EvTelefonu], [g0].[FotografYolu], [g0].[GorevliDurumId], [g0].[HafizlikDurumuId], [g0].[IlkGoreveBaslamaTarihi], [g0].[Kademe], [g0].[KadroTuruId], [g0].[KanGrubuId], [g0].[MezuniyetBolum], [g0].[MezuniyetOkul], [g0].[Soyad], [g0].[SozlesmeTipId], [g0].[TCKimlikNo], [g0].[UnvanId], [r].[Id], [r].[Ad], [r].[AktifMi], [r].[IsDeleted], [r].[Renk], [r].[Sira], [k].[Id], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId], [g2].[Id], [g2].[Ad], [g2].[Adres], [g2].[AnneAdi], [g2].[AskerlikDurumuId], [g2].[BabaAdi], [g2].[BasvuruTuruId], [g2].[CepTelefonu], [g2].[Cinsiyet], [g2].[Derece], [g2].[DiyanetGirisTarihi], [g2].[DogumTarihi], [g2].[DogumYeri], [g2].[Durum], [g2].[EgitimDurumuId], [g2].[Email], [g2].[EmeklilikTarihi], [g2].[EvTelefonu], [g2].[FotografYolu], [g2].[GorevliDurumId], [g2].[HafizlikDurumuId], [g2].[IlkGoreveBaslamaTarihi], [g2].[Kademe], [g2].[KadroTuruId], [g2].[KanGrubuId], [g2].[MezuniyetBolum], [g2].[MezuniyetOkul], [g2].[Soyad], [g2].[SozlesmeTipId], [g2].[TCKimlikNo], [g2].[UnvanId]
+      FROM (
+          SELECT [g].[Id], [g].[BitisTarihi], [g].[GorevliId], [g].[KurumId], [g].[Tarih], [g].[YerineGelecekGorevliId], [g].[YerineGelisPlanlananBitisTarih], [g].[YerineGelisPlanlananTarih]
+          FROM [Gorevlendirme] AS [g]
+          ORDER BY [g].[Tarih] DESC
+          OFFSET @p ROWS FETCH NEXT @p1 ROWS ONLY
+      ) AS [g1]
+      INNER JOIN [Gorevli] AS [g0] ON [g1].[GorevliId] = [g0].[Id]
+      LEFT JOIN [Ref_GorevliDurums] AS [r] ON [g0].[GorevliDurumId] = [r].[Id]
+      INNER JOIN [Kurum] AS [k] ON [g1].[KurumId] = [k].[Id]
+      LEFT JOIN [Gorevli] AS [g2] ON [g1].[YerineGelecekGorevliId] = [g2].[Id]
+      ORDER BY [g1].[Tarih] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[AktifMi], [r].[IsDeleted], [r].[Renk], [r].[Sira]
+      FROM [Ref_GorevliDurums] AS [r]
+      WHERE [r].[AktifMi] = CAST(1 AS bit) AND [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Sira]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_SozlesmeTips] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_Unvans] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_EgitimDurumlari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_HafizlikDurumlari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_KadroTurleri] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_AskerlikDurumlari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_KanGruplari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [k].[Id], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId]
+      FROM [Kurum] AS [k]
+      ORDER BY [k].[Isim]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevli] AS [g]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@p='?' (DbType = Int32), @p1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [g0].[Id], [g0].[Ad], [g0].[Adres], [g0].[AnneAdi], [g0].[AskerlikDurumuId], [g0].[BabaAdi], [g0].[BasvuruTuruId], [g0].[CepTelefonu], [g0].[Cinsiyet], [g0].[Derece], [g0].[DiyanetGirisTarihi], [g0].[DogumTarihi], [g0].[DogumYeri], [g0].[Durum], [g0].[EgitimDurumuId], [g0].[Email], [g0].[EmeklilikTarihi], [g0].[EvTelefonu], [g0].[FotografYolu], [g0].[GorevliDurumId], [g0].[HafizlikDurumuId], [g0].[IlkGoreveBaslamaTarihi], [g0].[Kademe], [g0].[KadroTuruId], [g0].[KanGrubuId], [g0].[MezuniyetBolum], [g0].[MezuniyetOkul], [g0].[Soyad], [g0].[SozlesmeTipId], [g0].[TCKimlikNo], [g0].[UnvanId], [r].[Id], [r0].[Id], [r1].[Id], [r2].[Id], [r3].[Id], [r4].[Id], [r5].[Id], [r6].[Id], [s].[Id], [s].[BitisTarihi], [s].[GorevliId], [s].[KurumId], [s].[Tarih], [s].[YerineGelecekGorevliId], [s].[YerineGelisPlanlananBitisTarih], [s].[YerineGelisPlanlananTarih], [s].[Id0], [s].[Adres], [s].[AktifMi], [s].[BaskonsoloslukBolgesi], [s].[Bolge], [s].[CrmUyelikFormDurumu], [s].[DernekBaskaniAd], [s].[DernekBaskaniIletisim], [s].[DinGorevlisiAd], [s].[DinGorevlisiIletisim], [s].[Isim], [s].[KurulusKanunu], [s].[Sehir], [s].[Tip], [s].[UstKurumId], [r].[Ad], [r].[AktifMi], [r].[IsDeleted], [r].[Renk], [r].[Sira], [r0].[Ad], [r0].[IsDeleted], [r1].[Ad], [r1].[IsDeleted], [r2].[Ad], [r2].[IsDeleted], [r3].[Ad], [r3].[IsDeleted], [r4].[Ad], [r4].[IsDeleted], [r5].[Ad], [r5].[IsDeleted], [r6].[Ad], [r6].[IsDeleted], [g2].[Id], [g2].[GorevliId], [g2].[NotIcerik], [g2].[Tarih], [g2].[YazanKisiId]
+      FROM (
+          SELECT [g].[Id], [g].[Ad], [g].[Adres], [g].[AnneAdi], [g].[AskerlikDurumuId], [g].[BabaAdi], [g].[BasvuruTuruId], [g].[CepTelefonu], [g].[Cinsiyet], [g].[Derece], [g].[DiyanetGirisTarihi], [g].[DogumTarihi], [g].[DogumYeri], [g].[Durum], [g].[EgitimDurumuId], [g].[Email], [g].[EmeklilikTarihi], [g].[EvTelefonu], [g].[FotografYolu], [g].[GorevliDurumId], [g].[HafizlikDurumuId], [g].[IlkGoreveBaslamaTarihi], [g].[Kademe], [g].[KadroTuruId], [g].[KanGrubuId], [g].[MezuniyetBolum], [g].[MezuniyetOkul], [g].[Soyad], [g].[SozlesmeTipId], [g].[TCKimlikNo], [g].[UnvanId]
+          FROM [Gorevli] AS [g]
+          ORDER BY [g].[Ad]
+          OFFSET @p ROWS FETCH NEXT @p1 ROWS ONLY
+      ) AS [g0]
+      LEFT JOIN [Ref_GorevliDurums] AS [r] ON [g0].[GorevliDurumId] = [r].[Id]
+      LEFT JOIN [Ref_SozlesmeTips] AS [r0] ON [g0].[SozlesmeTipId] = [r0].[Id]
+      LEFT JOIN [Ref_Unvans] AS [r1] ON [g0].[UnvanId] = [r1].[Id]
+      LEFT JOIN [Ref_EgitimDurumlari] AS [r2] ON [g0].[EgitimDurumuId] = [r2].[Id]
+      LEFT JOIN [Ref_HafizlikDurumlari] AS [r3] ON [g0].[HafizlikDurumuId] = [r3].[Id]
+      LEFT JOIN [Ref_KadroTurleri] AS [r4] ON [g0].[KadroTuruId] = [r4].[Id]
+      LEFT JOIN [Ref_AskerlikDurumlari] AS [r5] ON [g0].[AskerlikDurumuId] = [r5].[Id]
+      LEFT JOIN [Ref_KanGruplari] AS [r6] ON [g0].[KanGrubuId] = [r6].[Id]
+      LEFT JOIN (
+          SELECT [g1].[Id], [g1].[BitisTarihi], [g1].[GorevliId], [g1].[KurumId], [g1].[Tarih], [g1].[YerineGelecekGorevliId], [g1].[YerineGelisPlanlananBitisTarih], [g1].[YerineGelisPlanlananTarih], [k].[Id] AS [Id0], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId]
+          FROM [Gorevlendirme] AS [g1]
+          INNER JOIN [Kurum] AS [k] ON [g1].[KurumId] = [k].[Id]
+      ) AS [s] ON [g0].[Id] = [s].[GorevliId]
+      LEFT JOIN [GorevliNotlari] AS [g2] ON [g0].[Id] = [g2].[GorevliId]
+      ORDER BY [g0].[Ad], [g0].[Id], [r].[Id], [r0].[Id], [r1].[Id], [r2].[Id], [r3].[Id], [r4].[Id], [r5].[Id], [r6].[Id], [s].[Id], [s].[Id0]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[AktifMi], [r].[IsDeleted], [r].[Renk], [r].[Sira]
+      FROM [Ref_GorevliDurums] AS [r]
+      WHERE [r].[AktifMi] = CAST(1 AS bit) AND [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Sira]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_SozlesmeTips] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_Unvans] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_EgitimDurumlari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_HafizlikDurumlari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_KadroTurleri] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_AskerlikDurumlari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_KanGruplari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [k].[Id], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId]
+      FROM [Kurum] AS [k]
+      ORDER BY [k].[Isim]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@filter_HafizlikDurumuIds1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevli] AS [g]
+      WHERE [g].[HafizlikDurumuId] IS NOT NULL AND [g].[HafizlikDurumuId] = @filter_HafizlikDurumuIds1
+warn: Microsoft.EntityFrameworkCore.Query[20504]
+      Compiling a query which loads related collections for more than one collection navigation, either via 'Include' or through projection, but no 'QuerySplittingBehavior' has been configured. By default, Entity Framework will use 'QuerySplittingBehavior.SingleQuery', which can potentially result in slow query performance. See https://go.microsoft.com/fwlink/?linkid=2134277 for more information. To identify the query that's triggering this warning call 'ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning))'.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (22ms) [Parameters=[@filter_HafizlikDurumuIds1='?' (DbType = Int32), @p='?' (DbType = Int32), @p2='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [g0].[Id], [g0].[Ad], [g0].[Adres], [g0].[AnneAdi], [g0].[AskerlikDurumuId], [g0].[BabaAdi], [g0].[BasvuruTuruId], [g0].[CepTelefonu], [g0].[Cinsiyet], [g0].[Derece], [g0].[DiyanetGirisTarihi], [g0].[DogumTarihi], [g0].[DogumYeri], [g0].[Durum], [g0].[EgitimDurumuId], [g0].[Email], [g0].[EmeklilikTarihi], [g0].[EvTelefonu], [g0].[FotografYolu], [g0].[GorevliDurumId], [g0].[HafizlikDurumuId], [g0].[IlkGoreveBaslamaTarihi], [g0].[Kademe], [g0].[KadroTuruId], [g0].[KanGrubuId], [g0].[MezuniyetBolum], [g0].[MezuniyetOkul], [g0].[Soyad], [g0].[SozlesmeTipId], [g0].[TCKimlikNo], [g0].[UnvanId], [r].[Id], [r0].[Id], [r1].[Id], [r2].[Id], [r3].[Id], [r4].[Id], [r5].[Id], [r6].[Id], [s].[Id], [s].[BitisTarihi], [s].[GorevliId], [s].[KurumId], [s].[Tarih], [s].[YerineGelecekGorevliId], [s].[YerineGelisPlanlananBitisTarih], [s].[YerineGelisPlanlananTarih], [s].[Id0], [s].[Adres], [s].[AktifMi], [s].[BaskonsoloslukBolgesi], [s].[Bolge], [s].[CrmUyelikFormDurumu], [s].[DernekBaskaniAd], [s].[DernekBaskaniIletisim], [s].[DinGorevlisiAd], [s].[DinGorevlisiIletisim], [s].[Isim], [s].[KurulusKanunu], [s].[Sehir], [s].[Tip], [s].[UstKurumId], [r].[Ad], [r].[AktifMi], [r].[IsDeleted], [r].[Renk], [r].[Sira], [r0].[Ad], [r0].[IsDeleted], [r1].[Ad], [r1].[IsDeleted], [r2].[Ad], [r2].[IsDeleted], [r3].[Ad], [r3].[IsDeleted], [r4].[Ad], [r4].[IsDeleted], [r5].[Ad], [r5].[IsDeleted], [r6].[Ad], [r6].[IsDeleted], [g2].[Id], [g2].[GorevliId], [g2].[NotIcerik], [g2].[Tarih], [g2].[YazanKisiId]
+      FROM (
+          SELECT [g].[Id], [g].[Ad], [g].[Adres], [g].[AnneAdi], [g].[AskerlikDurumuId], [g].[BabaAdi], [g].[BasvuruTuruId], [g].[CepTelefonu], [g].[Cinsiyet], [g].[Derece], [g].[DiyanetGirisTarihi], [g].[DogumTarihi], [g].[DogumYeri], [g].[Durum], [g].[EgitimDurumuId], [g].[Email], [g].[EmeklilikTarihi], [g].[EvTelefonu], [g].[FotografYolu], [g].[GorevliDurumId], [g].[HafizlikDurumuId], [g].[IlkGoreveBaslamaTarihi], [g].[Kademe], [g].[KadroTuruId], [g].[KanGrubuId], [g].[MezuniyetBolum], [g].[MezuniyetOkul], [g].[Soyad], [g].[SozlesmeTipId], [g].[TCKimlikNo], [g].[UnvanId]
+          FROM [Gorevli] AS [g]
+          WHERE [g].[HafizlikDurumuId] IS NOT NULL AND [g].[HafizlikDurumuId] = @filter_HafizlikDurumuIds1
+          ORDER BY [g].[Ad]
+          OFFSET @p ROWS FETCH NEXT @p2 ROWS ONLY
+      ) AS [g0]
+      LEFT JOIN [Ref_GorevliDurums] AS [r] ON [g0].[GorevliDurumId] = [r].[Id]
+      LEFT JOIN [Ref_SozlesmeTips] AS [r0] ON [g0].[SozlesmeTipId] = [r0].[Id]
+      LEFT JOIN [Ref_Unvans] AS [r1] ON [g0].[UnvanId] = [r1].[Id]
+      LEFT JOIN [Ref_EgitimDurumlari] AS [r2] ON [g0].[EgitimDurumuId] = [r2].[Id]
+      LEFT JOIN [Ref_HafizlikDurumlari] AS [r3] ON [g0].[HafizlikDurumuId] = [r3].[Id]
+      LEFT JOIN [Ref_KadroTurleri] AS [r4] ON [g0].[KadroTuruId] = [r4].[Id]
+      LEFT JOIN [Ref_AskerlikDurumlari] AS [r5] ON [g0].[AskerlikDurumuId] = [r5].[Id]
+      LEFT JOIN [Ref_KanGruplari] AS [r6] ON [g0].[KanGrubuId] = [r6].[Id]
+      LEFT JOIN (
+          SELECT [g1].[Id], [g1].[BitisTarihi], [g1].[GorevliId], [g1].[KurumId], [g1].[Tarih], [g1].[YerineGelecekGorevliId], [g1].[YerineGelisPlanlananBitisTarih], [g1].[YerineGelisPlanlananTarih], [k].[Id] AS [Id0], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId]
+          FROM [Gorevlendirme] AS [g1]
+          INNER JOIN [Kurum] AS [k] ON [g1].[KurumId] = [k].[Id]
+      ) AS [s] ON [g0].[Id] = [s].[GorevliId]
+      LEFT JOIN [GorevliNotlari] AS [g2] ON [g0].[Id] = [g2].[GorevliId]
+      ORDER BY [g0].[Ad], [g0].[Id], [r].[Id], [r0].[Id], [r1].[Id], [r2].[Id], [r3].[Id], [r4].[Id], [r5].[Id], [r6].[Id], [s].[Id], [s].[Id0]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[AktifMi], [r].[IsDeleted], [r].[Renk], [r].[Sira]
+      FROM [Ref_GorevliDurums] AS [r]
+      WHERE [r].[AktifMi] = CAST(1 AS bit) AND [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Sira]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_SozlesmeTips] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_Unvans] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_EgitimDurumlari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_HafizlikDurumlari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_KadroTurleri] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_AskerlikDurumlari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_KanGruplari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [k].[Id], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId]
+      FROM [Kurum] AS [k]
+      ORDER BY [k].[Isim]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@filter_HafizlikDurumuIds1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevli] AS [g]
+      WHERE [g].[HafizlikDurumuId] IS NOT NULL AND [g].[HafizlikDurumuId] = @filter_HafizlikDurumuIds1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@filter_HafizlikDurumuIds1='?' (DbType = Int32), @p='?' (DbType = Int32), @p2='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [g0].[Id], [g0].[Ad], [g0].[Adres], [g0].[AnneAdi], [g0].[AskerlikDurumuId], [g0].[BabaAdi], [g0].[BasvuruTuruId], [g0].[CepTelefonu], [g0].[Cinsiyet], [g0].[Derece], [g0].[DiyanetGirisTarihi], [g0].[DogumTarihi], [g0].[DogumYeri], [g0].[Durum], [g0].[EgitimDurumuId], [g0].[Email], [g0].[EmeklilikTarihi], [g0].[EvTelefonu], [g0].[FotografYolu], [g0].[GorevliDurumId], [g0].[HafizlikDurumuId], [g0].[IlkGoreveBaslamaTarihi], [g0].[Kademe], [g0].[KadroTuruId], [g0].[KanGrubuId], [g0].[MezuniyetBolum], [g0].[MezuniyetOkul], [g0].[Soyad], [g0].[SozlesmeTipId], [g0].[TCKimlikNo], [g0].[UnvanId], [r].[Id], [r0].[Id], [r1].[Id], [r2].[Id], [r3].[Id], [r4].[Id], [r5].[Id], [r6].[Id], [s].[Id], [s].[BitisTarihi], [s].[GorevliId], [s].[KurumId], [s].[Tarih], [s].[YerineGelecekGorevliId], [s].[YerineGelisPlanlananBitisTarih], [s].[YerineGelisPlanlananTarih], [s].[Id0], [s].[Adres], [s].[AktifMi], [s].[BaskonsoloslukBolgesi], [s].[Bolge], [s].[CrmUyelikFormDurumu], [s].[DernekBaskaniAd], [s].[DernekBaskaniIletisim], [s].[DinGorevlisiAd], [s].[DinGorevlisiIletisim], [s].[Isim], [s].[KurulusKanunu], [s].[Sehir], [s].[Tip], [s].[UstKurumId], [r].[Ad], [r].[AktifMi], [r].[IsDeleted], [r].[Renk], [r].[Sira], [r0].[Ad], [r0].[IsDeleted], [r1].[Ad], [r1].[IsDeleted], [r2].[Ad], [r2].[IsDeleted], [r3].[Ad], [r3].[IsDeleted], [r4].[Ad], [r4].[IsDeleted], [r5].[Ad], [r5].[IsDeleted], [r6].[Ad], [r6].[IsDeleted], [g2].[Id], [g2].[GorevliId], [g2].[NotIcerik], [g2].[Tarih], [g2].[YazanKisiId]
+      FROM (
+          SELECT [g].[Id], [g].[Ad], [g].[Adres], [g].[AnneAdi], [g].[AskerlikDurumuId], [g].[BabaAdi], [g].[BasvuruTuruId], [g].[CepTelefonu], [g].[Cinsiyet], [g].[Derece], [g].[DiyanetGirisTarihi], [g].[DogumTarihi], [g].[DogumYeri], [g].[Durum], [g].[EgitimDurumuId], [g].[Email], [g].[EmeklilikTarihi], [g].[EvTelefonu], [g].[FotografYolu], [g].[GorevliDurumId], [g].[HafizlikDurumuId], [g].[IlkGoreveBaslamaTarihi], [g].[Kademe], [g].[KadroTuruId], [g].[KanGrubuId], [g].[MezuniyetBolum], [g].[MezuniyetOkul], [g].[Soyad], [g].[SozlesmeTipId], [g].[TCKimlikNo], [g].[UnvanId]
+          FROM [Gorevli] AS [g]
+          WHERE [g].[HafizlikDurumuId] IS NOT NULL AND [g].[HafizlikDurumuId] = @filter_HafizlikDurumuIds1
+          ORDER BY [g].[Ad]
+          OFFSET @p ROWS FETCH NEXT @p2 ROWS ONLY
+      ) AS [g0]
+      LEFT JOIN [Ref_GorevliDurums] AS [r] ON [g0].[GorevliDurumId] = [r].[Id]
+      LEFT JOIN [Ref_SozlesmeTips] AS [r0] ON [g0].[SozlesmeTipId] = [r0].[Id]
+      LEFT JOIN [Ref_Unvans] AS [r1] ON [g0].[UnvanId] = [r1].[Id]
+      LEFT JOIN [Ref_EgitimDurumlari] AS [r2] ON [g0].[EgitimDurumuId] = [r2].[Id]
+      LEFT JOIN [Ref_HafizlikDurumlari] AS [r3] ON [g0].[HafizlikDurumuId] = [r3].[Id]
+      LEFT JOIN [Ref_KadroTurleri] AS [r4] ON [g0].[KadroTuruId] = [r4].[Id]
+      LEFT JOIN [Ref_AskerlikDurumlari] AS [r5] ON [g0].[AskerlikDurumuId] = [r5].[Id]
+      LEFT JOIN [Ref_KanGruplari] AS [r6] ON [g0].[KanGrubuId] = [r6].[Id]
+      LEFT JOIN (
+          SELECT [g1].[Id], [g1].[BitisTarihi], [g1].[GorevliId], [g1].[KurumId], [g1].[Tarih], [g1].[YerineGelecekGorevliId], [g1].[YerineGelisPlanlananBitisTarih], [g1].[YerineGelisPlanlananTarih], [k].[Id] AS [Id0], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId]
+          FROM [Gorevlendirme] AS [g1]
+          INNER JOIN [Kurum] AS [k] ON [g1].[KurumId] = [k].[Id]
+      ) AS [s] ON [g0].[Id] = [s].[GorevliId]
+      LEFT JOIN [GorevliNotlari] AS [g2] ON [g0].[Id] = [g2].[GorevliId]
+      ORDER BY [g0].[Ad], [g0].[Id], [r].[Id], [r0].[Id], [r1].[Id], [r2].[Id], [r3].[Id], [r4].[Id], [r5].[Id], [r6].[Id], [s].[Id], [s].[Id0]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[AktifMi], [r].[IsDeleted], [r].[Renk], [r].[Sira]
+      FROM [Ref_GorevliDurums] AS [r]
+      WHERE [r].[AktifMi] = CAST(1 AS bit) AND [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Sira]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_SozlesmeTips] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_Unvans] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_EgitimDurumlari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_HafizlikDurumlari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_KadroTurleri] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_AskerlikDurumlari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_KanGruplari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [k].[Id], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId]
+      FROM [Kurum] AS [k]
+      ORDER BY [k].[Isim]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevli] AS [g]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@p='?' (DbType = Int32), @p1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [g0].[Id], [g0].[Ad], [g0].[Adres], [g0].[AnneAdi], [g0].[AskerlikDurumuId], [g0].[BabaAdi], [g0].[BasvuruTuruId], [g0].[CepTelefonu], [g0].[Cinsiyet], [g0].[Derece], [g0].[DiyanetGirisTarihi], [g0].[DogumTarihi], [g0].[DogumYeri], [g0].[Durum], [g0].[EgitimDurumuId], [g0].[Email], [g0].[EmeklilikTarihi], [g0].[EvTelefonu], [g0].[FotografYolu], [g0].[GorevliDurumId], [g0].[HafizlikDurumuId], [g0].[IlkGoreveBaslamaTarihi], [g0].[Kademe], [g0].[KadroTuruId], [g0].[KanGrubuId], [g0].[MezuniyetBolum], [g0].[MezuniyetOkul], [g0].[Soyad], [g0].[SozlesmeTipId], [g0].[TCKimlikNo], [g0].[UnvanId], [r].[Id], [r0].[Id], [r1].[Id], [r2].[Id], [r3].[Id], [r4].[Id], [r5].[Id], [r6].[Id], [s].[Id], [s].[BitisTarihi], [s].[GorevliId], [s].[KurumId], [s].[Tarih], [s].[YerineGelecekGorevliId], [s].[YerineGelisPlanlananBitisTarih], [s].[YerineGelisPlanlananTarih], [s].[Id0], [s].[Adres], [s].[AktifMi], [s].[BaskonsoloslukBolgesi], [s].[Bolge], [s].[CrmUyelikFormDurumu], [s].[DernekBaskaniAd], [s].[DernekBaskaniIletisim], [s].[DinGorevlisiAd], [s].[DinGorevlisiIletisim], [s].[Isim], [s].[KurulusKanunu], [s].[Sehir], [s].[Tip], [s].[UstKurumId], [r].[Ad], [r].[AktifMi], [r].[IsDeleted], [r].[Renk], [r].[Sira], [r0].[Ad], [r0].[IsDeleted], [r1].[Ad], [r1].[IsDeleted], [r2].[Ad], [r2].[IsDeleted], [r3].[Ad], [r3].[IsDeleted], [r4].[Ad], [r4].[IsDeleted], [r5].[Ad], [r5].[IsDeleted], [r6].[Ad], [r6].[IsDeleted], [g2].[Id], [g2].[GorevliId], [g2].[NotIcerik], [g2].[Tarih], [g2].[YazanKisiId]
+      FROM (
+          SELECT [g].[Id], [g].[Ad], [g].[Adres], [g].[AnneAdi], [g].[AskerlikDurumuId], [g].[BabaAdi], [g].[BasvuruTuruId], [g].[CepTelefonu], [g].[Cinsiyet], [g].[Derece], [g].[DiyanetGirisTarihi], [g].[DogumTarihi], [g].[DogumYeri], [g].[Durum], [g].[EgitimDurumuId], [g].[Email], [g].[EmeklilikTarihi], [g].[EvTelefonu], [g].[FotografYolu], [g].[GorevliDurumId], [g].[HafizlikDurumuId], [g].[IlkGoreveBaslamaTarihi], [g].[Kademe], [g].[KadroTuruId], [g].[KanGrubuId], [g].[MezuniyetBolum], [g].[MezuniyetOkul], [g].[Soyad], [g].[SozlesmeTipId], [g].[TCKimlikNo], [g].[UnvanId]
+          FROM [Gorevli] AS [g]
+          ORDER BY [g].[Ad]
+          OFFSET @p ROWS FETCH NEXT @p1 ROWS ONLY
+      ) AS [g0]
+      LEFT JOIN [Ref_GorevliDurums] AS [r] ON [g0].[GorevliDurumId] = [r].[Id]
+      LEFT JOIN [Ref_SozlesmeTips] AS [r0] ON [g0].[SozlesmeTipId] = [r0].[Id]
+      LEFT JOIN [Ref_Unvans] AS [r1] ON [g0].[UnvanId] = [r1].[Id]
+      LEFT JOIN [Ref_EgitimDurumlari] AS [r2] ON [g0].[EgitimDurumuId] = [r2].[Id]
+      LEFT JOIN [Ref_HafizlikDurumlari] AS [r3] ON [g0].[HafizlikDurumuId] = [r3].[Id]
+      LEFT JOIN [Ref_KadroTurleri] AS [r4] ON [g0].[KadroTuruId] = [r4].[Id]
+      LEFT JOIN [Ref_AskerlikDurumlari] AS [r5] ON [g0].[AskerlikDurumuId] = [r5].[Id]
+      LEFT JOIN [Ref_KanGruplari] AS [r6] ON [g0].[KanGrubuId] = [r6].[Id]
+      LEFT JOIN (
+          SELECT [g1].[Id], [g1].[BitisTarihi], [g1].[GorevliId], [g1].[KurumId], [g1].[Tarih], [g1].[YerineGelecekGorevliId], [g1].[YerineGelisPlanlananBitisTarih], [g1].[YerineGelisPlanlananTarih], [k].[Id] AS [Id0], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId]
+          FROM [Gorevlendirme] AS [g1]
+          INNER JOIN [Kurum] AS [k] ON [g1].[KurumId] = [k].[Id]
+      ) AS [s] ON [g0].[Id] = [s].[GorevliId]
+      LEFT JOIN [GorevliNotlari] AS [g2] ON [g0].[Id] = [g2].[GorevliId]
+      ORDER BY [g0].[Ad], [g0].[Id], [r].[Id], [r0].[Id], [r1].[Id], [r2].[Id], [r3].[Id], [r4].[Id], [r5].[Id], [r6].[Id], [s].[Id], [s].[Id0]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@p='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [g].[Id], [g].[Ad], [g].[Adres], [g].[AnneAdi], [g].[AskerlikDurumuId], [g].[BabaAdi], [g].[BasvuruTuruId], [g].[CepTelefonu], [g].[Cinsiyet], [g].[Derece], [g].[DiyanetGirisTarihi], [g].[DogumTarihi], [g].[DogumYeri], [g].[Durum], [g].[EgitimDurumuId], [g].[Email], [g].[EmeklilikTarihi], [g].[EvTelefonu], [g].[FotografYolu], [g].[GorevliDurumId], [g].[HafizlikDurumuId], [g].[IlkGoreveBaslamaTarihi], [g].[Kademe], [g].[KadroTuruId], [g].[KanGrubuId], [g].[MezuniyetBolum], [g].[MezuniyetOkul], [g].[Soyad], [g].[SozlesmeTipId], [g].[TCKimlikNo], [g].[UnvanId]
+      FROM [Gorevli] AS [g]
+      WHERE [g].[Id] = @p
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[AktifMi], [r].[IsDeleted], [r].[Renk], [r].[Sira]
+      FROM [Ref_GorevliDurums] AS [r]
+      WHERE [r].[AktifMi] = CAST(1 AS bit) AND [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Sira]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_SozlesmeTips] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_Unvans] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_EgitimDurumlari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_HafizlikDurumlari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_KadroTurleri] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_AskerlikDurumlari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_KanGruplari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (7ms) [Parameters=[@p30='?' (DbType = Int32), @p0='?' (Size = 450), @p1='?' (Size = 500), @p2='?' (Size = 4000), @p3='?' (DbType = Int32), @p4='?' (Size = 4000), @p5='?' (DbType = Int32), @p6='?' (Size = 4000), @p7='?' (Size = 4000), @p8='?' (Size = 4000), @p9='?' (DbType = DateTime2), @p10='?' (DbType = DateTime2), @p11='?' (Size = 4000), @p12='?' (DbType = Int32), @p13='?' (DbType = Int32), @p14='?' (Size = 450), @p15='?' (DbType = DateTime2), @p16='?' (Size = 4000), @p17='?' (Size = 4000), @p18='?' (DbType = Int32), @p19='?' (DbType = Int32), @p20='?' (DbType = DateTime2), @p21='?' (Size = 4000), @p22='?' (DbType = Int32), @p23='?' (DbType = Int32), @p24='?' (Size = 4000), @p25='?' (Size = 4000), @p26='?' (Size = 450), @p27='?' (DbType = Int32), @p28='?' (Size = 11), @p29='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      UPDATE [Gorevli] SET [Ad] = @p0, [Adres] = @p1, [AnneAdi] = @p2, [AskerlikDurumuId] = @p3, [BabaAdi] = @p4, [BasvuruTuruId] = @p5, [CepTelefonu] = @p6, [Cinsiyet] = @p7, [Derece] = @p8, [DiyanetGirisTarihi] = @p9, [DogumTarihi] = @p10, [DogumYeri] = @p11, [Durum] = @p12, [EgitimDurumuId] = @p13, [Email] = @p14, [EmeklilikTarihi] = @p15, [EvTelefonu] = @p16, [FotografYolu] = @p17, [GorevliDurumId] = @p18, [HafizlikDurumuId] = @p19, [IlkGoreveBaslamaTarihi] = @p20, [Kademe] = @p21, [KadroTuruId] = @p22, [KanGrubuId] = @p23, [MezuniyetBolum] = @p24, [MezuniyetOkul] = @p25, [Soyad] = @p26, [SozlesmeTipId] = @p27, [TCKimlikNo] = @p28, [UnvanId] = @p29
+      OUTPUT 1
+      WHERE [Id] = @p30;
+info: DitibStasbourg.Services.Implementations.GorevliService[0]
+      Updated Gorevli
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[AktifMi], [r].[IsDeleted], [r].[Renk], [r].[Sira]
+      FROM [Ref_GorevliDurums] AS [r]
+      WHERE [r].[AktifMi] = CAST(1 AS bit) AND [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Sira]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_SozlesmeTips] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_Unvans] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_EgitimDurumlari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_HafizlikDurumlari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_KadroTurleri] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_AskerlikDurumlari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_KanGruplari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [k].[Id], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId]
+      FROM [Kurum] AS [k]
+      ORDER BY [k].[Isim]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevli] AS [g]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p='?' (DbType = Int32), @p1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [g0].[Id], [g0].[Ad], [g0].[Adres], [g0].[AnneAdi], [g0].[AskerlikDurumuId], [g0].[BabaAdi], [g0].[BasvuruTuruId], [g0].[CepTelefonu], [g0].[Cinsiyet], [g0].[Derece], [g0].[DiyanetGirisTarihi], [g0].[DogumTarihi], [g0].[DogumYeri], [g0].[Durum], [g0].[EgitimDurumuId], [g0].[Email], [g0].[EmeklilikTarihi], [g0].[EvTelefonu], [g0].[FotografYolu], [g0].[GorevliDurumId], [g0].[HafizlikDurumuId], [g0].[IlkGoreveBaslamaTarihi], [g0].[Kademe], [g0].[KadroTuruId], [g0].[KanGrubuId], [g0].[MezuniyetBolum], [g0].[MezuniyetOkul], [g0].[Soyad], [g0].[SozlesmeTipId], [g0].[TCKimlikNo], [g0].[UnvanId], [r].[Id], [r0].[Id], [r1].[Id], [r2].[Id], [r3].[Id], [r4].[Id], [r5].[Id], [r6].[Id], [s].[Id], [s].[BitisTarihi], [s].[GorevliId], [s].[KurumId], [s].[Tarih], [s].[YerineGelecekGorevliId], [s].[YerineGelisPlanlananBitisTarih], [s].[YerineGelisPlanlananTarih], [s].[Id0], [s].[Adres], [s].[AktifMi], [s].[BaskonsoloslukBolgesi], [s].[Bolge], [s].[CrmUyelikFormDurumu], [s].[DernekBaskaniAd], [s].[DernekBaskaniIletisim], [s].[DinGorevlisiAd], [s].[DinGorevlisiIletisim], [s].[Isim], [s].[KurulusKanunu], [s].[Sehir], [s].[Tip], [s].[UstKurumId], [r].[Ad], [r].[AktifMi], [r].[IsDeleted], [r].[Renk], [r].[Sira], [r0].[Ad], [r0].[IsDeleted], [r1].[Ad], [r1].[IsDeleted], [r2].[Ad], [r2].[IsDeleted], [r3].[Ad], [r3].[IsDeleted], [r4].[Ad], [r4].[IsDeleted], [r5].[Ad], [r5].[IsDeleted], [r6].[Ad], [r6].[IsDeleted], [g2].[Id], [g2].[GorevliId], [g2].[NotIcerik], [g2].[Tarih], [g2].[YazanKisiId]
+      FROM (
+          SELECT [g].[Id], [g].[Ad], [g].[Adres], [g].[AnneAdi], [g].[AskerlikDurumuId], [g].[BabaAdi], [g].[BasvuruTuruId], [g].[CepTelefonu], [g].[Cinsiyet], [g].[Derece], [g].[DiyanetGirisTarihi], [g].[DogumTarihi], [g].[DogumYeri], [g].[Durum], [g].[EgitimDurumuId], [g].[Email], [g].[EmeklilikTarihi], [g].[EvTelefonu], [g].[FotografYolu], [g].[GorevliDurumId], [g].[HafizlikDurumuId], [g].[IlkGoreveBaslamaTarihi], [g].[Kademe], [g].[KadroTuruId], [g].[KanGrubuId], [g].[MezuniyetBolum], [g].[MezuniyetOkul], [g].[Soyad], [g].[SozlesmeTipId], [g].[TCKimlikNo], [g].[UnvanId]
+          FROM [Gorevli] AS [g]
+          ORDER BY [g].[Ad]
+          OFFSET @p ROWS FETCH NEXT @p1 ROWS ONLY
+      ) AS [g0]
+      LEFT JOIN [Ref_GorevliDurums] AS [r] ON [g0].[GorevliDurumId] = [r].[Id]
+      LEFT JOIN [Ref_SozlesmeTips] AS [r0] ON [g0].[SozlesmeTipId] = [r0].[Id]
+      LEFT JOIN [Ref_Unvans] AS [r1] ON [g0].[UnvanId] = [r1].[Id]
+      LEFT JOIN [Ref_EgitimDurumlari] AS [r2] ON [g0].[EgitimDurumuId] = [r2].[Id]
+      LEFT JOIN [Ref_HafizlikDurumlari] AS [r3] ON [g0].[HafizlikDurumuId] = [r3].[Id]
+      LEFT JOIN [Ref_KadroTurleri] AS [r4] ON [g0].[KadroTuruId] = [r4].[Id]
+      LEFT JOIN [Ref_AskerlikDurumlari] AS [r5] ON [g0].[AskerlikDurumuId] = [r5].[Id]
+      LEFT JOIN [Ref_KanGruplari] AS [r6] ON [g0].[KanGrubuId] = [r6].[Id]
+      LEFT JOIN (
+          SELECT [g1].[Id], [g1].[BitisTarihi], [g1].[GorevliId], [g1].[KurumId], [g1].[Tarih], [g1].[YerineGelecekGorevliId], [g1].[YerineGelisPlanlananBitisTarih], [g1].[YerineGelisPlanlananTarih], [k].[Id] AS [Id0], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId]
+          FROM [Gorevlendirme] AS [g1]
+          INNER JOIN [Kurum] AS [k] ON [g1].[KurumId] = [k].[Id]
+      ) AS [s] ON [g0].[Id] = [s].[GorevliId]
+      LEFT JOIN [GorevliNotlari] AS [g2] ON [g0].[Id] = [g2].[GorevliId]
+      ORDER BY [g0].[Ad], [g0].[Id], [r].[Id], [r0].[Id], [r1].[Id], [r2].[Id], [r3].[Id], [r4].[Id], [r5].[Id], [r6].[Id], [s].[Id], [s].[Id0]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[AktifMi], [r].[IsDeleted], [r].[Renk], [r].[Sira]
+      FROM [Ref_GorevliDurums] AS [r]
+      WHERE [r].[AktifMi] = CAST(1 AS bit) AND [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Sira]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_SozlesmeTips] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_Unvans] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_EgitimDurumlari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_HafizlikDurumlari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_KadroTurleri] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_AskerlikDurumlari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_KanGruplari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [k].[Id], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId]
+      FROM [Kurum] AS [k]
+      ORDER BY [k].[Isim]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@filter_Cinsiyet='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevli] AS [g]
+      WHERE [g].[Cinsiyet] = @filter_Cinsiyet
+warn: Microsoft.EntityFrameworkCore.Query[20504]
+      Compiling a query which loads related collections for more than one collection navigation, either via 'Include' or through projection, but no 'QuerySplittingBehavior' has been configured. By default, Entity Framework will use 'QuerySplittingBehavior.SingleQuery', which can potentially result in slow query performance. See https://go.microsoft.com/fwlink/?linkid=2134277 for more information. To identify the query that's triggering this warning call 'ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning))'.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (22ms) [Parameters=[@filter_Cinsiyet='?' (Size = 4000), @p='?' (DbType = Int32), @p2='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [g0].[Id], [g0].[Ad], [g0].[Adres], [g0].[AnneAdi], [g0].[AskerlikDurumuId], [g0].[BabaAdi], [g0].[BasvuruTuruId], [g0].[CepTelefonu], [g0].[Cinsiyet], [g0].[Derece], [g0].[DiyanetGirisTarihi], [g0].[DogumTarihi], [g0].[DogumYeri], [g0].[Durum], [g0].[EgitimDurumuId], [g0].[Email], [g0].[EmeklilikTarihi], [g0].[EvTelefonu], [g0].[FotografYolu], [g0].[GorevliDurumId], [g0].[HafizlikDurumuId], [g0].[IlkGoreveBaslamaTarihi], [g0].[Kademe], [g0].[KadroTuruId], [g0].[KanGrubuId], [g0].[MezuniyetBolum], [g0].[MezuniyetOkul], [g0].[Soyad], [g0].[SozlesmeTipId], [g0].[TCKimlikNo], [g0].[UnvanId], [r].[Id], [r0].[Id], [r1].[Id], [r2].[Id], [r3].[Id], [r4].[Id], [r5].[Id], [r6].[Id], [s].[Id], [s].[BitisTarihi], [s].[GorevliId], [s].[KurumId], [s].[Tarih], [s].[YerineGelecekGorevliId], [s].[YerineGelisPlanlananBitisTarih], [s].[YerineGelisPlanlananTarih], [s].[Id0], [s].[Adres], [s].[AktifMi], [s].[BaskonsoloslukBolgesi], [s].[Bolge], [s].[CrmUyelikFormDurumu], [s].[DernekBaskaniAd], [s].[DernekBaskaniIletisim], [s].[DinGorevlisiAd], [s].[DinGorevlisiIletisim], [s].[Isim], [s].[KurulusKanunu], [s].[Sehir], [s].[Tip], [s].[UstKurumId], [r].[Ad], [r].[AktifMi], [r].[IsDeleted], [r].[Renk], [r].[Sira], [r0].[Ad], [r0].[IsDeleted], [r1].[Ad], [r1].[IsDeleted], [r2].[Ad], [r2].[IsDeleted], [r3].[Ad], [r3].[IsDeleted], [r4].[Ad], [r4].[IsDeleted], [r5].[Ad], [r5].[IsDeleted], [r6].[Ad], [r6].[IsDeleted], [g2].[Id], [g2].[GorevliId], [g2].[NotIcerik], [g2].[Tarih], [g2].[YazanKisiId]
+      FROM (
+          SELECT [g].[Id], [g].[Ad], [g].[Adres], [g].[AnneAdi], [g].[AskerlikDurumuId], [g].[BabaAdi], [g].[BasvuruTuruId], [g].[CepTelefonu], [g].[Cinsiyet], [g].[Derece], [g].[DiyanetGirisTarihi], [g].[DogumTarihi], [g].[DogumYeri], [g].[Durum], [g].[EgitimDurumuId], [g].[Email], [g].[EmeklilikTarihi], [g].[EvTelefonu], [g].[FotografYolu], [g].[GorevliDurumId], [g].[HafizlikDurumuId], [g].[IlkGoreveBaslamaTarihi], [g].[Kademe], [g].[KadroTuruId], [g].[KanGrubuId], [g].[MezuniyetBolum], [g].[MezuniyetOkul], [g].[Soyad], [g].[SozlesmeTipId], [g].[TCKimlikNo], [g].[UnvanId]
+          FROM [Gorevli] AS [g]
+          WHERE [g].[Cinsiyet] = @filter_Cinsiyet
+          ORDER BY [g].[Ad]
+          OFFSET @p ROWS FETCH NEXT @p2 ROWS ONLY
+      ) AS [g0]
+      LEFT JOIN [Ref_GorevliDurums] AS [r] ON [g0].[GorevliDurumId] = [r].[Id]
+      LEFT JOIN [Ref_SozlesmeTips] AS [r0] ON [g0].[SozlesmeTipId] = [r0].[Id]
+      LEFT JOIN [Ref_Unvans] AS [r1] ON [g0].[UnvanId] = [r1].[Id]
+      LEFT JOIN [Ref_EgitimDurumlari] AS [r2] ON [g0].[EgitimDurumuId] = [r2].[Id]
+      LEFT JOIN [Ref_HafizlikDurumlari] AS [r3] ON [g0].[HafizlikDurumuId] = [r3].[Id]
+      LEFT JOIN [Ref_KadroTurleri] AS [r4] ON [g0].[KadroTuruId] = [r4].[Id]
+      LEFT JOIN [Ref_AskerlikDurumlari] AS [r5] ON [g0].[AskerlikDurumuId] = [r5].[Id]
+      LEFT JOIN [Ref_KanGruplari] AS [r6] ON [g0].[KanGrubuId] = [r6].[Id]
+      LEFT JOIN (
+          SELECT [g1].[Id], [g1].[BitisTarihi], [g1].[GorevliId], [g1].[KurumId], [g1].[Tarih], [g1].[YerineGelecekGorevliId], [g1].[YerineGelisPlanlananBitisTarih], [g1].[YerineGelisPlanlananTarih], [k].[Id] AS [Id0], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId]
+          FROM [Gorevlendirme] AS [g1]
+          INNER JOIN [Kurum] AS [k] ON [g1].[KurumId] = [k].[Id]
+      ) AS [s] ON [g0].[Id] = [s].[GorevliId]
+      LEFT JOIN [GorevliNotlari] AS [g2] ON [g0].[Id] = [g2].[GorevliId]
+      ORDER BY [g0].[Ad], [g0].[Id], [r].[Id], [r0].[Id], [r1].[Id], [r2].[Id], [r3].[Id], [r4].[Id], [r5].[Id], [r6].[Id], [s].[Id], [s].[Id0]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [g].[Id], [g].[Ad], [g].[Adres], [g].[AnneAdi], [g].[AskerlikDurumuId], [g].[BabaAdi], [g].[BasvuruTuruId], [g].[CepTelefonu], [g].[Cinsiyet], [g].[Derece], [g].[DiyanetGirisTarihi], [g].[DogumTarihi], [g].[DogumYeri], [g].[Durum], [g].[EgitimDurumuId], [g].[Email], [g].[EmeklilikTarihi], [g].[EvTelefonu], [g].[FotografYolu], [g].[GorevliDurumId], [g].[HafizlikDurumuId], [g].[IlkGoreveBaslamaTarihi], [g].[Kademe], [g].[KadroTuruId], [g].[KanGrubuId], [g].[MezuniyetBolum], [g].[MezuniyetOkul], [g].[Soyad], [g].[SozlesmeTipId], [g].[TCKimlikNo], [g].[UnvanId]
+      FROM [Gorevli] AS [g]
+      ORDER BY [g].[Ad], [g].[Soyad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [k].[Id], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId]
+      FROM [Kurum] AS [k]
+      ORDER BY [k].[Isim]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevlendirme] AS [g]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@p='?' (DbType = Int32), @p1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [g1].[Id], [g1].[BitisTarihi], [g1].[GorevliId], [g1].[KurumId], [g1].[Tarih], [g1].[YerineGelecekGorevliId], [g1].[YerineGelisPlanlananBitisTarih], [g1].[YerineGelisPlanlananTarih], [g0].[Id], [g0].[Ad], [g0].[Adres], [g0].[AnneAdi], [g0].[AskerlikDurumuId], [g0].[BabaAdi], [g0].[BasvuruTuruId], [g0].[CepTelefonu], [g0].[Cinsiyet], [g0].[Derece], [g0].[DiyanetGirisTarihi], [g0].[DogumTarihi], [g0].[DogumYeri], [g0].[Durum], [g0].[EgitimDurumuId], [g0].[Email], [g0].[EmeklilikTarihi], [g0].[EvTelefonu], [g0].[FotografYolu], [g0].[GorevliDurumId], [g0].[HafizlikDurumuId], [g0].[IlkGoreveBaslamaTarihi], [g0].[Kademe], [g0].[KadroTuruId], [g0].[KanGrubuId], [g0].[MezuniyetBolum], [g0].[MezuniyetOkul], [g0].[Soyad], [g0].[SozlesmeTipId], [g0].[TCKimlikNo], [g0].[UnvanId], [r].[Id], [r].[Ad], [r].[AktifMi], [r].[IsDeleted], [r].[Renk], [r].[Sira], [k].[Id], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId], [g2].[Id], [g2].[Ad], [g2].[Adres], [g2].[AnneAdi], [g2].[AskerlikDurumuId], [g2].[BabaAdi], [g2].[BasvuruTuruId], [g2].[CepTelefonu], [g2].[Cinsiyet], [g2].[Derece], [g2].[DiyanetGirisTarihi], [g2].[DogumTarihi], [g2].[DogumYeri], [g2].[Durum], [g2].[EgitimDurumuId], [g2].[Email], [g2].[EmeklilikTarihi], [g2].[EvTelefonu], [g2].[FotografYolu], [g2].[GorevliDurumId], [g2].[HafizlikDurumuId], [g2].[IlkGoreveBaslamaTarihi], [g2].[Kademe], [g2].[KadroTuruId], [g2].[KanGrubuId], [g2].[MezuniyetBolum], [g2].[MezuniyetOkul], [g2].[Soyad], [g2].[SozlesmeTipId], [g2].[TCKimlikNo], [g2].[UnvanId]
+      FROM (
+          SELECT [g].[Id], [g].[BitisTarihi], [g].[GorevliId], [g].[KurumId], [g].[Tarih], [g].[YerineGelecekGorevliId], [g].[YerineGelisPlanlananBitisTarih], [g].[YerineGelisPlanlananTarih]
+          FROM [Gorevlendirme] AS [g]
+          ORDER BY [g].[Tarih] DESC
+          OFFSET @p ROWS FETCH NEXT @p1 ROWS ONLY
+      ) AS [g1]
+      INNER JOIN [Gorevli] AS [g0] ON [g1].[GorevliId] = [g0].[Id]
+      LEFT JOIN [Ref_GorevliDurums] AS [r] ON [g0].[GorevliDurumId] = [r].[Id]
+      INNER JOIN [Kurum] AS [k] ON [g1].[KurumId] = [k].[Id]
+      LEFT JOIN [Gorevli] AS [g2] ON [g1].[YerineGelecekGorevliId] = [g2].[Id]
+      ORDER BY [g1].[Tarih] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [k].[Id], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId], [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Kurum] AS [k]
+      LEFT JOIN [Ref_KurumTurus] AS [r] ON [k].[UstKurumId] = [r].[Id]
+      WHERE [k].[Tip] = 1 AND [k].[AktifMi] = CAST(1 AS bit)
+      ORDER BY [k].[Isim]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@id='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [s].[Id], [s].[Adres], [s].[AktifMi], [s].[BaskonsoloslukBolgesi], [s].[Bolge], [s].[CrmUyelikFormDurumu], [s].[DernekBaskaniAd], [s].[DernekBaskaniIletisim], [s].[DinGorevlisiAd], [s].[DinGorevlisiIletisim], [s].[Isim], [s].[KurulusKanunu], [s].[Sehir], [s].[Tip], [s].[UstKurumId], [s].[Id0], [s].[Ad], [s].[IsDeleted], [d].[Id], [d].[AdSoyad], [d].[AileUyeSayisi], [d].[Iletisim], [d].[KayitTarihi], [d].[KurumId]
+      FROM (
+          SELECT TOP(1) [k].[Id], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId], [r].[Id] AS [Id0], [r].[Ad], [r].[IsDeleted]
+          FROM [Kurum] AS [k]
+          LEFT JOIN [Ref_KurumTurus] AS [r] ON [k].[UstKurumId] = [r].[Id]
+          WHERE [k].[Id] = @id
+      ) AS [s]
+      LEFT JOIN [DernekUyeleri] AS [d] ON [s].[Id] = [d].[KurumId]
+      ORDER BY [s].[Id], [s].[Id0]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_KurumTurus] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+[DEBUG] Login POST received for Email: 'aakyol28@gmail.com'
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@normalizedEmail='?' (Size = 256)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName]
+      FROM [AspNetUsers] AS [a]
+      WHERE [a].[NormalizedEmail] = @normalizedEmail
+[DEBUG] User Found: ID=106ff549-0c67-439e-bbd5-a40565506aee, UserName=aakyol28@gmail.com, Email=aakyol28@gmail.com, Confirmed=True
+[DEBUG] Password Input: '55.Samsun'
+[DEBUG] Password Check Result: True
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@normalizedUserName='?' (Size = 256)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[Email], [a].[EmailConfirmed], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TwoFactorEnabled], [a].[UserName]
+      FROM [AspNetUsers] AS [a]
+      WHERE [a].[NormalizedUserName] = @normalizedUserName
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@user_Id='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [a].[Id], [a].[ClaimType], [a].[ClaimValue], [a].[UserId]
+      FROM [AspNetUserClaims] AS [a]
+      WHERE [a].[UserId] = @user_Id
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [a0].[Name]
+      FROM [AspNetUserRoles] AS [a]
+      INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+      WHERE [a].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@normalizedName='?' (Size = 256)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+      FROM [AspNetRoles] AS [a]
+      WHERE [a].[NormalizedName] = @normalizedName
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@role_Id='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [a].[ClaimType], [a].[ClaimValue]
+      FROM [AspNetRoleClaims] AS [a]
+      WHERE [a].[RoleId] = @role_Id
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@normalizedName='?' (Size = 256)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+      FROM [AspNetRoles] AS [a]
+      WHERE [a].[NormalizedName] = @normalizedName
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@role_Id='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [a].[ClaimType], [a].[ClaimValue]
+      FROM [AspNetRoleClaims] AS [a]
+      WHERE [a].[RoleId] = @role_Id
+[DEBUG] SignInManager Result: Succeeded
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [s].[UserId], [s].[RoleTemplateId], [s].[Id], [s].[Name], [r0].[Id], [r0].[ClaimValue], [r0].[RoleTemplateId]
+      FROM (
+          SELECT TOP(1) [u].[UserId], [u].[RoleTemplateId], [r].[Id], [r].[Name]
+          FROM [UserRoleTemplates] AS [u]
+          INNER JOIN [RoleTemplates] AS [r] ON [u].[RoleTemplateId] = [r].[Id]
+          WHERE [u].[UserId] = @userId
+      ) AS [s]
+      LEFT JOIN [RoleTemplateClaims] AS [r0] ON [s].[Id] = [r0].[RoleTemplateId]
+      ORDER BY [s].[UserId], [s].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@userId='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SELECT [u].[Id], [u].[ClaimValue], [u].[IsDenied], [u].[UserId]
+      FROM [UserClaimOverrides] AS [u]
+      WHERE [u].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevli] AS [g]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@today='?' (DbType = DateTime2), @today1='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevli] AS [g]
+      WHERE EXISTS (
+          SELECT 1
+          FROM [Gorevlendirme] AS [g0]
+          WHERE [g].[Id] = [g0].[GorevliId] AND @today >= [g0].[Tarih] AND ([g0].[BitisTarihi] IS NULL OR @today1 <= [g0].[BitisTarihi]))
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Kurum] AS [k]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevlendirme] AS [g]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevlendirme] AS [g]
+      WHERE DATEPART(month, [g].[Tarih]) = DATEPART(month, GETDATE()) AND DATEPART(year, [g].[Tarih]) = DATEPART(year, GETDATE())
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevlendirme] AS [g]
+      WHERE DATEPART(year, [g].[Tarih]) = DATEPART(year, GETDATE())
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevlendirme] AS [g]
+      WHERE [g].[Tarih] >= GETDATE()
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Kurum] AS [k]
+      WHERE [k].[Tip] = 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevli] AS [g]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevlendirme] AS [g]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [d].[UserId], [d].[ShowAssignmentChart], [d].[ShowKurbanChart], [d].[ShowPersonnelChart], [d].[ShowRegionMap]
+      FROM [DashboardPreferences] AS [d]
+      WHERE [d].[UserId] = @p
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [k].[Bolge] AS [RegionName], COUNT(*) AS [AssociationCount], COUNT(*) * 2 AS [PersonnelCount]
+      FROM [Kurum] AS [k]
+      WHERE [k].[Bolge] IS NOT NULL AND [k].[Bolge] NOT LIKE N''
+      GROUP BY [k].[Bolge]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [k].[Id], [k].[CreatedAt], [k].[Price], [k].[RemainingShares], [k].[Species], [k].[Status], [k].[TagNumber], [k].[TotalShares], [k].[Weight]
+      FROM [Kurbanliklar] AS [k]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[AktifMi], [r].[IsDeleted], [r].[Renk], [r].[Sira]
+      FROM [Ref_GorevliDurums] AS [r]
+      WHERE [r].[AktifMi] = CAST(1 AS bit) AND [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Sira]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_SozlesmeTips] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_Unvans] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_EgitimDurumlari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_HafizlikDurumlari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_KadroTurleri] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_AskerlikDurumlari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_KanGruplari] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [k].[Id], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId]
+      FROM [Kurum] AS [k]
+      ORDER BY [k].[Isim]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevli] AS [g]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p='?' (DbType = Int32), @p1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [g0].[Id], [g0].[Ad], [g0].[Adres], [g0].[AnneAdi], [g0].[AskerlikDurumuId], [g0].[BabaAdi], [g0].[BasvuruTuruId], [g0].[CepTelefonu], [g0].[Cinsiyet], [g0].[Derece], [g0].[DiyanetGirisTarihi], [g0].[DogumTarihi], [g0].[DogumYeri], [g0].[Durum], [g0].[EgitimDurumuId], [g0].[Email], [g0].[EmeklilikTarihi], [g0].[EvTelefonu], [g0].[FotografYolu], [g0].[GorevliDurumId], [g0].[HafizlikDurumuId], [g0].[IlkGoreveBaslamaTarihi], [g0].[Kademe], [g0].[KadroTuruId], [g0].[KanGrubuId], [g0].[MezuniyetBolum], [g0].[MezuniyetOkul], [g0].[Soyad], [g0].[SozlesmeTipId], [g0].[TCKimlikNo], [g0].[UnvanId], [r].[Id], [r0].[Id], [r1].[Id], [r2].[Id], [r3].[Id], [r4].[Id], [r5].[Id], [r6].[Id], [s].[Id], [s].[BitisTarihi], [s].[GorevliId], [s].[KurumId], [s].[Tarih], [s].[YerineGelecekGorevliId], [s].[YerineGelisPlanlananBitisTarih], [s].[YerineGelisPlanlananTarih], [s].[Id0], [s].[Adres], [s].[AktifMi], [s].[BaskonsoloslukBolgesi], [s].[Bolge], [s].[CrmUyelikFormDurumu], [s].[DernekBaskaniAd], [s].[DernekBaskaniIletisim], [s].[DinGorevlisiAd], [s].[DinGorevlisiIletisim], [s].[Isim], [s].[KurulusKanunu], [s].[Sehir], [s].[Tip], [s].[UstKurumId], [r].[Ad], [r].[AktifMi], [r].[IsDeleted], [r].[Renk], [r].[Sira], [r0].[Ad], [r0].[IsDeleted], [r1].[Ad], [r1].[IsDeleted], [r2].[Ad], [r2].[IsDeleted], [r3].[Ad], [r3].[IsDeleted], [r4].[Ad], [r4].[IsDeleted], [r5].[Ad], [r5].[IsDeleted], [r6].[Ad], [r6].[IsDeleted], [g2].[Id], [g2].[GorevliId], [g2].[NotIcerik], [g2].[Tarih], [g2].[YazanKisiId]
+      FROM (
+          SELECT [g].[Id], [g].[Ad], [g].[Adres], [g].[AnneAdi], [g].[AskerlikDurumuId], [g].[BabaAdi], [g].[BasvuruTuruId], [g].[CepTelefonu], [g].[Cinsiyet], [g].[Derece], [g].[DiyanetGirisTarihi], [g].[DogumTarihi], [g].[DogumYeri], [g].[Durum], [g].[EgitimDurumuId], [g].[Email], [g].[EmeklilikTarihi], [g].[EvTelefonu], [g].[FotografYolu], [g].[GorevliDurumId], [g].[HafizlikDurumuId], [g].[IlkGoreveBaslamaTarihi], [g].[Kademe], [g].[KadroTuruId], [g].[KanGrubuId], [g].[MezuniyetBolum], [g].[MezuniyetOkul], [g].[Soyad], [g].[SozlesmeTipId], [g].[TCKimlikNo], [g].[UnvanId]
+          FROM [Gorevli] AS [g]
+          ORDER BY [g].[Ad]
+          OFFSET @p ROWS FETCH NEXT @p1 ROWS ONLY
+      ) AS [g0]
+      LEFT JOIN [Ref_GorevliDurums] AS [r] ON [g0].[GorevliDurumId] = [r].[Id]
+      LEFT JOIN [Ref_SozlesmeTips] AS [r0] ON [g0].[SozlesmeTipId] = [r0].[Id]
+      LEFT JOIN [Ref_Unvans] AS [r1] ON [g0].[UnvanId] = [r1].[Id]
+      LEFT JOIN [Ref_EgitimDurumlari] AS [r2] ON [g0].[EgitimDurumuId] = [r2].[Id]
+      LEFT JOIN [Ref_HafizlikDurumlari] AS [r3] ON [g0].[HafizlikDurumuId] = [r3].[Id]
+      LEFT JOIN [Ref_KadroTurleri] AS [r4] ON [g0].[KadroTuruId] = [r4].[Id]
+      LEFT JOIN [Ref_AskerlikDurumlari] AS [r5] ON [g0].[AskerlikDurumuId] = [r5].[Id]
+      LEFT JOIN [Ref_KanGruplari] AS [r6] ON [g0].[KanGrubuId] = [r6].[Id]
+      LEFT JOIN (
+          SELECT [g1].[Id], [g1].[BitisTarihi], [g1].[GorevliId], [g1].[KurumId], [g1].[Tarih], [g1].[YerineGelecekGorevliId], [g1].[YerineGelisPlanlananBitisTarih], [g1].[YerineGelisPlanlananTarih], [k].[Id] AS [Id0], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId]
+          FROM [Gorevlendirme] AS [g1]
+          INNER JOIN [Kurum] AS [k] ON [g1].[KurumId] = [k].[Id]
+      ) AS [s] ON [g0].[Id] = [s].[GorevliId]
+      LEFT JOIN [GorevliNotlari] AS [g2] ON [g0].[Id] = [g2].[GorevliId]
+      ORDER BY [g0].[Ad], [g0].[Id], [r].[Id], [r0].[Id], [r1].[Id], [r2].[Id], [r3].[Id], [r4].[Id], [r5].[Id], [r6].[Id], [s].[Id], [s].[Id0]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [g].[Id], [g].[Ad], [g].[Adres], [g].[AnneAdi], [g].[AskerlikDurumuId], [g].[BabaAdi], [g].[BasvuruTuruId], [g].[CepTelefonu], [g].[Cinsiyet], [g].[Derece], [g].[DiyanetGirisTarihi], [g].[DogumTarihi], [g].[DogumYeri], [g].[Durum], [g].[EgitimDurumuId], [g].[Email], [g].[EmeklilikTarihi], [g].[EvTelefonu], [g].[FotografYolu], [g].[GorevliDurumId], [g].[HafizlikDurumuId], [g].[IlkGoreveBaslamaTarihi], [g].[Kademe], [g].[KadroTuruId], [g].[KanGrubuId], [g].[MezuniyetBolum], [g].[MezuniyetOkul], [g].[Soyad], [g].[SozlesmeTipId], [g].[TCKimlikNo], [g].[UnvanId]
+      FROM [Gorevli] AS [g]
+      ORDER BY [g].[Ad], [g].[Soyad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [k].[Id], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId]
+      FROM [Kurum] AS [k]
+      ORDER BY [k].[Isim]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevlendirme] AS [g]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p='?' (DbType = Int32), @p1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [g1].[Id], [g1].[BitisTarihi], [g1].[GorevliId], [g1].[KurumId], [g1].[Tarih], [g1].[YerineGelecekGorevliId], [g1].[YerineGelisPlanlananBitisTarih], [g1].[YerineGelisPlanlananTarih], [g0].[Id], [g0].[Ad], [g0].[Adres], [g0].[AnneAdi], [g0].[AskerlikDurumuId], [g0].[BabaAdi], [g0].[BasvuruTuruId], [g0].[CepTelefonu], [g0].[Cinsiyet], [g0].[Derece], [g0].[DiyanetGirisTarihi], [g0].[DogumTarihi], [g0].[DogumYeri], [g0].[Durum], [g0].[EgitimDurumuId], [g0].[Email], [g0].[EmeklilikTarihi], [g0].[EvTelefonu], [g0].[FotografYolu], [g0].[GorevliDurumId], [g0].[HafizlikDurumuId], [g0].[IlkGoreveBaslamaTarihi], [g0].[Kademe], [g0].[KadroTuruId], [g0].[KanGrubuId], [g0].[MezuniyetBolum], [g0].[MezuniyetOkul], [g0].[Soyad], [g0].[SozlesmeTipId], [g0].[TCKimlikNo], [g0].[UnvanId], [r].[Id], [r].[Ad], [r].[AktifMi], [r].[IsDeleted], [r].[Renk], [r].[Sira], [k].[Id], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId], [g2].[Id], [g2].[Ad], [g2].[Adres], [g2].[AnneAdi], [g2].[AskerlikDurumuId], [g2].[BabaAdi], [g2].[BasvuruTuruId], [g2].[CepTelefonu], [g2].[Cinsiyet], [g2].[Derece], [g2].[DiyanetGirisTarihi], [g2].[DogumTarihi], [g2].[DogumYeri], [g2].[Durum], [g2].[EgitimDurumuId], [g2].[Email], [g2].[EmeklilikTarihi], [g2].[EvTelefonu], [g2].[FotografYolu], [g2].[GorevliDurumId], [g2].[HafizlikDurumuId], [g2].[IlkGoreveBaslamaTarihi], [g2].[Kademe], [g2].[KadroTuruId], [g2].[KanGrubuId], [g2].[MezuniyetBolum], [g2].[MezuniyetOkul], [g2].[Soyad], [g2].[SozlesmeTipId], [g2].[TCKimlikNo], [g2].[UnvanId]
+      FROM (
+          SELECT [g].[Id], [g].[BitisTarihi], [g].[GorevliId], [g].[KurumId], [g].[Tarih], [g].[YerineGelecekGorevliId], [g].[YerineGelisPlanlananBitisTarih], [g].[YerineGelisPlanlananTarih]
+          FROM [Gorevlendirme] AS [g]
+          ORDER BY [g].[Tarih] DESC
+          OFFSET @p ROWS FETCH NEXT @p1 ROWS ONLY
+      ) AS [g1]
+      INNER JOIN [Gorevli] AS [g0] ON [g1].[GorevliId] = [g0].[Id]
+      LEFT JOIN [Ref_GorevliDurums] AS [r] ON [g0].[GorevliDurumId] = [r].[Id]
+      INNER JOIN [Kurum] AS [k] ON [g1].[KurumId] = [k].[Id]
+      LEFT JOIN [Gorevli] AS [g2] ON [g1].[YerineGelecekGorevliId] = [g2].[Id]
+      ORDER BY [g1].[Tarih] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [k].[Id], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId], [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Kurum] AS [k]
+      LEFT JOIN [Ref_KurumTurus] AS [r] ON [k].[UstKurumId] = [r].[Id]
+      WHERE [k].[Tip] = 1 AND [k].[AktifMi] = CAST(1 AS bit)
+      ORDER BY [k].[Isim]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@id='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [s].[Id], [s].[Adres], [s].[AktifMi], [s].[BaskonsoloslukBolgesi], [s].[Bolge], [s].[CrmUyelikFormDurumu], [s].[DernekBaskaniAd], [s].[DernekBaskaniIletisim], [s].[DinGorevlisiAd], [s].[DinGorevlisiIletisim], [s].[Isim], [s].[KurulusKanunu], [s].[Sehir], [s].[Tip], [s].[UstKurumId], [s].[Id0], [s].[Ad], [s].[IsDeleted], [d].[Id], [d].[AdSoyad], [d].[AileUyeSayisi], [d].[Iletisim], [d].[KayitTarihi], [d].[KurumId]
+      FROM (
+          SELECT TOP(1) [k].[Id], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId], [r].[Id] AS [Id0], [r].[Ad], [r].[IsDeleted]
+          FROM [Kurum] AS [k]
+          LEFT JOIN [Ref_KurumTurus] AS [r] ON [k].[UstKurumId] = [r].[Id]
+          WHERE [k].[Id] = @id
+      ) AS [s]
+      LEFT JOIN [DernekUyeleri] AS [d] ON [s].[Id] = [d].[KurumId]
+      ORDER BY [s].[Id], [s].[Id0]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Ref_KurumTurus] AS [r]
+      WHERE [r].[IsDeleted] = CAST(0 AS bit)
+      ORDER BY [r].[Ad]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [k].[Id], [k].[Adres], [k].[AktifMi], [k].[BaskonsoloslukBolgesi], [k].[Bolge], [k].[CrmUyelikFormDurumu], [k].[DernekBaskaniAd], [k].[DernekBaskaniIletisim], [k].[DinGorevlisiAd], [k].[DinGorevlisiIletisim], [k].[Isim], [k].[KurulusKanunu], [k].[Sehir], [k].[Tip], [k].[UstKurumId], [r].[Id], [r].[Ad], [r].[IsDeleted]
+      FROM [Kurum] AS [k]
+      LEFT JOIN [Ref_KurumTurus] AS [r] ON [k].[UstKurumId] = [r].[Id]
+      WHERE [k].[Tip] = 1 AND [k].[AktifMi] = CAST(1 AS bit)
+      ORDER BY [k].[Isim]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevli] AS [g]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@today='?' (DbType = DateTime2), @today1='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevli] AS [g]
+      WHERE EXISTS (
+          SELECT 1
+          FROM [Gorevlendirme] AS [g0]
+          WHERE [g].[Id] = [g0].[GorevliId] AND @today >= [g0].[Tarih] AND ([g0].[BitisTarihi] IS NULL OR @today1 <= [g0].[BitisTarihi]))
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Kurum] AS [k]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevlendirme] AS [g]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevlendirme] AS [g]
+      WHERE DATEPART(month, [g].[Tarih]) = DATEPART(month, GETDATE()) AND DATEPART(year, [g].[Tarih]) = DATEPART(year, GETDATE())
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevlendirme] AS [g]
+      WHERE DATEPART(year, [g].[Tarih]) = DATEPART(year, GETDATE())
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevlendirme] AS [g]
+      WHERE [g].[Tarih] >= GETDATE()
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Kurum] AS [k]
+      WHERE [k].[Tip] = 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevli] AS [g]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevlendirme] AS [g]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [d].[UserId], [d].[ShowAssignmentChart], [d].[ShowKurbanChart], [d].[ShowPersonnelChart], [d].[ShowRegionMap]
+      FROM [DashboardPreferences] AS [d]
+      WHERE [d].[UserId] = @p
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [k].[Bolge] AS [RegionName], COUNT(*) AS [AssociationCount], COUNT(*) * 2 AS [PersonnelCount]
+      FROM [Kurum] AS [k]
+      WHERE [k].[Bolge] IS NOT NULL AND [k].[Bolge] NOT LIKE N''
+      GROUP BY [k].[Bolge]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [k].[Id], [k].[CreatedAt], [k].[Price], [k].[RemainingShares], [k].[Species], [k].[Status], [k].[TagNumber], [k].[TotalShares], [k].[Weight]
+      FROM [Kurbanliklar] AS [k]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevli] AS [g]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@today='?' (DbType = DateTime2), @today1='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevli] AS [g]
+      WHERE EXISTS (
+          SELECT 1
+          FROM [Gorevlendirme] AS [g0]
+          WHERE [g].[Id] = [g0].[GorevliId] AND @today >= [g0].[Tarih] AND ([g0].[BitisTarihi] IS NULL OR @today1 <= [g0].[BitisTarihi]))
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Kurum] AS [k]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevlendirme] AS [g]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevlendirme] AS [g]
+      WHERE DATEPART(month, [g].[Tarih]) = DATEPART(month, GETDATE()) AND DATEPART(year, [g].[Tarih]) = DATEPART(year, GETDATE())
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevlendirme] AS [g]
+      WHERE DATEPART(year, [g].[Tarih]) = DATEPART(year, GETDATE())
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevlendirme] AS [g]
+      WHERE [g].[Tarih] >= GETDATE()
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Kurum] AS [k]
+      WHERE [k].[Tip] = 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevli] AS [g]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Gorevlendirme] AS [g]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [d].[UserId], [d].[ShowAssignmentChart], [d].[ShowKurbanChart], [d].[ShowPersonnelChart], [d].[ShowRegionMap]
+      FROM [DashboardPreferences] AS [d]
+      WHERE [d].[UserId] = @p
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [k].[Bolge] AS [RegionName], COUNT(*) AS [AssociationCount], COUNT(*) * 2 AS [PersonnelCount]
+      FROM [Kurum] AS [k]
+      WHERE [k].[Bolge] IS NOT NULL AND [k].[Bolge] NOT LIKE N''
+      GROUP BY [k].[Bolge]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [k].[Id], [k].[CreatedAt], [k].[Price], [k].[RemainingShares], [k].[Species], [k].[Status], [k].[TagNumber], [k].[TotalShares], [k].[Weight]
+      FROM [Kurbanliklar] AS [k]

@@ -1,16 +1,20 @@
 using DitibStasbourg.Data;
 using DitibStasbourg.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace DitibStasbourg.Services
 {
     public class LookupService : ILookupService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMemoryCache _cache;
+        private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(30);
 
-        public LookupService(ApplicationDbContext context)
+        public LookupService(ApplicationDbContext context, IMemoryCache cache)
         {
             _context = context;
+            _cache = cache;
         }
 
         // Gorevli Durum
@@ -163,6 +167,31 @@ namespace DitibStasbourg.Services
         public async Task<List<Ref_KadroTuru>> GetKadroTurleriAsync(bool activeOnly = true)
         {
             return await _context.Ref_KadroTurleri.Where(x => !activeOnly || !x.IsDeleted).OrderBy(x => x.Ad).ToListAsync();
+        }
+
+        // Generic Dynamic Lookups Implementation
+        public async Task<List<LookupValue>> GetDynamicValuesAsync(string typeCode)
+        {
+            string cacheKey = $"Lookup_{typeCode}";
+
+            if (!_cache.TryGetValue(cacheKey, out List<LookupValue>? values))
+            {
+                values = await _context.LookupValues
+                    .Include(v => v.LookupType)
+                    .Where(v => v.LookupType != null && v.LookupType.Code == typeCode && v.IsActive && v.LookupType.IsActive)
+                    .OrderBy(v => v.SortOrder)
+                    .ThenBy(v => v.Name)
+                    .ToListAsync();
+
+                _cache.Set(cacheKey, values, CacheDuration);
+            }
+
+            return values ?? new List<LookupValue>();
+        }
+
+        public void ClearDynamicCache(string typeCode)
+        {
+            _cache.Remove($"Lookup_{typeCode}");
         }
     }
 }

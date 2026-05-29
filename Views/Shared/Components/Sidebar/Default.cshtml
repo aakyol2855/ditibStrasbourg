@@ -1,0 +1,46 @@
+@model List<DitibStasbourg.Models.Navigation.MenuItem>
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+@{
+    var currentCtrl = ViewBag.CurrentController as string ?? "";
+    var currentAct = ViewBag.CurrentAction as string ?? "";
+    string ActiveClass(string c) => currentCtrl == c ? "active" : "";
+}
+
+<div id="sidebar-wrapper">
+    <div class="sidebar-heading">
+        <img src="@Configuration["Branding:LogoUrl"]" alt="Logo" onerror="this.style.display='none'" />
+        <span>@Configuration["Branding:AppName"]</span>
+    </div>
+    <div class="list-group list-group-borderless mt-2 px-1">
+        @foreach (var item in Model)
+        {
+            if (item.Children != null && item.Children.Any())
+            {
+                var collapseId = "collapse_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+                var isActiveGroup = item.IsActive(currentCtrl, currentAct);
+                
+                <a class="list-group-item list-group-item-action standard-menu-item d-flex align-items-center" data-bs-toggle="collapse" href="#@collapseId" role="button" aria-expanded="@(isActiveGroup ? "true" : "false")" aria-controls="@collapseId">
+                    <i class="@(item.Icon ?? "bi bi-folder") me-3 fs-5"></i>
+                    <span class="flex-grow-1 text-start menu-text">@item.Title</span>
+                    <i class="bi bi-chevron-down ms-2 opacity-75 small menu-text expand-icon"></i>
+                </a>
+                <div class="collapse menu-collapse @(isActiveGroup ? "show" : "")" id="@collapseId">
+                    @foreach (var child in item.Children)
+                    {
+                        var isChildActive = child.IsActive(currentCtrl, currentAct);
+                        <a class="list-group-item list-group-item-action standard-menu-item border-0 @(isChildActive ? "active" : "")" asp-controller="@child.Controller" asp-action="@child.Action" style="padding-left: 20px;">
+                            <i class="@(child.Icon ?? "bi bi-record-circle") me-3 fs-5"></i> <span class="menu-text">@child.Title</span>
+                        </a>
+                    }
+                </div>
+            }
+            else
+            {
+                var isActive = item.IsActive(currentCtrl, currentAct);
+                <a class="list-group-item list-group-item-action standard-menu-item border-0 @(isActive ? "active" : "")" asp-controller="@item.Controller" asp-action="@item.Action">
+                    <i class="@(item.Icon ?? "bi bi-record-circle") me-3 fs-5"></i> <span class="menu-text">@item.Title</span>
+                </a>
+            }
+        }
+    </div>
+</div>

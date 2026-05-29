@@ -12,7 +12,7 @@
 </style>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1>Görevliler</h1>
+    <h1 class="fw-bold">Görevliler <help-icon topic-id="1" title="Personel Yönetimi"></help-icon></h1>
     <div>
         <button type="button" id="btnExportExcel" class="btn btn-success me-2">
             <i class="fas fa-file-excel me-2"></i>Excel'e Aktar
@@ -330,17 +330,27 @@
     <!-- Simplified Pagination for Filtered Results -->
     <!-- Ideally, use a TagHelper or JS to submit form with page number -->
     
-    <nav aria-label="Page navigation">
-      <ul class="pagination">
-        <li class="page-item @prevDisabled">
-            <button class="page-link" onclick="changePage(@(Model.PageIndex - 1))">Previous</button>
-        </li>
-        <li class="page-item disabled"><span class="page-link">Sayfa @Model.PageIndex / @Model.TotalPages</span></li>
-        <li class="page-item @nextDisabled">
-            <button class="page-link" onclick="changePage(@(Model.PageIndex + 1))">Next</button>
-        </li>
-      </ul>
-    </nav>
+    <div class="d-flex align-items-center">
+        <label class="me-2 text-muted small">Her sayfada:</label>
+        <select name="PageSize" class="form-select form-select-sm w-auto me-4" onchange="changePage(1)">
+            <option value="10" selected="@(filter.PageSize == 10)">10</option>
+            <option value="20" selected="@(filter.PageSize == 20 || filter.PageSize == null)">20</option>
+            <option value="50" selected="@(filter.PageSize == 50)">50</option>
+            <option value="100" selected="@(filter.PageSize == 100)">100</option>
+        </select>
+
+        <nav aria-label="Page navigation">
+          <ul class="pagination mb-0">
+            <li class="page-item @prevDisabled">
+                <button class="page-link" onclick="changePage(@(Model.PageIndex - 1))">Previous</button>
+            </li>
+            <li class="page-item disabled"><span class="page-link">Sayfa @Model.PageIndex / @Model.TotalPages</span></li>
+            <li class="page-item @nextDisabled">
+                <button class="page-link" onclick="changePage(@(Model.PageIndex + 1))">Next</button>
+            </li>
+          </ul>
+        </nav>
+    </div>
     
     <script>
         // Handle Excel export button
@@ -433,6 +443,17 @@
                 pageInput.name = 'PageNumber';
                 pageInput.value = pageNum;
                 form.appendChild(pageInput);
+                
+                // Ensure PageSize is included
+                var pageSizeSelect = document.querySelector('select[name="PageSize"]');
+                if (pageSizeSelect) {
+                    var pageSizeInput = document.createElement('input');
+                    pageSizeInput.type = 'hidden';
+                    pageSizeInput.name = 'PageSize';
+                    pageSizeInput.value = pageSizeSelect.value;
+                    form.appendChild(pageSizeInput);
+                }
+                
                 form.submit();
             } else {
                  // Fallback if form not found (should not happen)
@@ -520,7 +541,7 @@
                     cache: true
                 },
                 placeholder: 'İsim, soyad veya e-posta ile arayın...',
-                minimumInputLength: 1,
+                minimumInputLength: 3, // Optimization: Min 3 chars
                 allowClear: true,
                 width: '100%'
             });

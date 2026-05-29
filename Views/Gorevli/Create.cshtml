@@ -70,6 +70,13 @@
                                     <span asp-validation-for="FotografYolu" class="text-danger"></span>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-12 form-group mb-3">
+                                    <label asp-for="BasvuruTuruId" class="control-label"></label>
+                                    <lookup-dropdown type="BASVURU_TURU" asp-for="BasvuruTuruId"></lookup-dropdown>
+                                    <span asp-validation-for="BasvuruTuruId" class="text-danger"></span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

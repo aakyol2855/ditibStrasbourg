@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using DitibStasbourg.Models;
+using DitibStasbourg.Models.Dashboard;
+using DitibStasbourg.Models.Security;
 
 namespace DitibStasbourg.Data;
 
@@ -32,9 +34,28 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<Ref_AskerlikDurumu> Ref_AskerlikDurumlari { get; set; }
     public DbSet<Ref_KadroTuru> Ref_KadroTurleri { get; set; }
 
+    // Dynamic Lookups
+    public DbSet<LookupType> LookupTypes { get; set; }
+    public DbSet<LookupValue> LookupValues { get; set; }
+
+    // Dynamic Security System
+    public DbSet<RoleTemplate> RoleTemplates { get; set; }
+    public DbSet<RoleTemplateClaim> RoleTemplateClaims { get; set; }
+    public DbSet<UserRoleTemplate> UserRoleTemplates { get; set; }
+    public DbSet<UserClaimOverride> UserClaimOverrides { get; set; }
+    public DbSet<HelpTopic> HelpTopics { get; set; }
+    public DbSet<Kurbanlik> Kurbanliklar { get; set; }
+    public DbSet<Hissedar> Hissedarlar { get; set; }
+    public DbSet<DashboardPreference> DashboardPreferences { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+        // Configure Lookups
+        builder.Entity<LookupType>()
+            .HasIndex(lt => lt.Code)
+            .IsUnique();
 
         // Configure Gorevlendirme relationships
         builder.Entity<Gorevlendirme>()
@@ -82,5 +103,34 @@ public class ApplicationDbContext : IdentityDbContext
             .WithMany()
             .HasForeignKey(g => g.YerineGelenGorevliId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<Kurbanlik>(entity =>
+        {
+            entity.Property(e => e.Price).HasColumnType("decimal(18,2)");
+            entity.Property(e => e.Weight).HasColumnType("decimal(18,2)");
+        });
+
+        builder.Entity<DashboardPreference>(entity =>
+        {
+            entity.HasKey(e => e.UserId);
+        });
+
+        // Performance Indexes
+        builder.Entity<Gorevli>()
+            .HasIndex(g => new { g.Ad, g.Soyad, g.Email })
+            .HasDatabaseName("IX_Gorevli_Search");
+
+        builder.Entity<Gorevli>()
+            .HasIndex(g => g.TCKimlikNo)
+            .IsUnique()
+            .HasFilter("[TCKimlikNo] IS NOT NULL");
+
+        builder.Entity<Kurum>()
+            .HasIndex(k => new { k.Bolge, k.Sehir })
+            .HasDatabaseName("IX_Kurum_Geo");
+
+        builder.Entity<Gorevlendirme>()
+            .HasIndex(g => new { g.Tarih, g.BitisTarihi, g.KurumId, g.GorevliId })
+            .HasDatabaseName("IX_Gorevlendirme_Filters");
     }
 }

@@ -1,135 +1,452 @@
-/* Global Styles */
+/*
+ * DITIB Strasbourg Platform - Global UI Variables & Rules
+ * Designed for a premium 2026 SaaS experience.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+:root {
+    /* Brand Colors */
+    --platform-primary: #1e40af; /* Deep Blue */
+    --platform-primary-hover: #1e3a8a;
+    --platform-secondary: #64748b; /* Slate Gray */
+    --platform-success: #10b981;
+    --platform-danger: #ef4444;
+    --platform-warning: #f59e0b;
+    --platform-info: #3b82f6;
+    
+    /* Backgrounds & Surfaces */
+    --platform-bg-body: #f8fafc; /* Very light slate */
+    --platform-bg-surface: #ffffff;
+    --platform-bg-sidebar: #0f172a; /* Very dark slate */
+    --platform-border: #e2e8f0;
+    
+    /* Typography */
+    --platform-text-main: #1e293b;
+    --platform-text-muted: #64748b;
+    --font-family-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-family-heading: 'Poppins', 'Inter', system-ui, sans-serif;
+
+    /* Metrics & Spacing */
+    --border-radius-sm: 6px;
+    --border-radius-md: 10px;
+    --border-radius-lg: 16px;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-card: 0 2px 12px rgba(15, 23, 42, 0.04);
+
+    /* Sidebar Variables */
+    --sidebar-width: 280px;
+    --sidebar-collapsed-width: 70px;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevent body scroll */
+}
+
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  overflow-x: hidden;
-  background-color: #f4f6f9;
+    background-color: var(--platform-bg-body);
+    font-family: var(--font-family-sans);
+    color: var(--platform-text-main);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
 }
 
-/* Sidebar */
-#sidebar-wrapper {
-  min-height: 100vh;
-  width: 17rem;
-  margin-left: 0;
-  transition: margin 0.25s ease-out;
-  background-color: #1a237e;
-  /* Dark Blue */
-  color: #fff;
-  position: fixed;
-  z-index: 1000;
+h1, h2, h3, h4, h5, h6, .navbar-brand, .sidebar-heading {
+    font-family: var(--font-family-heading);
+    font-weight: 600;
 }
 
-#sidebar-wrapper .sidebar-heading {
-  padding: 1rem 1.25rem;
-  font-size: 1.4rem;
-  font-weight: bold;
-  color: #fff;
-  text-align: center;
-  background-color: rgba(0, 0, 0, 0.1);
-}
-
-#sidebar-wrapper .list-group {
-  width: 17rem;
-}
-
-#sidebar-wrapper .list-group-item {
-  background-color: transparent;
-  color: #cfd8dc;
-  border: none;
-  padding: 15px 25px;
-  font-size: 1rem;
-}
-
-#sidebar-wrapper .list-group-item:hover,
-#sidebar-wrapper .list-group-item:focus {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  text-decoration: none;
-}
-
-#sidebar-wrapper .list-group-item.active {
-  background-color: #3949ab;
-  color: #fff;
-  border-left: 4px solid #fff;
-}
-
-/* Page Content */
-#page-content-wrapper {
-  margin-left: 17rem;
-  width: calc(100% - 17rem);
-  transition: margin 0.25s ease-out, width 0.25s ease-out;
-}
-
-/* Toggled State */
-body.sb-sidenav-toggled #sidebar-wrapper {
-  margin-left: -17rem;
-}
-
-body.sb-sidenav-toggled #page-content-wrapper {
-  margin-left: 0;
-  width: 100%;
-}
-
-/* Header / Navbar */
-.navbar {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, .08);
-  background-color: #fff !important;
-  padding: 0.8rem 1rem;
-}
-
-/* Cards */
+/* ==========================================================================
+   CARDS & CONTAINERS
+   ========================================================================== */
 .card {
-  border: none;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  margin-bottom: 24px;
-  border-radius: 8px;
+    background: var(--platform-bg-surface);
+    border: 1px solid var(--platform-border);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-card);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    margin-bottom: 1.5rem;
 }
 
 .card-header {
-  background-color: #1a237e;
-  color: #fff;
-  font-weight: 600;
-  border-radius: 8px 8px 0 0 !important;
-  padding: 1rem 1.25rem;
+    background: transparent;
+    border-bottom: 1px solid var(--platform-border);
+    padding: 1.25rem 1.5rem;
+    font-weight: 600;
+    font-family: var(--font-family-heading);
 }
 
-/* Tables */
-.table {
-  margin-bottom: 0;
+.card-body {
+    padding: 1.5rem;
 }
 
-.table thead th {
-  background-color: #1a237e;
-  color: #fff;
-  border: none;
-  font-weight: 500;
-  padding: 12px;
+/* ==========================================================================
+   BUTTONS
+   ========================================================================== */
+.btn {
+    border-radius: var(--border-radius-sm);
+    font-weight: 500;
+    padding: 0.5rem 1.25rem;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
-.table tbody td {
-  vertical-align: middle;
-  padding: 12px;
-}
-
-.table-striped tbody tr:nth-of-type(odd) {
-  background-color: rgba(0, 0, 0, .02);
-}
-
-.table-hover tbody tr:hover {
-  background-color: rgba(0, 0, 0, .04);
-}
-
-/* Buttons */
 .btn-primary {
-  background-color: #1a237e;
-  border-color: #1a237e;
+    background-color: var(--platform-primary);
+    border-color: var(--platform-primary);
+    color: white;
 }
 
 .btn-primary:hover {
-  background-color: #283593;
-  border-color: #283593;
+    background-color: var(--platform-primary-hover);
+    border-color: var(--platform-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(30, 64, 175, 0.25);
 }
 
-.btn-sm {
-  padding: 0.25rem 0.6rem;
-  font-size: 0.875rem;
+.btn-light {
+    background-color: #f1f5f9;
+    border-color: transparent;
+    color: var(--platform-text-main);
+}
+.btn-light:hover {
+    background-color: #e2e8f0;
+}
+
+/* ==========================================================================
+   TABLES
+   ========================================================================== */
+.table {
+    margin-bottom: 0;
+    color: var(--platform-text-main);
+}
+.table > :not(caption) > * > * {
+    padding: 1rem 1.25rem;
+    border-bottom-color: var(--platform-border);
+}
+.table th {
+    font-family: var(--font-family-heading);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--platform-text-muted);
+    font-weight: 600;
+    background-color: #f8fafc;
+    border-top: none;
+}
+.table tbody tr {
+    transition: background-color 0.15s ease;
+}
+.table tbody tr:hover {
+    background-color: #f1f5f9;
+}
+
+/* ==========================================================================
+   SIDEBAR & LAYOUT
+   ========================================================================== */
+.layout-authenticated #wrapper {
+    display: grid;
+    grid-template-columns: var(--sidebar-width) 1fr;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-collapsed.layout-authenticated #wrapper {
+    grid-template-columns: var(--sidebar-collapsed-width) 1fr;
+}
+
+.layout-authenticated #sidebar-wrapper {
+    background-color: var(--platform-bg-sidebar) !important;
+    color: #e2e8f0;
+    height: 100vh;
+    width: var(--sidebar-width);
+    flex-shrink: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-lg);
+    z-index: 1050;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.layout-authenticated #page-content-wrapper {
+    display: grid;
+    grid-template-rows: auto 1fr auto; /* Header, Content, Footer */
+    height: 100vh;
+    min-width: 0;
+    overflow: hidden;
+    background-color: var(--platform-bg-body);
+}
+
+#sidebar-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 1040;
+    display: none;
+    transition: opacity 0.3s ease;
+}
+
+#sidebar-backdrop.show {
+    display: block;
+}
+
+.content-scrollable {
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.navbar-sticky {
+    /* Sticky is handled by grid-template-rows now */
+}
+
+.footer-sticky {
+    width: 100%;
+    background-color: var(--platform-bg-surface);
+    z-index: 1000;
+    margin-top: auto;
+}
+
+/* Mini Sidebar when collapsed */
+.sidebar-collapsed #sidebar-wrapper {
+    width: var(--sidebar-collapsed-width);
+}
+
+.sidebar-collapsed .menu-text, 
+.sidebar-collapsed .sidebar-heading span,
+.sidebar-collapsed .expand-icon {
+    display: none !important;
+}
+
+.sidebar-collapsed .sidebar-heading {
+    padding: 1.5rem 0.5rem;
+    justify-content: center;
+}
+
+.sidebar-collapsed .list-group-item.standard-menu-item {
+    margin: 0.25rem 0.5rem;
+    padding: 0.85rem 0;
+    justify-content: center;
+}
+
+.sidebar-collapsed .list-group-item.standard-menu-item i {
+    margin-right: 0 !important;
+    font-size: 1.4rem;
+}
+
+.sidebar-collapsed .menu-collapse {
+    display: none !important;
+}
+
+
+
+.sidebar-heading {
+    padding: 1.5rem 1.5rem;
+    font-size: 1.2rem;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.sidebar-heading img {
+    height: 32px;
+    width: auto;
+    border-radius: 4px;
+}
+
+.list-group-item.standard-menu-item {
+    background: transparent;
+    color: #94a3b8;
+    border: none;
+    padding: 0.85rem 1.5rem;
+    margin: 0.25rem 1rem;
+    border-radius: var(--border-radius-sm);
+    transition: all 0.2s ease;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.list-group-item.standard-menu-item:hover, 
+.list-group-item.standard-menu-item[aria-expanded="true"] {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: white;
+}
+
+.list-group-item.standard-menu-item.active {
+    background-color: var(--platform-primary);
+    color: white;
+    box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+}
+
+.menu-collapse .list-group-item {
+    background: transparent;
+    color: #64748b;
+    font-size: 0.9rem;
+    padding: 0.6rem 1rem 0.6rem 3rem;
+    border-radius: var(--border-radius-sm);
+    margin: 0.1rem 1rem;
+}
+.menu-collapse .list-group-item:hover {
+    color: white;
+}
+.menu-collapse .list-group-item.active {
+    color: var(--platform-primary) !important;
+    font-weight: 600;
+    background: transparent;
+    box-shadow: none;
+}
+
+/* ==========================================================================
+   FORMS & INPUTS
+   ========================================================================== */
+.form-control, .form-select {
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--platform-border);
+    padding: 0.6rem 1rem;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--platform-primary);
+    box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+}
+
+/* Select2 overrides to match Bootstrap 5 */
+.select2-container--bootstrap-5 .select2-selection {
+    border-radius: var(--border-radius-sm);
+    border-color: var(--platform-border);
+    min-height: calc(1.5em + 1.2rem + 2px);
+}
+.select2-container--bootstrap-5.select2-container--focus .select2-selection {
+    border-color: var(--platform-primary);
+    box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+}
+
+/* ==========================================================================
+   DEVELOPER SIGNATURE
+   ========================================================================== */
+.dev-signature {
+    opacity: 0.3;
+    font-size: 0.8rem;
+    transition: opacity 0.3s ease;
+}
+.dev-signature:hover {
+    opacity: 1;
+}
+
+/* ==========================================================================
+   GUEST / LOGIN LAYOUT
+   ========================================================================== */
+.layout-guest {
+    overflow-y: auto;
+    background-color: var(--platform-bg-body);
+}
+
+.layout-guest #wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 100vh;
+    padding: 2rem;
+}
+
+.layout-guest #page-content-wrapper {
+    display: block;
+    width: 100%;
+    max-width: 500px; /* Constrain login width for better look */
+}
+
+.layout-guest .navbar {
+    display: none; /* Hide top bar on login */
+}
+
+.layout-guest .content-scrollable {
+    overflow: visible;
+    display: block;
+    height: auto;
+}
+
+.layout-guest .footer {
+    position: relative;
+    width: 100%;
+}
+
+
+/* ==========================================================================
+   RESPONSIVE OVERRIDES
+   ========================================================================== */
+@media (max-width: 991.98px) {
+    .layout-authenticated #wrapper {
+        grid-template-columns: 1fr; /* Single column on mobile */
+    }
+
+    .layout-authenticated #sidebar-wrapper {
+        position: fixed;
+        left: calc(-1 * var(--sidebar-width));
+        top: 0;
+    }
+
+    .sidebar-mobile-open .layout-authenticated #sidebar-wrapper {
+        left: 0;
+    }
+
+    /* Disable mini-sidebar on mobile */
+    .sidebar-collapsed.layout-authenticated #wrapper {
+        grid-template-columns: 1fr;
+    }
+    
+    .sidebar-collapsed .layout-authenticated #sidebar-wrapper {
+        width: var(--sidebar-width);
+        left: calc(-1 * var(--sidebar-width));
+    }
+    
+    .sidebar-mobile-open.sidebar-collapsed .layout-authenticated #sidebar-wrapper {
+        left: 0;
+    }
+
+    .container-fluid {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .table-responsive {
+        border-radius: var(--border-radius-md);
+        overflow-x: auto;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .navbar-nav {
+        padding: 1rem 0;
+    }
 }

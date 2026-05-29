@@ -24,6 +24,7 @@ namespace DitibStasbourg.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             Console.WriteLine($"[DEBUG] Login POST received for Email: '{model.Email}'");
@@ -100,6 +101,7 @@ namespace DitibStasbourg.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SetPassword(SetPasswordViewModel model)
         {
             if (!ModelState.IsValid) return View(model);
@@ -126,6 +128,12 @@ namespace DitibStasbourg.Controllers
         {
             await _signInManager.SignOutAsync();
             return RedirectToAction("Login");
+        }
+
+        [HttpGet]
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
     }
 }

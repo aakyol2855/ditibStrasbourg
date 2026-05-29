@@ -1,0 +1,31 @@
+[
+  {
+    "Title": "Personel Yönetimi Rehberi",
+    "Category": "Personel",
+    "DisplayOrder": 1,
+    "Content": "<h3>Personel Yönetimi</h3><p>Sistemdeki tüm din görevlileri ve idari personeli bu modülden yönetebilirsiniz. Personel eklerken TC Kimlik No, Sözleşme Tipi ve Ünvan bilgilerinin doğruluğundan emin olun.</p><ul><li><strong>Toplu İçe Aktarım:</strong> Excel formatındaki personel listenizi tek seferde sisteme yükleyebilirsiniz.</li><li><strong>Durum Takibi:</strong> Personelin görevde, izinde veya emekli olma durumlarını 'Görevli Durumu' sekmesinden güncelleyebilirsiniz.</li></ul>",
+    "RequiredClaim": "Gorevli-Index",
+    "ImageUrl": "/images/help/personnel.png"
+  },
+  {
+    "Title": "Görevlendirme ve Atama Sistemi",
+    "Category": "Görevlendirme",
+    "DisplayOrder": 2,
+    "Content": "<h3>Görevlendirme Süreci</h3><p>Personelin cami veya derneklere atandığı merkezi sistemdir. Atama yaparken başlangıç ve bitiş tarihlerine dikkat edilmelidir.</p><p>Sistem, bir personelin aynı anda birden fazla aktif görevde olup olmadığını otomatik olarak kontrol eder.</p>",
+    "RequiredClaim": "Gorevlendirme-Index"
+  },
+  {
+    "Title": "Dinamik Raporlama ve Filtreleme Rehberi",
+    "Category": "Sistem Yönetimi",
+    "DisplayOrder": 10,
+    "Content": "<h3>Yüksek Performanslı Filtreleme Sistemi</h3><p>Platformumuz, büyük veri setlerinde dahi milisaniyeler içinde sonuç verebilen dinamik bir sorgu motoru kullanmaktadır.</p><h4>Arama İpuçları:</h4><ul><li><strong>Minimum Karakter:</strong> Hızlı sonuç alabilmek için arama kutularına en az 3 karakter girilmelidir.</li><li><strong>Gecikmeli Sorgulama:</strong> Yazmaya başladığınızda sistem SQL yükünü azaltmak için akıllı bekleme yapar.</li></ul><h4>Dinamik Excel Raporlama:</h4><p>Artık her raporda tüm sütunları indirmek zorunda değilsiniz. Excel'e Aktar butonuna tıkladığınızda çıkan sütun seçiciden sadece ihtiyacınız olan alanları seçebilirsiniz.</p>",
+    "RequiredClaim": "Admin-Dashboard"
+  },
+  {
+    "Title": "Kurban Organizasyon Modülü",
+    "Category": "Kurban",
+    "DisplayOrder": 3,
+    "Content": "<h3>Kurban Takibi</h3><p>Hissedar kayıtları, vekalet işlemleri ve hisse atamaları bu modülden yapılır.</p><ul><li><strong>Otomatik Hisse Atama:</strong> Sistem, hissedarı dolmaya en yakın kurbanlığa otomatik olarak atar.</li><li><strong>Fiyatlandırma:</strong> Hisse fiyatları 'Sistem Ayarları' üzerinden her yıl güncellenmelidir.</li></ul>",
+    "RequiredClaim": "Kurban-Index"
+  }
+]

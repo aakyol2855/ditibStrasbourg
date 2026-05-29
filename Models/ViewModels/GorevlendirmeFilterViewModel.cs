@@ -11,5 +11,9 @@ namespace DitibStasbourg.Models.ViewModels
         public bool? AktifMi { get; set; } // Currently active assignments
         public string? Sehir { get; set; }
         public string? DurumFilter { get; set; } // "aktif", "pasif", "tumunu"
+        public int? PageNumber { get; set; }
+        public string? Bolge { get; set; }
+        public string? Dernek { get; set; }
+        public string? Gorevli { get; set; }
     }
 }

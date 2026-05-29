@@ -1,0 +1,66 @@
+@{
+    ViewData["Title"] = "Yönetici Araçları";
+}
+
+<div class="row g-4">
+    <div class="col-md-12">
+        <h1 class="fw-bold mb-4"><i class="bi bi-shield-lock me-2"></i> @ViewData["Title"]</h1>
+    </div>
+
+    <!-- Mock Data Management -->
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-database-fill-gear me-2"></i> Mock Veri Yönetimi</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small">Sistemi test etmek için Strasbourg özelinde 15+ dernek ve 50+ personel kaydı oluşturun. Bu işlem mevcut verileri silmez, üzerine ekler.</p>
+                
+                <div class="d-grid gap-2">
+                    <form asp-action="SeedTestData" method="post">
+                        <button type="submit" class="btn btn-outline-primary w-100 py-2">
+                            <i class="bi bi-plus-circle me-2"></i> Strasbourg Test Verisi Yükle
+                        </button>
+                    </form>
+                    
+                    <form asp-action="PurgeTestData" method="post">
+                        <button type="submit" class="btn btn-outline-danger w-100 py-2" onclick="return confirm('Tüm test verileri silinecek. Emin misiniz?')">
+                            <i class="bi bi-trash-fill me-2"></i> Tüm Test Verilerini Temizle
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Logs / Diagnostics Placeholder -->
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-dark text-white py-3">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-journal-text me-2"></i> Sistem Günlüğü & Log</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small">Sistem hataları, kullanıcı hareketleri ve performans metriklerini buradan takip edebilirsiniz.</p>
+                
+                <div class="alert alert-info py-2 small">
+                    <i class="bi bi-info-circle me-2"></i> Log modülü şu an "Read-Only" modundadır.
+                </div>
+
+                <div class="list-group list-group-flush small">
+                    <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
+                        <span>Veritabanı Durumu</span>
+                        <span class="badge bg-success rounded-pill">Aktif</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
+                        <span>Depolama Alanı</span>
+                        <span class="badge bg-info rounded-pill">92% Boş</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
+                        <span>Son Seeding</span>
+                        <span class="text-muted">@DateTime.Now.ToShortDateString()</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

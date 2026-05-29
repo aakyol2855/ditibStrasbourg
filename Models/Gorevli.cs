@@ -127,6 +127,11 @@ namespace DitibStasbourg.Models
         [Display(Name = "Fotoğraf Yolu")]
         public string? FotografYolu { get; set; }
 
+        [Display(Name = "Başvuru Türü")]
+        public int? BasvuruTuruId { get; set; }
+        [ForeignKey("BasvuruTuruId")]
+        public LookupValue? BasvuruTuru { get; set; }
+
         // Navigation property for assignments
         public ICollection<Gorevlendirme> Gorevlendirmeler { get; set; } = new List<Gorevlendirme>();
 

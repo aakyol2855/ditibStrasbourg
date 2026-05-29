@@ -1,0 +1,45 @@
+@model DitibStasbourg.Models.ViewModels.ImportResultViewModel
+
+@{
+    ViewData["Title"] = "Aktarım Sonucu";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-lg">
+            <div class="card-body p-5 text-center">
+                @if (Model.IsSuccess)
+                {
+                    <div class="mb-4">
+                        <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+                    </div>
+                    <h2 class="fw-bold text-success mb-3">İşlem Başarılı!</h2>
+                    <p class="lead text-muted mb-4">Toplam <strong>@Model.SuccessCount</strong> dernek kaydı sisteme başarıyla aktarıldı.</p>
+                }
+                else
+                {
+                    <div class="mb-4">
+                        <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size: 5rem;"></i>
+                    </div>
+                    <h2 class="fw-bold text-danger mb-3">İşlem Başarısız</h2>
+                    <p class="lead text-muted mb-4">Veri tutarlılığını korumak için işlem iptal edildi. Lütfen aşağıdaki hataları düzeltip tekrar deneyin.</p>
+
+                    <div class="alert alert-danger text-start p-4 border-0">
+                        <h6 class="fw-bold mb-3">Hata Detayları:</h6>
+                        <ul class="mb-0 small">
+                            @foreach (var error in Model.Errors)
+                            {
+                                <li>@error</li>
+                            }
+                        </ul>
+                    </div>
+                }
+
+                <div class="mt-5 d-flex justify-content-center gap-3">
+                    <a asp-action="Import" class="btn btn-outline-primary px-4">Tekrar Dene</a>
+                    <a asp-action="Index" class="btn btn-primary px-5">Dernek Listesine Dön</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

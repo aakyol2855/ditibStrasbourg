@@ -3,6 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using DitibStasbourg.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Authentication;
+using DitibStasbourg.Services.Security;
+using DitibStasbourg.Services;
+using DitibStasbourg.Services.Interfaces;
+using DitibStasbourg.Services.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,10 +16,27 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
                        throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
+builder.Services.AddScoped<ILookupService, LookupService>();
+builder.Services.AddScoped<IMenuService, MenuService>();
+builder.Services.AddScoped(typeof(DitibStasbourg.Services.Base.IBaseService<>), typeof(DitibStasbourg.Services.Base.BaseService<>));
+builder.Services.AddScoped<IGorevliService, GorevliService>();
+builder.Services.AddScoped<IGorevlendirmeService, GorevlendirmeService>();
+builder.Services.AddScoped<IUserManagementService, UserManagementService>();
+builder.Services.AddScoped<IDernekIslemleriService, DernekIslemleriService>();
+builder.Services.AddScoped<IHelpService, HelpService>();
+builder.Services.AddScoped<IFileStorageService, FileStorageService>();
+builder.Services.AddScoped<IAssociationImportService, AssociationImportService>();
+builder.Services.AddScoped<IKurbanService, KurbanService>();
+builder.Services.AddScoped<IDashboardPreferenceService, DashboardPreferenceService>();
+builder.Services.AddScoped<IDynamicExportService, DynamicExportService>();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 // Register application services
-builder.Services.AddScoped<DitibStasbourg.Services.ILookupService, DitibStasbourg.Services.LookupService>();
+builder.Services.AddMemoryCache();
+
+// Dynamic Security System
+builder.Services.AddScoped<IClaimsTransformation, DynamicClaimsTransformation>();
+builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 
 // Add Identity Roles
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
@@ -34,6 +56,7 @@ builder.Services.AddControllersWithViews(options =>
         .RequireAuthenticatedUser()
         .Build();
     options.Filters.Add(new AuthorizeFilter(policy));
+    options.Filters.Add<DynamicPermissionFilter>();
 });
 
 var app = builder.Build();
@@ -45,6 +68,10 @@ using (var scope = app.Services.CreateScope())
     try
     {
         await DbSeeder.SeedRolesAndAdminAsync(services);
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        await TestDataInitializer.SeedMockDataAsync(context);
+        await DitibStasbourg.Data.KurbanInitializer.SeedKurbanLookupsAsync(context);
+        await DocumentationInitializer.SeedHelpTopicsAsync(context);
     }
     catch (Exception ex)
     {

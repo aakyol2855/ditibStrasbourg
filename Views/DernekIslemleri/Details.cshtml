@@ -1,0 +1,115 @@
+@model DitibStasbourg.Models.Kurum
+@{
+    ViewData["Title"] = Model.Isim + " Detayları";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark mb-0">@Model.Isim</h2>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-2"></i>Listeye Dön
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            @await Html.PartialAsync("_DernekDetayPartial", Model)
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Shared logic with Index
+        function reloadDetails(id) {
+            window.location.reload();
+        }
+
+        function toggleAddMember(id) {
+            var form = document.getElementById('add-member-form-' + id);
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function submitUpdateForm(formElement, dernekId, sectionName) {
+            var formData = new FormData(formElement);
+            var formId = formElement.getAttribute('id') || '';
+            var action = formId.includes('baskan') 
+                ? '/DernekIslemleri/UpdateBaskan'
+                : '/DernekIslemleri/UpdateDinGorevlisi';
+            
+            fetch(action, { method: 'POST', body: formData })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✓ ' + sectionName + ' başarıyla güncellendi!');
+                    reloadDetails(dernekId);
+                } else {
+                    alert('✗ Güncelleme sırasında hata oluştu.');
+                }
+            });
+        }
+
+        function submitUpdateDernek(formElement, dernekId) {
+            var formData = new FormData(formElement);
+            fetch('/DernekIslemleri/UpdateDernek', { method: 'POST', body: formData })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✓ Dernek bilgileri güncellendi!');
+                    reloadDetails(dernekId);
+                } else {
+                    alert('✗ Güncelleme başarısız.');
+                }
+            });
+        }
+
+        function toggleEditMember(uyeId) {
+            document.getElementById('display-adsoyad-' + uyeId).style.display = 'none';
+            document.getElementById('display-iletisim-' + uyeId).style.display = 'none';
+            document.getElementById('display-ailesayisi-' + uyeId).style.display = 'none';
+            document.getElementById('edit-adsoyad-' + uyeId).style.display = 'inline-block';
+            document.getElementById('edit-iletisim-' + uyeId).style.display = 'inline-block';
+            document.getElementById('edit-ailesayisi-' + uyeId).style.display = 'inline-block';
+            document.getElementById('btn-edit-' + uyeId).style.display = 'none';
+            document.getElementById('btn-save-' + uyeId).style.display = 'inline-block';
+            document.getElementById('btn-cancel-' + uyeId).style.display = 'inline-block';
+        }
+        
+        function cancelEditMember(uyeId) {
+            document.getElementById('display-adsoyad-' + uyeId).style.display = 'inline';
+            document.getElementById('display-iletisim-' + uyeId).style.display = 'inline';
+            document.getElementById('display-ailesayisi-' + uyeId).style.display = 'inline';
+            document.getElementById('edit-adsoyad-' + uyeId).style.display = 'none';
+            document.getElementById('edit-iletisim-' + uyeId).style.display = 'none';
+            document.getElementById('edit-ailesayisi-' + uyeId).style.display = 'none';
+            document.getElementById('btn-edit-' + uyeId).style.display = 'inline-block';
+            document.getElementById('btn-save-' + uyeId).style.display = 'none';
+            document.getElementById('btn-cancel-' + uyeId).style.display = 'none';
+        }
+        
+        function saveMember(uyeId, dernekId) {
+            var adSoyad = document.getElementById('edit-adsoyad-' + uyeId).value;
+            var iletisim = document.getElementById('edit-iletisim-' + uyeId).value;
+            var aileSayisi = document.getElementById('edit-ailesayisi-' + uyeId).value;
+            var formData = new FormData();
+            formData.append('id', uyeId);
+            formData.append('adSoyad', adSoyad);
+            formData.append('iletisim', iletisim);
+            formData.append('aileUyeSayisi', aileSayisi);
+            formData.append('kurumId', dernekId);
+            var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            formData.append('__RequestVerificationToken', token);
+            
+            fetch('/DernekIslemleri/UpdateUye', { method: 'POST', body: formData })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✓ Üye bilgileri güncellendi!');
+                    reloadDetails(dernekId);
+                } else {
+                    alert('✗ Güncelleme başarısız.');
+                }
+            });
+        }
+    </script>
+}

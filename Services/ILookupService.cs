@@ -32,5 +32,9 @@ namespace DitibStasbourg.Services
         Task<List<Ref_KanGrubu>> GetKanGruplariAsync(bool activeOnly = true);
         Task<List<Ref_AskerlikDurumu>> GetAskerlikDurumlariAsync(bool activeOnly = true);
         Task<List<Ref_KadroTuru>> GetKadroTurleriAsync(bool activeOnly = true);
+
+        // Generic Dynamic Lookups
+        Task<List<LookupValue>> GetDynamicValuesAsync(string typeCode);
+        void ClearDynamicCache(string typeCode);
     }
 }

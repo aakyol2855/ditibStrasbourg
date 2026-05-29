@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DitibStasbourg")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fc2a023e643f929d4ee0ed5c7dbded795283e382")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f297be0970c1a94de14a6cf35df6198f3a626e8f")]
 [assembly: System.Reflection.AssemblyProductAttribute("DitibStasbourg")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DitibStasbourg")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

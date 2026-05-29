@@ -254,9 +254,7 @@
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/compressed/nezrqnk58p-{0}-muycvpuwrr-muycvpuwrr.gz
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/compressed/v0zgfp0y55-{0}-87fc7y1x7t-87fc7y1x7t.gz
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/compressed/yfc7ypekbg-{0}-mlv21k5csn-mlv21k5csn.gz
-/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/compressed/2tgqt6bjes-{0}-xnc7kmedw3-xnc7kmedw3.gz
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/compressed/6mbzvqr28c-{0}-61n19gt1b8-61n19gt1b8.gz
-/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/compressed/d0s0wodx65-{0}-fr7q2aak1r-fr7q2aak1r.gz
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/compressed/f622921lj2-{0}-bqjiyaj88i-bqjiyaj88i.gz
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/compressed/e33tfykhkl-{0}-c2jlpeoesf-c2jlpeoesf.gz
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/compressed/dxr44qiq4a-{0}-erw9l3u2r3-erw9l3u2r3.gz
@@ -329,3 +327,9 @@
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/DitibStasbourg.pdb
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/DitibStasbourg.genruntimeconfig.cache
 /home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/ref/DitibStasbourg.dll
+/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/compressed/d0s0wodx65-{0}-twqw8ot645-twqw8ot645.gz
+/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/bin/Debug/net10.0/navigation.json
+/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/compressed/eh27i3ck6g-{0}-f9ozz6it8d-f9ozz6it8d.gz
+/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/compressed/baix7eqh9b-{0}-igybriuc4r-igybriuc4r.gz
+/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/compressed/2tgqt6bjes-{0}-mh3f0yaioj-mh3f0yaioj.gz
+/home/aakyol/RiderProjects/DitibStasbourg/DitibStasbourg/obj/Debug/net10.0/compressed/8o0wqgi41z-{0}-bu591vg6y3-bu591vg6y3.gz

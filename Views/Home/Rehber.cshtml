@@ -1,0 +1,186 @@
+@{
+    ViewData["Title"] = "Kullanım Rehberi";
+    bool isSuperAdmin = User.HasClaim("Permission", "UserManagement-Index") || User.HasClaim("Permission", "LookupAdmin-Index");
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5 text-primary mb-3"><i class="bi bi-journal-bookmark-fill me-3"></i>Sistem Kullanım Rehberi</h1>
+            <p class="lead text-muted">DITIB Strasbourg Yönetim Paneline hoş geldiniz. Bu sayfa, sistemi en verimli şekilde kullanabilmeniz için adım adım hazırlanmış bir rehberdir.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Sol Menü (Hızlı Erişim) -->
+        <div class="col-md-3 mb-4">
+            <div class="list-group sticky-top" style="top: 20px; z-index: 1;">
+                @if (!isSuperAdmin)
+                {
+                    <div class="list-group-item bg-light text-muted fw-bold text-uppercase" style="font-size: 0.8rem;">Kullanıcı Rehberi</div>
+                    <a href="#genel" class="list-group-item list-group-item-action fw-bold"><i class="bi bi-house me-2"></i>1. Ekranı Tanıyalım</a>
+                    <a href="#gorevliler" class="list-group-item list-group-item-action fw-bold"><i class="bi bi-person-badge me-2"></i>2. Yeni Görevli Nasıl Eklenir?</a>
+                    <a href="#dernekler" class="list-group-item list-group-item-action fw-bold"><i class="bi bi-building me-2"></i>3. Dernek İşlemleri Nedir?</a>
+                    <a href="#gorevlendirmeler" class="list-group-item list-group-item-action fw-bold"><i class="bi bi-calendar-check me-2"></i>4. Nasıl Atama Yapılır?</a>
+                }
+                else
+                {
+                    <div class="list-group-item bg-dark text-white fw-bold text-uppercase" style="font-size: 0.8rem;">Sistem Yöneticisi Rehberi</div>
+                    <a href="#admin-genel" class="list-group-item list-group-item-action fw-bold"><i class="bi bi-shield-lock me-2"></i>1. Yönetici Paneli Nedir?</a>
+                    <a href="#kullanicilar" class="list-group-item list-group-item-action fw-bold"><i class="bi bi-people me-2"></i>2. Yeni Kullanıcı Eklemek</a>
+                    <a href="#dinamik-alanlar" class="list-group-item list-group-item-action fw-bold bg-primary text-white"><i class="bi bi-tags me-2"></i>3. Dinamik Alanlar (ÖNEMLİ)</a>
+                }
+            </div>
+        </div>
+
+        <!-- İçerik -->
+        <div class="col-md-9">
+            
+            @if (!isSuperAdmin)
+            {
+                <!-- NORMAL KULLANICI İÇERİĞİ -->
+                <div class="alert alert-success border-0 shadow-sm mb-4">
+                    <h5 class="alert-heading"><i class="bi bi-info-circle-fill me-2"></i>Bilgilendirme</h5>
+                    Bu rehber, sistemi günlük işlerinizde nasıl kullanacağınızı adım adım göstermek için hazırlanmıştır. Takıldığınız bir yer olursa bu sayfaya tekrar dönebilirsiniz.
+                </div>
+
+                <!-- 1. Ekranı Tanıyalım -->
+                <div id="genel" class="card shadow-sm mb-5 border-0">
+                    <div class="card-body">
+                        <h3 class="text-secondary border-bottom pb-2 mb-4">1. Ekranı Tanıyalım</h3>
+                        <p>Sisteme giriş yaptığınızda karşınıza gelen ilk ekran <strong>Ana Sayfa (Dashboard)</strong> ekranıdır.</p>
+                        <ul>
+                            <li><strong>Sol Taraftaki Menü:</strong> Tüm işlemleri yapacağınız ana yer burasıdır. "Görevliler", "Görevlendirmeler" veya "Dernek İşlemleri" yazılarına tıklayarak ilgili sayfalara geçebilirsiniz.</li>
+                            <li><strong>Ortadaki Renkli Kutular:</strong> Sistemdeki toplam görevli sayısını, toplam dernek sayısını ve aktif çalışanları bir bakışta görmenizi sağlar.</li>
+                            <li><strong>Sağ Üst Köşe:</strong> Burada adınız yazar. Tıklayarak sistemden güvenli bir şekilde "Çıkış Yap"abilirsiniz.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 2. Görevliler -->
+                <div id="gorevliler" class="card shadow-sm mb-5 border-0">
+                    <div class="card-body">
+                        <h3 class="text-secondary border-bottom pb-2 mb-4">2. Yeni Görevli Nasıl Eklenir?</h3>
+                        <p>Sisteme yeni bir personel veya görevli kaydetmek çok kolaydır. Lütfen şu adımları takip edin:</p>
+                        <ol class="fs-6">
+                            <li class="mb-2">Öncelikle sol taraftaki menüden <strong>"Görevliler"</strong> yazısına tıklayın.</li>
+                            <li class="mb-2">Karşınıza gelen ekranın sağ üst tarafında mavi renkli <strong>"Yeni Ekle"</strong> butonunu göreceksiniz. O butona tıklayın.</li>
+                            <li class="mb-2">Açılan sayfada kişinin "Adı", "Soyadı", "TC Kimlik Numarası" gibi bilgilerini doldurun. (Yanında kırmızı yıldız veya uyarı olan alanları doldurmak zorunludur, diğerlerini boş bırakabilirsiniz).</li>
+                            <li class="mb-2">Formun alt kısmındaki mavi renkli <strong>"Kaydet"</strong> butonuna basmayı unutmayın! Kaydet'e bastığınızda kişi sisteme eklenecektir.</li>
+                        </ol>
+                        <div class="bg-light p-3 rounded">
+                            <strong>İpucu:</strong> Eklediğiniz görevlileri listede görebilir, yanlarındaki "Detay" tuşuna basarak bilgilerini okuyabilir veya "Düzenle" tuşuyla yanlış girdiğiniz bir harfi düzeltebilirsiniz.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Dernek İşlemleri -->
+                <div id="dernekler" class="card shadow-sm mb-5 border-0">
+                    <div class="card-body">
+                        <h3 class="text-secondary border-bottom pb-2 mb-4">3. Dernek İşlemleri Nedir?</h3>
+                        <p>Bölgemizdeki Camiler ve Dernekler bu menüden yönetilir.</p>
+                        <ol class="fs-6">
+                            <li class="mb-2">Sol menüden <strong>"Dernek İşlemleri"</strong>ne tıklayın.</li>
+                            <li class="mb-2">Karşınıza tüm derneklerin bir listesi çıkacak. Eğer yeni bir dernek açıldıysa, sağ üstteki <strong>"Yeni Dernek Ekle"</strong> butonuna basarak sisteme tanıtabilirsiniz.</li>
+                            <li class="mb-2">Mevcut bir derneğin üstüne tıklarsanız (Detay tuşu ile), o derneğin başkanını, iletişim bilgilerini ve derneğe kayıtlı üyeleri görebilirsiniz.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- 4. Görevlendirmeler -->
+                <div id="gorevlendirmeler" class="card shadow-sm mb-5 border-0">
+                    <div class="card-body">
+                        <h3 class="text-secondary border-bottom pb-2 mb-4">4. Nasıl Atama (Görevlendirme) Yapılır?</h3>
+                        <p>Sisteme kaydettiğiniz bir görevliyi, belirli bir dernekte çalışmak üzere görevlendirmek için şu adımları yapmalısınız:</p>
+                        <ol class="fs-6">
+                            <li class="mb-2">Sol menüden <strong>"Görevlendirmeler"</strong> butonuna tıklayın.</li>
+                            <li class="mb-2">Yine sağ üst köşeden <strong>"Yeni Görevlendirme"</strong> butonuna basın.</li>
+                            <li class="mb-2">Açılan ekranda, "Hangi Görevli?" sorusu için listeden görevliyi seçin.</li>
+                            <li class="mb-2">"Hangi Derneğe/Camiye?" sorusu için listeden derneği seçin.</li>
+                            <li class="mb-2">Göreve ne zaman başlayacağını (Tarih) seçin. Eğer görevin ne zaman biteceği belliyse Bitiş Tarihini de seçebilirsiniz. Belli değilse Bitiş Tarihi boş kalabilir.</li>
+                            <li class="mb-2">Son olarak <strong>"Kaydet"</strong> butonuna basın. İşlem tamamlandı!</li>
+                        </ol>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <!-- SUPER ADMIN İÇERİĞİ -->
+                <div class="alert alert-dark border-0 shadow-sm mb-4">
+                    <h5 class="alert-heading"><i class="bi bi-shield-lock-fill me-2"></i>Sistem Yöneticisi Uyarısı</h5>
+                    Bu bölüm sadece <strong>SuperAdmin</strong> yetkisine sahip kullanıcılar tarafından görüntülenmektedir. Lütfen sistem konfigürasyonlarında değişiklik yaparken dikkatli olunuz.
+                </div>
+
+                <!-- 1. Yönetici Paneli -->
+                <div id="admin-genel" class="card shadow-sm mb-5 border-0">
+                    <div class="card-body">
+                        <h3 class="text-secondary border-bottom pb-2 mb-4">1. Yönetici Paneli Nedir?</h3>
+                        <p>Normal kullanıcılar sol menüde sadece standart işlemleri görür. Siz "Yönetici Araçları" başlığı altındaki özel menülere erişebilirsiniz.</p>
+                        <ul>
+                            <li>Bu alandan sistemdeki statik ayarları (Tanımlamalar) ve Dinamik Alanları (Dinamik Tanımlamalar) düzenleyebilirsiniz.</li>
+                            <li>Sisteme kimlerin giriş yapabileceğine (Kullanıcılar) siz karar verirsiniz.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 2. Kullanıcılar -->
+                <div id="kullanicilar" class="card shadow-sm mb-5 border-0">
+                    <div class="card-body">
+                        <h3 class="text-secondary border-bottom pb-2 mb-4">2. Yeni Kullanıcı Eklemek (Sisteme Giriş Yetkisi Vermek)</h3>
+                        <p>Sistemi kullanacak yeni bir personel işe başladığında, ona sisteme giriş yapabilmesi için bir hesap açmalısınız:</p>
+                        <ol class="fs-6">
+                            <li class="mb-2">Sol menüdeki "Yönetici Araçları" altından <strong>"Kullanıcılar"</strong> sekmesine tıklayın.</li>
+                            <li class="mb-2">Mevcut şifreli kullanıcıların listesini göreceksiniz. Sağ üstten <strong>"Yeni Kullanıcı"</strong> butonuna basın.</li>
+                            <li class="mb-2">Kişinin E-posta adresini ve sisteme girerken kullanacağı geçici şifreyi belirleyin. (Daha sonra kendileri değiştirebilir).</li>
+                            <li class="mb-2">Eğer bu kişinin sizin gibi her yetkiye sahip olmasını isterseniz rolünü <em>"SuperAdmin"</em> yapın. Eğer sadece görevli ve dernek ekleyebilecek standart bir personel ise hiçbir rol seçmenize gerek yoktur veya standart bırakın.</li>
+                            <li class="mb-2">Kaydedin. Artık bu E-posta ve şifre ile siteye giriş yapabilir.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- 3. Dinamik Alanlar -->
+                <div id="dinamik-alanlar" class="card shadow-sm border-primary mb-5">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0"><i class="bi bi-stars me-2"></i>3. Dinamik Tanımlamalar Nasıl Kullanılır? (Çok Önemli)</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="fs-5">Dinamik tanımlamalar, sistemi yazılımcıya ihtiyaç duymadan büyütmenizi sağlayan muazzam bir özelliktir. Açılır listelerde (Dropdown) görünen seçenekleri buradan eklersiniz.</p>
+                        
+                        <div class="alert alert-info mt-4">
+                            <h5 class="alert-heading"><i class="bi bi-info-circle-fill me-2"></i>Mantık Nasıl İşler?</h5>
+                            Örneğin, "Görevliler" ekranında "Başvuru Türü" adında bir kutucuk vardır. İçinde "Geçici" ve "Sürekli" seçenekleri çıkar. Bir gün kuruma "Dönemsel" diye yeni bir başvuru türü gelirse ne yapacaksınız? Yazılımcıyı aramanıza gerek yok!
+                        </div>
+
+                        <h5 class="mt-4 text-dark">Adım Adım Yeni Bir Seçenek Eklemek:</h5>
+                        <ol class="list-group list-group-numbered mb-4 shadow-sm">
+                            <li class="list-group-item p-3">
+                                Sol menüden <strong>"Dinamik Tanımlamalar"</strong> sekmesine tıklayın.
+                            </li>
+                            <li class="list-group-item p-3">
+                                Karşınıza "Türler" (Kategoriler) çıkacaktır. Listeden <strong>"Başvuru Türü"</strong> satırını bulun. (Türler yazılımın bel kemiğidir, yeni tür eklerken "KOD" kısmına yazdığınız verinin kod içerisinde karşılığı olması gerekir. Sistem kurulurken ana kategoriler oluşturulmuştur).
+                            </li>
+                            <li class="list-group-item p-3">
+                                O satırın en sağındaki <button class="btn btn-sm btn-info text-white py-0">Değerler</button> butonuna tıklayın.
+                            </li>
+                            <li class="list-group-item p-3 bg-light">
+                                Burası artık menünün içindeki seçeneklerin olduğu yerdir. Sağ üstten <strong>"Yeni Değer Ekle"</strong> butonuna tıklayın.
+                            </li>
+                            <li class="list-group-item p-3">
+                                Değer Adı kısmına eklemek istediğiniz metni yazın (Örn: <em>Dönemsel Görev</em>). İsterseniz sırasını (1, 2, 3 gibi) belirleyebilirsiniz.
+                            </li>
+                            <li class="list-group-item p-3">
+                                <strong>Kaydet</strong> butonuna basın. İşlem bu kadar!
+                            </li>
+                        </ol>
+
+                        <div class="bg-success text-white p-3 border rounded">
+                            <p class="mb-1"><i class="bi bi-check-circle-fill me-2"></i><strong>Sonuç:</strong></p>
+                            <p class="mb-0">Bu işlemi yaptıktan sonra herhangi bir personel Görevli eklemeye çalıştığında, "Başvuru Türü" açılır listesinde anında "Dönemsel Görev" seçeneğini görecektir. İşlem tamamen güvenli, veritabanı destekli ve anlıktır.</p>
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
