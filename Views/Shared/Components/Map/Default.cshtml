@@ -1,74 +1,597 @@
 @model DitibStasbourg.Models.ViewModels.MapViewModel
 
-<div class="map-container position-relative bg-light rounded shadow-lg overflow-hidden border" style="height: 600px;">
-    <div class="map-header p-3 bg-white border-bottom d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 fw-bold text-primary">
-            <i class="bi bi-geo-alt-fill me-2"></i>@Model.RegionName
-        </h5>
-        <div class="badge bg-soft-primary text-primary">Canlı Veri Aktif</div>
+<!-- FontAwesome & Leaflet CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+<div class="map-dashboard-container rounded shadow-lg border">
+    <!-- Sidebar -->
+    <div class="map-sidebar">
+        <!-- Search -->
+        <div class="map-sidebar-header">
+            <div class="map-search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="map-search-input" placeholder="Dernek veya şehir ara..." autocomplete="off" />
+            </div>
+        </div>
+
+        <!-- Department Filter -->
+        <div class="map-filter-group">
+            <select id="map-dept-select">
+                <option value="">Tüm Departmanlar (Doğu Fransa)</option>
+                <option value="25">25 - Doubs</option>
+                <option value="52">52 - Haute-Marne</option>
+                <option value="54">54 - Meurthe-et-Moselle</option>
+                <option value="55">55 - Meuse</option>
+                <option value="57">57 - Moselle</option>
+                <option value="67">67 - Bas-Rhin</option>
+                <option value="68">68 - Haut-Rhin</option>
+                <option value="70">70 - Haute-Saône</option>
+                <option value="88">88 - Vosges</option>
+                <option value="90">90 - Territoire de Belfort</option>
+            </select>
+        </div>
+
+        <!-- Routing Section -->
+        <div class="map-routing-box">
+            <div class="map-routing-title">
+                <i class="fa-solid fa-route text-primary"></i> Rota Hesaplayıcı (OSRM)
+            </div>
+            <div class="map-routing-fields">
+                <div class="map-routing-field">
+                    <label for="route-start">Başlangıç Derneği</label>
+                    <select id="route-start">
+                        <option value="">Seçiniz...</option>
+                    </select>
+                </div>
+                <div class="map-routing-swap">
+                    <button type="button" id="route-swap-btn" title="Yönleri Değiştir">
+                        <i class="fa-solid fa-arrows-up-down"></i>
+                    </button>
+                </div>
+                <div class="map-routing-field">
+                    <label for="route-end">Hedef Dernek</label>
+                    <select id="route-end">
+                        <option value="">Seçiniz...</option>
+                    </select>
+                </div>
+            </div>
+            <div class="map-routing-actions">
+                <button type="button" id="btn-calc-route" class="btn btn-primary btn-sm flex-grow-1 py-1" disabled>
+                    <i class="fa-solid fa-location-arrow"></i> Hesapla
+                </button>
+                <button type="button" id="btn-clear-route" class="btn btn-light btn-sm py-1" disabled>
+                    Temizle
+                </button>
+            </div>
+            <div id="route-results-box" class="map-routing-results hidden">
+                <div class="text-center w-50 border-end">
+                    <span class="d-block text-muted small uppercase">Mesafe</span>
+                    <strong class="text-primary font-weight-bold" id="route-distance-val">- km</strong>
+                </div>
+                <div class="text-center w-50">
+                    <span class="d-block text-muted small uppercase">Süre</span>
+                    <strong class="text-info font-weight-bold" id="route-duration-val">- dk</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scrollable List -->
+        <div id="map-assoc-list" class="map-assoc-list">
+            <!-- Populated via Javascript -->
+        </div>
     </div>
 
-    <svg viewBox="@Model.ViewBox" class="w-100 h-100" style="background: #f8f9fa;">
-        <!-- Districts -->
-        @foreach (var district in Model.Districts)
-        {
-            <path d="@district.SvgPath" 
-                  fill="@district.Color" 
-                  fill-opacity="0.8" 
-                  stroke="#fff" 
-                  stroke-width="2"
-                  class="district-path"
-                  data-bs-toggle="popover" 
-                  data-bs-trigger="hover" 
-                  title="@district.Name"
-                  data-bs-content="Dernek: @district.AssociationCount | Görevli: @district.TotalStaff"
-                  style="transition: all 0.3s ease; cursor: pointer;">
-            </path>
-        }
+    <!-- Map Canvas -->
+    <div class="leaflet-map-container">
+        <div id="leaflet-map-canvas" class="leaflet-map-canvas"></div>
 
-        <!-- Association Markers (Pins) -->
-        @foreach (var marker in Model.Markers)
-        {
-            <g class="map-marker" style="cursor: pointer;" 
-               onclick="window.location.href='/DernekIslemleri/Details/@marker.Id'">
-                <circle cx="@marker.X" cy="@marker.Y" r="6" fill="#f44336" stroke="#fff" stroke-width="2" />
-                <circle cx="@marker.X" cy="@marker.Y" r="10" fill="#f44336" fill-opacity="0.2">
-                    <animate attributeName="r" from="6" to="12" dur="1.5s" repeatCount="indefinite" />
-                    <animate attributeName="opacity" from="0.6" to="0" dur="1.5s" repeatCount="indefinite" />
-                </circle>
-                <title>@marker.Name (@marker.City)</title>
-            </g>
-        }
-    </svg>
-
-    <div class="map-legend position-absolute bottom-0 start-0 m-3 p-2 bg-white rounded shadow-sm border opacity-75">
-        <div class="small fw-bold mb-1">Gösterge</div>
-        <div class="d-flex align-items-center mb-1">
-            <span class="d-inline-block rounded-circle me-2" style="width: 10px; height: 10px; background: #1a237e;"></span>
-            <span class="x-small">Yoğun Bölge</span>
-        </div>
-        <div class="d-flex align-items-center">
-            <span class="d-inline-block rounded-circle me-2" style="width: 10px; height: 10px; background: #f44336;"></span>
-            <span class="x-small">Dernek Konumu</span>
+        <!-- Floating Info Overlay -->
+        <div class="map-floating-overlay" id="map-overlay-panel">
+            <div class="map-floating-header">
+                <h6>Hızlı Filtre</h6>
+                <button type="button" class="map-floating-close" id="map-overlay-toggle" title="Kapat/Aç">
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+            </div>
+            <div class="map-floating-content" id="map-overlay-content">
+                <p class="text-muted small mb-2">Departman bazlı filtrelemek için tıklayın:</p>
+                <div class="map-floating-tags">
+                    <span class="map-dept-tag" data-code="25">Doubs (25)</span>
+                    <span class="map-dept-tag" data-code="52">Haute-Marne (52)</span>
+                    <span class="map-dept-tag" data-code="54">M. & M. (54)</span>
+                    <span class="map-dept-tag" data-code="55">Meuse (55)</span>
+                    <span class="map-dept-tag" data-code="57">Moselle (57)</span>
+                    <span class="map-dept-tag" data-code="67">Bas-Rhin (67)</span>
+                    <span class="map-dept-tag" data-code="68">Haut-Rhin (68)</span>
+                    <span class="map-dept-tag" data-code="70">H. Saône (70)</span>
+                    <span class="map-dept-tag" data-code="88">Vosges (88)</span>
+                    <span class="map-dept-tag" data-code="90">Belfort (90)</span>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<style>
-    .district-path:hover {
-        fill-opacity: 1 !important;
-        transform: scale(1.01);
-        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
-    }
-    .x-small { font-size: 0.75rem; }
-    .bg-soft-primary { background-color: rgba(13, 110, 253, 0.1); }
-</style>
+<!-- Leaflet JS & Department Boundaries -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="~/js/departements.js"></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
-        var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-            return new bootstrap.Popover(popoverTriggerEl)
-        })
-    });
+    (function () {
+        // Data injected from MVC backend
+        const markersData = @Html.Raw(Json.Serialize(Model.Markers));
+
+        // Department Metadata Config
+        const DEPARTMENTS_INFO = {
+            '25': { name: 'Doubs', color: '#3b82f6' },
+            '52': { name: 'Haute-Marne', color: '#10b981' },
+            '54': { name: 'Meurthe-et-Moselle', color: '#f59e0b' },
+            '55': { name: 'Meuse', color: '#ef4444' },
+            '57': { name: 'Moselle', color: '#8b5cf6' },
+            '67': { name: 'Bas-Rhin', color: '#ec4899' },
+            '68': { name: 'Haut-Rhin', color: '#06b6d4' },
+            '70': { name: 'Haute-Saône', color: '#14b8a6' },
+            '88': { name: 'Vosges', color: '#f97316' },
+            '90': { name: 'Territoire de Belfort', color: '#6366f1' }
+        };
+
+        // State Store
+        const state = {
+            map: null,
+            tileLayer: null,
+            geojsonLayer: null,
+            markers: {}, // Keyed by Marker ID
+            routeLine: null,
+            activeMarkerId: null,
+            filters: {
+                searchQuery: "",
+                departmentCode: ""
+            }
+        };
+
+        document.addEventListener("DOMContentLoaded", function () {
+            initMap();
+            loadDepartments();
+            renderMarkersAndList();
+            populateRoutingDropdowns();
+            setupEventListeners();
+        });
+
+        // Map Initialization
+        function initMap() {
+            // Eastern France center coordinates
+            const centerPoint = [48.3, 7.2];
+            const initialZoom = 8;
+
+            state.map = L.map('leaflet-map-canvas', {
+                zoomControl: true,
+                attributionControl: true
+            }).setView(centerPoint, initialZoom);
+
+            // Minimalist CartoDB Light Tile
+            state.tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(state.map);
+        }
+
+        // Draw Department Boundaries
+        function loadDepartments() {
+            if (typeof DEPARTEMENTS_GEOJSON === 'undefined') {
+                console.warn('DEPARTEMENTS_GEOJSON not loaded.');
+                return;
+            }
+
+            const defaultStyle = {
+                fillColor: 'rgba(59, 130, 246, 0.03)',
+                weight: 1.5,
+                opacity: 0.6,
+                color: '#94a3b8',
+                dashArray: '3, 3',
+                fillOpacity: 0.08
+            };
+
+            state.geojsonLayer = L.geoJSON(DEPARTEMENTS_GEOJSON, {
+                style: function (feature) {
+                    const code = feature.properties.code;
+                    const dept = DEPARTMENTS_INFO[code];
+                    if (dept) {
+                        return {
+                            ...defaultStyle,
+                            color: dept.color,
+                            fillColor: dept.color
+                        };
+                    }
+                    return defaultStyle;
+                },
+                onEachFeature: function (feature, layer) {
+                    const code = feature.properties.code;
+                    const name = feature.properties.nom || DEPARTMENTS_INFO[code]?.name || `Departman ${code}`;
+
+                    layer.bindTooltip(`${code} - ${name}`, {
+                        sticky: true,
+                        className: 'dept-tooltip',
+                        direction: 'top'
+                    });
+
+                    layer.on({
+                        mouseover: function (e) {
+                            e.target.setStyle({
+                                weight: 2.5,
+                                dashArray: '',
+                                fillOpacity: 0.2
+                            });
+                        },
+                        mouseout: function (e) {
+                            state.geojsonLayer.resetStyle(e.target);
+                        },
+                        click: function (e) {
+                            state.map.fitBounds(e.target.getBounds(), { padding: [10, 10] });
+                            setDepartmentFilter(code);
+                        }
+                    });
+                }
+            }).addTo(state.map);
+        }
+
+        // Render Markers & Sidebar List
+        function renderMarkersAndList() {
+            const listContainer = document.getElementById("map-assoc-list");
+            if (!listContainer) return;
+
+            // Clear existing markers
+            Object.values(state.markers).forEach(m => state.map.removeLayer(m));
+            state.markers = {};
+            listContainer.innerHTML = "";
+
+            // Filter data
+            const filteredData = markersData.filter(item => {
+                const matchesSearch = !state.filters.searchQuery || 
+                    item.name.toLowerCase().includes(state.filters.searchQuery) ||
+                    item.city.toLowerCase().includes(state.filters.searchQuery) ||
+                    item.address.toLowerCase().includes(state.filters.searchQuery);
+
+                const matchesDept = !state.filters.departmentCode || item.departmentCode === state.filters.departmentCode;
+
+                return matchesSearch && matchesDept;
+            });
+
+            if (filteredData.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="text-center py-5 text-muted">
+                        <i class="fa-solid fa-location-dot fa-2x mb-2 text-muted opacity-50"></i>
+                        <p class="small mb-0">Eşleşen dernek bulunamadı.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Draw filtered markers
+            filteredData.forEach(item => {
+                const customIcon = L.divIcon({
+                    className: 'address-marker' + (state.activeMarkerId === item.id ? ' address-marker-active' : ''),
+                    iconSize: [16, 16],
+                    iconAnchor: [8, 8],
+                    html: `<div class="address-dot"></div>`
+                });
+
+                // Marker instance
+                const marker = L.marker([item.latitude, item.longitude], { icon: customIcon });
+
+                // Popup Details
+                const popupContent = `
+                    <div class="custom-popup">
+                        <h5>${item.name}</h5>
+                        <div class="popup-row">
+                            <i class="fa-solid fa-city"></i>
+                            <span>${item.city} (Dept: ${item.departmentCode})</span>
+                        </div>
+                        <div class="popup-row">
+                            <i class="fa-solid fa-map-location-dot"></i>
+                            <span class="small">${item.address}</span>
+                        </div>
+                        <div class="popup-row">
+                            <i class="fa-solid fa-users"></i>
+                            <span class="popup-badge">Aktif Personel: ${item.staffCount}</span>
+                        </div>
+                        <div class="mt-2 text-end">
+                            <a href="/DernekIslemleri/Details/${item.id}" class="btn btn-primary btn-sm px-2 py-1 text-white" style="font-size: 0.75rem;">
+                                <i class="fa-solid fa-circle-info"></i> Detay Git
+                            </a>
+                        </div>
+                    </div>
+                `;
+                marker.bindPopup(popupContent);
+
+                // Permanent tooltip label
+                marker.bindTooltip(item.name.replace("DITIB ", ""), {
+                    permanent: false,
+                    className: 'addr-permanent-tooltip',
+                    direction: 'top',
+                    offset: [0, -10]
+                });
+
+                marker.on("click", function () {
+                    selectAssociation(item.id, false);
+                });
+
+                marker.addTo(state.map);
+                state.markers[item.id] = marker;
+
+                // Render Sidebar list item
+                const card = document.createElement("div");
+                card.className = "map-assoc-item" + (state.activeMarkerId === item.id ? " active" : "");
+                card.setAttribute("data-id", item.id);
+                card.innerHTML = `
+                    <div class="map-assoc-item-info">
+                        <h6>${item.name}</h6>
+                        <p><i class="fa-solid fa-location-dot"></i> ${item.city} (${item.departmentCode})</p>
+                    </div>
+                    <span class="map-assoc-item-badge"><i class="fa-solid fa-user-tie"></i> ${item.staffCount}</span>
+                `;
+
+                card.addEventListener("click", function () {
+                    selectAssociation(item.id, true);
+                });
+
+                listContainer.appendChild(card);
+            });
+        }
+
+        // Selection Trigger
+        function selectAssociation(id, zoomTo) {
+            state.activeMarkerId = id;
+
+            // Highlight active sidebar card
+            document.querySelectorAll(".map-assoc-item").forEach(el => {
+                if (el.getAttribute("data-id") == id) {
+                    el.classList.add("active");
+                    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                } else {
+                    el.classList.remove("active");
+                }
+            });
+
+            // Re-render markers to update classes (size & color)
+            Object.keys(state.markers).forEach(mId => {
+                const marker = state.markers[mId];
+                const markerIcon = L.divIcon({
+                    className: 'address-marker' + (id == mId ? ' address-marker-active' : ''),
+                    iconSize: [16, 16],
+                    iconAnchor: [8, 8],
+                    html: `<div class="address-dot"></div>`
+                });
+                marker.setIcon(markerIcon);
+            });
+
+            const marker = state.markers[id];
+            const dataItem = markersData.find(d => d.id == id);
+
+            if (marker && dataItem) {
+                if (zoomTo) {
+                    state.map.setView([dataItem.latitude, dataItem.longitude], 12);
+                }
+                marker.openPopup();
+            }
+        }
+
+        // Populate dropdown selectors for routing
+        function populateRoutingDropdowns() {
+            const startSelect = document.getElementById("route-start");
+            const endSelect = document.getElementById("route-end");
+            if (!startSelect || !endSelect) return;
+
+            // Sort alphabetically by name
+            const sortedMarkers = [...markersData].sort((a, b) => a.name.localeCompare(b.name));
+
+            sortedMarkers.forEach(item => {
+                const opt1 = document.createElement("option");
+                opt1.value = item.id;
+                opt1.textContent = item.name;
+                startSelect.appendChild(opt1);
+
+                const opt2 = document.createElement("option");
+                opt2.value = item.id;
+                opt2.textContent = item.name;
+                endSelect.appendChild(opt2);
+            });
+        }
+
+        // Apply filters
+        function setDepartmentFilter(code) {
+            state.filters.departmentCode = code;
+            
+            // Sync UI dropdown
+            const selectEl = document.getElementById("map-dept-select");
+            if (selectEl) selectEl.value = code;
+
+            // Sync Floating tags
+            document.querySelectorAll(".map-dept-tag").forEach(tag => {
+                if (tag.getAttribute("data-code") === code) {
+                    tag.classList.add("active");
+                } else {
+                    tag.classList.remove("active");
+                }
+            });
+
+            renderMarkersAndList();
+        }
+
+        // Event Handling Integration
+        function setupEventListeners() {
+            // Text Search
+            const searchInput = document.getElementById("map-search-input");
+            if (searchInput) {
+                searchInput.addEventListener("input", function (e) {
+                    state.filters.searchQuery = e.target.value.toLowerCase().trim();
+                    renderMarkersAndList();
+                });
+            }
+
+            // Department Select dropdown
+            const deptSelect = document.getElementById("map-dept-select");
+            if (deptSelect) {
+                deptSelect.addEventListener("change", function (e) {
+                    setDepartmentFilter(e.target.value);
+                });
+            }
+
+            // Department Floating tags
+            document.querySelectorAll(".map-dept-tag").forEach(tag => {
+                tag.addEventListener("click", function () {
+                    const code = this.getAttribute("data-code");
+                    if (state.filters.departmentCode === code) {
+                        setDepartmentFilter(""); // Clear filter if clicked again
+                    } else {
+                        setDepartmentFilter(code);
+                    }
+                });
+            });
+
+            // Toggle floating overlay collapse
+            const overlayToggle = document.getElementById("map-overlay-toggle");
+            const overlayPanel = document.getElementById("map-overlay-panel");
+            if (overlayToggle && overlayPanel) {
+                overlayToggle.addEventListener("click", function () {
+                    overlayPanel.classList.toggle("collapsed");
+                    const icon = overlayToggle.querySelector("i");
+                    if (overlayPanel.classList.contains("collapsed")) {
+                        icon.className = "fa-solid fa-chevron-up";
+                    } else {
+                        icon.className = "fa-solid fa-chevron-down";
+                    }
+                });
+            }
+
+            // Route validation
+            const startSelect = document.getElementById("route-start");
+            const endSelect = document.getElementById("route-end");
+            const calcBtn = document.getElementById("btn-calc-route");
+            const clearBtn = document.getElementById("btn-clear-route");
+
+            const checkRoutingSelection = () => {
+                if (startSelect && endSelect && calcBtn) {
+                    calcBtn.disabled = !(startSelect.value && endSelect.value && startSelect.value !== endSelect.value);
+                }
+            };
+
+            if (startSelect) startSelect.addEventListener("change", checkRoutingSelection);
+            if (endSelect) endSelect.addEventListener("change", checkRoutingSelection);
+
+            // Route Calculate Command
+            if (calcBtn) {
+                calcBtn.addEventListener("click", calculateRoute);
+            }
+
+            // Route Clear Command
+            if (clearBtn) {
+                clearBtn.addEventListener("click", clearRoute);
+            }
+
+            // Route Swap Trigger
+            const swapBtn = document.getElementById("route-swap-btn");
+            if (swapBtn && startSelect && endSelect) {
+                swapBtn.addEventListener("click", function () {
+                    const startVal = startSelect.value;
+                    startSelect.value = endSelect.value;
+                    endSelect.value = startVal;
+                    checkRoutingSelection();
+                });
+            }
+        }
+
+        // Calculate OSRM Route
+        function calculateRoute() {
+            const startId = document.getElementById("route-start").value;
+            const endId = document.getElementById("route-end").value;
+
+            const startObj = markersData.find(d => d.id == startId);
+            const endObj = markersData.find(d => d.id == endId);
+
+            if (!startObj || !endObj) return;
+
+            // Remove existing route line
+            if (state.routeLine) {
+                state.map.removeLayer(state.routeLine);
+                state.routeLine = null;
+            }
+
+            const url = `https://router.project-osrm.org/route/v1/driving/${startObj.longitude},${startObj.latitude};${endObj.longitude},${endObj.latitude}?overview=full&geometries=geojson`;
+
+            // Display loading metrics
+            document.getElementById("btn-calc-route").disabled = true;
+            document.getElementById("btn-calc-route").innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Rota...`;
+
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.code === "Ok" && data.routes && data.routes.length > 0) {
+                        const route = data.routes[0];
+                        const routeGeoJSON = route.geometry;
+
+                        // Draw path line on Leaflet map
+                        state.routeLine = L.geoJSON(routeGeoJSON, {
+                            style: {
+                                color: "#2563eb",
+                                weight: 5,
+                                opacity: 0.8
+                            }
+                        }).addTo(state.map);
+
+                        // Fit bounds to fit route
+                        state.map.fitBounds(state.routeLine.getBounds(), { padding: [50, 50] });
+
+                        // Fill route info results
+                        const distanceKm = (route.distance / 1000).toFixed(1);
+                        const durationMins = Math.round(route.duration / 60);
+                        let durationText = `${durationMins} dk`;
+
+                        if (durationMins >= 60) {
+                            const hrs = Math.floor(durationMins / 60);
+                            const remainingMins = durationMins % 60;
+                            durationText = `${hrs} sa ${remainingMins} dk`;
+                        }
+
+                        document.getElementById("route-distance-val").textContent = `${distanceKm} km`;
+                        document.getElementById("route-duration-val").textContent = durationText;
+
+                        // Reveal Info
+                        document.getElementById("route-results-box").classList.remove("hidden");
+                        document.getElementById("btn-clear-route").disabled = false;
+                    } else {
+                        alert("Yol tarifi bulunamadı. Lütfen daha sonra tekrar deneyiniz.");
+                    }
+                })
+                .catch(err => {
+                    console.error("OSRM Route Error: ", err);
+                    alert("Rota sunucusuna bağlanılamadı.");
+                })
+                .finally(() => {
+                    const calcBtn = document.getElementById("btn-calc-route");
+                    calcBtn.innerHTML = `<i class="fa-solid fa-location-arrow"></i> Hesapla`;
+                    calcBtn.disabled = false;
+                });
+        }
+
+        // Clear Route
+        function clearRoute() {
+            if (state.routeLine) {
+                state.map.removeLayer(state.routeLine);
+                state.routeLine = null;
+            }
+
+            document.getElementById("route-start").value = "";
+            document.getElementById("route-end").value = "";
+            document.getElementById("route-results-box").classList.add("hidden");
+            document.getElementById("btn-calc-route").disabled = true;
+            document.getElementById("btn-clear-route").disabled = true;
+
+            // Reset view
+            const centerPoint = [48.3, 7.2];
+            state.map.setView(centerPoint, 8);
+        }
+
+    })();
 </script>

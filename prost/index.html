@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carte des Adresses DITIB - Est de la France</title>
+    
+    <!-- SEO & Metadata -->
+    <meta name="description" content="Carte interactive affichant les adresses des associations DITIB dans l'Est de la France.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Leaflet Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+          crossorigin=""/>
+          
+    <!-- Main Styleheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation & Filters -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="brand">
+                    <div class="brand-logo" style="background: transparent; box-shadow: none; width: auto; height: auto; padding: 0; display: flex; align-items: center; justify-content: center;">
+                        <img id="custom-logo" src="/api/logo" style="max-width: 55px; max-height: 33px; object-fit: contain;" onerror="this.style.display='none'; document.getElementById('default-logo-svg').style.display='block';">
+                        <svg id="default-logo-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120" width="55" height="33" style="display: none;">
+                            <ellipse cx="100" cy="60" rx="90" ry="52" fill="#c22026" />
+                            <ellipse cx="100" cy="60" rx="84" ry="46" fill="none" stroke="white" stroke-width="1.2" />
+                            <g stroke="white" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+                                <path d="M 68,69 H 45 C 39,69 36,66 36,60 V 33 C 36,27 39,24 44,24 C 49,24 49,30 49,69" />
+                                <path d="M 132,69 H 155 C 161,69 164,66 164,60 V 33 C 164,27 161,24 156,24 C 151,24 151,30 151,69" />
+                                <path d="M 84,46 V 69" />
+                                <path d="M 116,46 V 69" />
+                                <path d="M 100,38 V 69" />
+                                <path d="M 76,36 H 124" />
+                            </g>
+                            <rect x="81.25" y="37" width="5.5" height="5.5" fill="white" />
+                            <rect x="113.25" y="37" width="5.5" height="5.5" fill="white" />
+                            <line x1="32" y1="81" x2="168" y2="81" stroke="white" stroke-width="1.5" />
+                            <text x="100" y="95" fill="white" font-family="'Outfit', sans-serif" font-size="10.5" font-weight="800" text-anchor="middle" letter-spacing="2.8">STRASBOURG</text>
+                        </svg>
+                    </div>
+                    <div class="brand-info">
+                        <h1>CartoBureau</h1>
+                        <span>Adresses DITIB</span>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <a href="print.html" target="_blank" class="btn-icon" title="Version Affiche Imprimable" aria-label="Version Affiche Imprimable" style="text-decoration: none;">
+                        <i class="fa-solid fa-print"></i>
+                    </a>
+                    <a href="admin.html" class="btn-icon" title="Panel Administrateur" aria-label="Panel Administrateur" style="text-decoration: none;">
+                        <i class="fa-solid fa-gear"></i>
+                    </a>
+                    <button id="theme-toggle" class="btn-icon" title="Changer de thème" aria-label="Changer de thème">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Quick Stats Summary -->
+            <div class="stats-section">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-location-dot" style="color: #f97316;"></i></div>
+                    <div class="stat-data">
+                        <h3 id="stat-total-count">0</h3>
+                        <span>Adresses DITIB</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-draw-polygon"></i></div>
+                    <div class="stat-data">
+                        <h3 id="stat-departments-count">10</h3>
+                        <span>Départements</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Filters -->
+            <div class="filter-section">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="city-search" placeholder="Rechercher une adresse, CP..." aria-label="Rechercher une adresse ou CP">
+                </div>
+                
+                <div class="filter-group">
+                    <label for="dept-select"><i class="fa-solid fa-filter"></i> Filtrer par département</label>
+                    <select id="dept-select">
+                        <option value="all">Tous les départements</option>
+                        <option value="25">25 - Doubs</option>
+                        <option value="52">52 - Haute-Marne</option>
+                        <option value="54">54 - Meurthe-et-Moselle</option>
+                        <option value="55">55 - Meuse</option>
+                        <option value="57">57 - Moselle</option>
+                        <option value="67">67 - Bas-Rhin</option>
+                        <option value="68">68 - Haut-Rhin</option>
+                        <option value="70">70 - Haute-Saône</option>
+                        <option value="88">88 - Vosges</option>
+                        <option value="90">90 - Territoire de Belfort</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Route Calculator Section -->
+            <div class="routing-section">
+                <h3><i class="fa-solid fa-route"></i> Calculateur d'Itinéraire</h3>
+                
+                <div class="routing-fields">
+                    <div class="routing-field">
+                        <label for="route-start"><i class="fa-solid fa-circle-dot" style="color: #10b981;"></i> Départ</label>
+                        <select id="route-start">
+                            <option value="">Sélectionnez un départ...</option>
+                            <!-- Dynamically populated from ADRESSES_DATA -->
+                        </select>
+                    </div>
+                    
+                    <div class="route-swap-container">
+                        <button id="route-swap" title="Inverser les adresses" aria-label="Inverser les adresses">
+                            <i class="fa-solid fa-up-down"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="routing-field">
+                        <label for="route-end"><i class="fa-solid fa-location-dot" style="color: #ef4444;"></i> Arrivée</label>
+                        <select id="route-end">
+                            <option value="">Sélectionnez une arrivée...</option>
+                            <!-- Dynamically populated from ADRESSES_DATA -->
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="routing-actions">
+                    <button id="btn-route-calculate" class="btn-primary">
+                        <i class="fa-solid fa-calculator"></i> Calculer la route
+                    </button>
+                    <button id="btn-route-clear" class="btn-secondary" title="Effacer l'itinéraire" disabled>
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+                
+                <!-- Results Output -->
+                <div id="routing-results" class="routing-results hidden">
+                    <div class="result-item">
+                        <span class="result-label">Distance :</span>
+                        <strong id="route-distance" class="result-value">0 km</strong>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Durée :</span>
+                        <strong id="route-duration" class="result-value">0 min</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive List Section -->
+            <div class="list-section">
+                <div class="list-header">
+                    <h2 id="list-title">Adresses du Réseau</h2>
+                    <span id="items-filtered-count">0 affichés</span>
+                </div>
+                
+                <div class="cities-list-container" id="cities-list" role="list">
+                    <!-- Dynamic address items go here -->
+                    <div class="loading-state">
+                        <i class="fa-solid fa-circle-notch fa-spin"></i>
+                        <p>En attente des données...</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area with Map -->
+        <main class="main-content">
+            <!-- Map Container -->
+            <div id="map" class="map-container"></div>
+            
+            <!-- Floating Dashboard Panel -->
+            <div class="floating-panel glass">
+                <div class="panel-header">
+                    <h3>Couverture Territoriale</h3>
+                    <button class="btn-close" id="close-floating" title="Masquer"><i class="fa-solid fa-chevron-down"></i></button>
+                </div>
+                <div class="panel-content">
+                    <p>Départements affichés :</p>
+                    <div class="tags-container">
+                        <span class="tag" data-dept="25">25 - Doubs</span>
+                        <span class="tag" data-dept="52">52 - H. Marne</span>
+                        <span class="tag" data-dept="54">54 - M. & Moselle</span>
+                        <span class="tag" data-dept="55">55 - Meuse</span>
+                        <span class="tag" data-dept="57">57 - Moselle</span>
+                        <span class="tag" data-dept="67">67 - B. Rhin</span>
+                        <span class="tag" data-dept="68">68 - H. Rhin</span>
+                        <span class="tag" data-dept="70">70 - H. Saône</span>
+                        <span class="tag" data-dept="88">88 - Vosges</span>
+                        <span class="tag" data-dept="90">90 - T. Belfort</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Leaflet JS Map Engine -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
+            crossorigin=""></script>
+            
+    <!-- Data scripts (loaded from files to avoid CORS) -->
+    <script src="departements.js"></script>
+    <script src="adresses.js" onerror="console.warn('Veuillez renseigner le fichier adresses.js via le script de géocodage.')"></script>
+    
+    <!-- Application Logic -->
+    <script src="app.js"></script>
+</body>
+</html>

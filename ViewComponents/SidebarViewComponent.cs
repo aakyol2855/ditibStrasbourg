@@ -1,5 +1,7 @@
 using DitibStasbourg.Services;
+using DitibStasbourg.Models.Navigation;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace DitibStasbourg.ViewComponents
 {
@@ -14,13 +16,13 @@ namespace DitibStasbourg.ViewComponents
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var menuItems = await _menuService.GetUserMenuAsync(UserClaimsPrincipal);
+            var sidebarMenu = await _menuService.GetSidebarMenuAsync(UserClaimsPrincipal);
             
             // Pass current route info for active state determination
             ViewBag.CurrentController = RouteData.Values["controller"]?.ToString();
             ViewBag.CurrentAction = RouteData.Values["action"]?.ToString();
             
-            return View(menuItems);
+            return View(sidebarMenu);
         }
     }
 }

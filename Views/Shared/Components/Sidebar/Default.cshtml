@@ -1,18 +1,69 @@
-@model List<DitibStasbourg.Models.Navigation.MenuItem>
+@model DitibStasbourg.Models.Navigation.SidebarViewModel
 @inject Microsoft.Extensions.Configuration.IConfiguration Configuration
 @{
     var currentCtrl = ViewBag.CurrentController as string ?? "";
     var currentAct = ViewBag.CurrentAction as string ?? "";
-    string ActiveClass(string c) => currentCtrl == c ? "active" : "";
 }
 
-<div id="sidebar-wrapper">
+<div id="sidebar-wrapper" style="display: flex; flex-direction: column; height: 100vh;">
     <div class="sidebar-heading">
         <img src="@Configuration["Branding:LogoUrl"]" alt="Logo" onerror="this.style.display='none'" />
         <span>@Configuration["Branding:AppName"]</span>
     </div>
-    <div class="list-group list-group-borderless mt-2 px-1">
-        @foreach (var item in Model)
+
+    <!-- Main Menu Layer (Layer 1) -->
+    <div class="list-group list-group-borderless mt-2 px-1 flex-grow-1" id="main-menu-container">
+        @foreach (var item in Model.MainMenu)
+        {
+            if (item.Children != null && item.Children.Any())
+            {
+                var collapseId = "collapse_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+                var isActiveGroup = item.IsActive(currentCtrl, currentAct);
+                
+                <a class="list-group-item list-group-item-action standard-menu-item d-flex align-items-center" data-bs-toggle="collapse" href="#@collapseId" role="button" aria-expanded="@(isActiveGroup ? "true" : "false")" aria-controls="@collapseId">
+                    <i class="@(item.Icon ?? "bi bi-folder") me-3 fs-5"></i>
+                    <span class="flex-grow-1 text-start menu-text">@item.Title</span>
+                    <i class="bi bi-chevron-down ms-2 opacity-75 small menu-text expand-icon"></i>
+                </a>
+                <div class="collapse menu-collapse @(isActiveGroup ? "show" : "")" id="@collapseId">
+                    @foreach (var child in item.Children)
+                    {
+                        var isChildActive = child.IsActive(currentCtrl, currentAct);
+                        <a class="list-group-item list-group-item-action standard-menu-item border-0 @(isChildActive ? "active" : "")" asp-controller="@child.Controller" asp-action="@child.Action" style="padding-left: 20px;">
+                            <i class="@(child.Icon ?? "bi bi-record-circle") me-3 fs-5"></i> <span class="menu-text">@child.Title</span>
+                        </a>
+                    }
+                </div>
+            }
+            else
+            {
+                var isActive = item.IsActive(currentCtrl, currentAct);
+                <a class="list-group-item list-group-item-action standard-menu-item border-0 @(isActive ? "active" : "")" asp-controller="@item.Controller" asp-action="@item.Action">
+                    <i class="@(item.Icon ?? "bi bi-record-circle") me-3 fs-5"></i> <span class="menu-text">@item.Title</span>
+                </a>
+            }
+        }
+
+        <!-- Toggle to Admin Mode (Only visible if user has AdminMenu permissions) -->
+        @if (Model.AdminMenu.Any())
+        {
+            <a id="btn-toggle-admin" class="list-group-item list-group-item-action standard-menu-item d-flex align-items-center mt-3 text-warning" href="#" role="button" style="border: 1px dashed rgba(255, 193, 7, 0.2); border-radius: 6px; background-color: rgba(255, 193, 7, 0.03);">
+                <i class="bi bi-shield-lock me-3 fs-5"></i>
+                <span class="flex-grow-1 text-start menu-text fw-bold">Yönetim İşlemleri</span>
+            </a>
+        }
+    </div>
+
+    <!-- Admin Menu Layer (Layer 2) -->
+    <div class="list-group list-group-borderless mt-2 px-1 flex-grow-1" id="admin-menu-container" style="display: none;">
+        <!-- Return to Main Menu -->
+        <a id="btn-toggle-main" class="list-group-item list-group-item-action standard-menu-item d-flex align-items-center mb-2 text-info" href="#" role="button" style="border: 1px dashed rgba(13, 202, 240, 0.2); border-radius: 6px; background-color: rgba(13, 202, 240, 0.03);">
+            <i class="bi bi-arrow-left me-3 fs-5"></i>
+            <span class="flex-grow-1 text-start menu-text fw-bold">Ana Menüye Dön</span>
+        </a>
+        <hr class="my-2" style="border-top: 1px dashed rgba(255, 255, 255, 0.1);" />
+
+        @foreach (var item in Model.AdminMenu)
         {
             if (item.Children != null && item.Children.Any())
             {
@@ -43,4 +94,62 @@
             }
         }
     </div>
+
+    <!-- Integrator Signature Footer -->
+    <div class="sidebar-footer text-center py-3 mt-auto" style="font-size: 0.7rem; opacity: 0.5; color: #94a3b8; border-top: 1px solid rgba(255,255,255,0.05);">
+        Developed by Abdulvahab Akyol (aakyol)
+    </div>
 </div>
+
+<!-- Anti-Flicker Layout Initialization Script -->
+<script>
+    (function() {
+        var mode = sessionStorage.getItem("sidebarMode");
+        var hasActiveAdmin = @(Model.AdminMenu.Any(item => item.IsActive(currentCtrl, currentAct)) ? "true" : "false");
+        
+        var mainMenu = document.getElementById("main-menu-container");
+        var adminMenu = document.getElementById("admin-menu-container");
+        
+        if (mainMenu && adminMenu) {
+            if (mode === "admin" || (!mode && hasActiveAdmin)) {
+                mainMenu.style.display = "none";
+                adminMenu.style.display = "block";
+            } else {
+                mainMenu.style.display = "block";
+                adminMenu.style.display = "none";
+            }
+        }
+    })();
+</script>
+
+<!-- Dynamic State Manager and Event Binder -->
+<script>
+    (function() {
+        document.addEventListener("DOMContentLoaded", function() {
+            const mainMenu = document.getElementById("main-menu-container");
+            const adminMenu = document.getElementById("admin-menu-container");
+            const btnToAdmin = document.getElementById("btn-toggle-admin");
+            const btnToMain = document.getElementById("btn-toggle-main");
+
+            if (!mainMenu || !adminMenu) return;
+
+            if (btnToAdmin) {
+                btnToAdmin.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    mainMenu.style.display = "none";
+                    adminMenu.style.display = "block";
+                    sessionStorage.setItem("sidebarMode", "admin");
+                });
+            }
+
+            if (btnToMain) {
+                btnToMain.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    adminMenu.style.display = "none";
+                    mainMenu.style.display = "block";
+                    sessionStorage.setItem("sidebarMode", "main");
+                });
+            }
+        });
+    })();
+</script>

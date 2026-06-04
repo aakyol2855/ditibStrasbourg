@@ -1,0 +1,99 @@
+{
+    "titleTr": "Derneklerimiz",
+    "titleFr": "Nos Associations",
+    "strasbourgSub": "Ditib Merkez Camii",
+    "websiteUrl": "www.ditibstrasbourg.fr",
+    "styles": {
+        "deptLabelFontSize": "1.4",
+        "deptLabelColor": "#7e1e3f",
+        "assocLabelFontSize": "10",
+        "assocLabelColor": "#000000",
+        "strasbourgMainFontSize": "12",
+        "strasbourgMainColor": "#c22026",
+        "strasbourgSubFontSize": "9",
+        "strasbourgSubColor": "#000000"
+    },
+    "departmentLabels": [
+        {
+            "name": "Bar-le-Duc",
+            "code": "55",
+            "coords": [
+                48.96,
+                5.28
+            ]
+        },
+        {
+            "name": "Metz",
+            "code": "57",
+            "coords": [
+                49.02,
+                6.45
+            ]
+        },
+        {
+            "name": "Strasbourg",
+            "code": "67",
+            "coords": [
+                48.69,
+                7.56
+            ]
+        },
+        {
+            "name": "Colmar",
+            "code": "68",
+            "coords": [
+                47.88,
+                7.28
+            ]
+        },
+        {
+            "name": "Épinal",
+            "code": "88",
+            "coords": [
+                48.18,
+                6.45
+            ]
+        },
+        {
+            "name": "Nancy",
+            "code": "54",
+            "coords": [
+                48.55,
+                6
+            ]
+        },
+        {
+            "name": "Chaumont",
+            "code": "52",
+            "coords": [
+                48,
+                5.15
+            ]
+        },
+        {
+            "name": "Vesoul",
+            "code": "70",
+            "coords": [
+                47.63,
+                5.95
+            ]
+        },
+        {
+            "name": "Besançon",
+            "code": "25",
+            "coords": [
+                47.16,
+                6.18
+            ]
+        },
+        {
+            "name": "Belfort",
+            "code": "90",
+            "coords": [
+                47.53,
+                6.95
+            ]
+        }
+    ],
+    "associationsOverrides": {}
+}

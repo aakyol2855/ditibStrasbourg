@@ -27,5 +27,11 @@ namespace DitibStasbourg.Models.ViewModels
         public decimal X { get; set; }
         public decimal Y { get; set; }
         public string City { get; set; } = string.Empty;
+        public string Address { get; set; } = string.Empty;
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+        public string DepartmentCode { get; set; } = string.Empty;
+        public string DepartmentName { get; set; } = string.Empty;
+        public int StaffCount { get; set; }
     }
 }

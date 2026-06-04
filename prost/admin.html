@@ -1,0 +1,2038 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administrateur - CartoBureau</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Leaflet Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+          crossorigin=""/>
+    
+    <style>
+        .admin-layout {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            overflow-y: auto;
+        }
+        
+        /* Style des onglets (Tabs) */
+        .admin-tabs-nav {
+            display: flex;
+            gap: 1rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+            margin-top: -0.5rem;
+        }
+        
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-family: inherit;
+            font-size: 1.05rem;
+            font-weight: 700;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .tab-btn:hover {
+            color: var(--text-primary);
+        }
+        
+        .tab-btn.active {
+            color: var(--accent-color);
+        }
+        
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--accent-color);
+            border-radius: 3px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .admin-title-area {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .admin-logo {
+            width: 46px;
+            height: 46px;
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-cyan));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 10px rgba(var(--accent-rgb), 0.3);
+        }
+        
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 2rem;
+            flex: 1;
+            min-height: 0;
+        }
+        
+        .admin-card {
+            background-color: var(--bg-sidebar);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(16px);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-input);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: all 0.25s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--border-color-active);
+            box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.15);
+        }
+        
+        .preview-box {
+            background: rgba(var(--accent-rgb), 0.05);
+            border: 1px dashed var(--accent-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .preview-title {
+            font-weight: 700;
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .preview-info {
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+        
+        .preview-coords {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+        
+        .address-list-card {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            height: 100%;
+            min-height: 0;
+        }
+        
+        .list-search {
+            position: relative;
+        }
+        
+        .list-search i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+        
+        .list-search input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-input);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+        
+        .address-table-container {
+            flex: 1;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        .address-table-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .address-table-container::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+        
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+        
+        .admin-table th, .admin-table td {
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .admin-table th {
+            background-color: var(--bg-input);
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        
+        .admin-table tr:hover td {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+        
+        .btn-delete {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 0.4rem 0.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.8rem;
+        }
+        
+        .btn-delete:hover {
+            background-color: #ef4444;
+            color: #ffffff;
+            border-color: #ef4444;
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-edit:hover {
+            background-color: #3b82f6;
+            color: #ffffff;
+            border-color: #3b82f6;
+            box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+        }
+        
+        .badge-dept {
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-cyan));
+            color: #ffffff;
+            padding: 0.15rem 0.4rem;
+            border-radius: 5px;
+        }
+        
+        .toast-notification {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            background-color: #10b981;
+            color: #ffffff;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: var(--shadow-lg);
+            z-index: 9999;
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .toast-notification.error {
+            background-color: #ef4444;
+        }
+        
+        .toast-notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        /* Admin Map tooltips and markers styling */
+        .admin-marker-tooltip {
+            background-color: var(--bg-sidebar);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 4px;
+            padding: 2px 6px;
+            box-shadow: var(--shadow-sm);
+        }
+        .active-admin-marker {
+            z-index: 1000 !important;
+        }
+
+        /* Ajustement des marqueurs de l'affiche */
+        .association-marker-icon-adjust {
+            width: 12px;
+            height: 12px;
+            overflow: visible;
+            cursor: move;
+        }
+
+        .marker-dot-adjust {
+            position: absolute;
+            left: 1px;
+            top: 1px;
+            width: 10px;
+            height: 10px;
+            border: 1.2px solid #000000;
+            border-radius: 50%;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            z-index: 2;
+        }
+
+        .marker-label-adjust {
+            position: absolute;
+            font-family: 'Outfit', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            color: #000000;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            padding: 1px 4px;
+            white-space: nowrap;
+            z-index: 1;
+            pointer-events: none;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Positions du texte pour l'ajustement */
+        .marker-label-adjust.lbl-right {
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .marker-label-adjust.lbl-left {
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .marker-label-adjust.lbl-top {
+            left: 50%;
+            bottom: 15px;
+            transform: translateX(-50%);
+        }
+        .marker-label-adjust.lbl-bottom {
+            left: 50%;
+            top: 15px;
+            transform: translateX(-50%);
+        }
+        .marker-label-adjust.lbl-top-right {
+            left: 12px;
+            bottom: 8px;
+        }
+        .marker-label-adjust.lbl-top-left {
+            right: 12px;
+            bottom: 8px;
+        }
+        .marker-label-adjust.lbl-bottom-right {
+            left: 12px;
+            top: 8px;
+        }
+        .marker-label-adjust.lbl-bottom-left {
+            right: 12px;
+            top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Header -->
+        <header class="admin-header">
+            <div class="admin-title-area">
+                <div class="admin-logo" style="background: transparent; box-shadow: none; width: auto; height: auto; padding: 0; display: flex; align-items: center; justify-content: center;">
+                    <img id="admin-custom-logo" src="/api/logo" style="max-width: 55px; max-height: 33px; object-fit: contain;" onerror="this.style.display='none'; document.getElementById('admin-default-logo-svg').style.display='block';">
+                    <svg id="admin-default-logo-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120" width="55" height="33" style="display: none;">
+                        <ellipse cx="100" cy="60" rx="90" ry="52" fill="#c22026" />
+                        <ellipse cx="100" cy="60" rx="84" ry="46" fill="none" stroke="white" stroke-width="1.2" />
+                        <g stroke="white" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+                            <path d="M 68,69 H 45 C 39,69 36,66 36,60 V 33 C 36,27 39,24 44,24 C 49,24 49,30 49,69" />
+                            <path d="M 132,69 H 155 C 161,69 164,66 164,60 V 33 C 164,27 161,24 156,24 C 151,24 151,30 151,69" />
+                            <path d="M 84,46 V 69" />
+                            <path d="M 116,46 V 69" />
+                            <path d="M 100,38 V 69" />
+                            <path d="M 76,36 H 124" />
+                        </g>
+                        <rect x="81.25" y="37" width="5.5" height="5.5" fill="white" />
+                        <rect x="113.25" y="37" width="5.5" height="5.5" fill="white" />
+                        <line x1="32" y1="81" x2="168" y2="81" stroke="white" stroke-width="1.5" />
+                        <text x="100" y="95" fill="white" font-family="'Outfit', sans-serif" font-size="10.5" font-weight="800" text-anchor="middle" letter-spacing="2.8">STRASBOURG</text>
+                    </svg>
+                </div>
+                <div>
+                    <h1 style="font-size: 1.5rem; font-weight: 800;">Panel Administrateur</h1>
+                    <span style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Gestion des adresses DITIB</span>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <button id="theme-toggle" class="btn-icon" title="Changer de thème">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <a href="index.html" class="btn-secondary" style="text-decoration: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.65rem 1.25rem;">
+                    <i class="fa-solid fa-arrow-left"></i> Retour à la Carte
+                </a>
+            </div>
+        </header>
+
+        <!-- Tabs Navigation -->
+        <nav class="admin-tabs-nav">
+            <button class="tab-btn active" data-tab="tab-associations">
+                <i class="fa-solid fa-map-location-dot"></i> Gestion des Associations
+            </button>
+            <button class="tab-btn" data-tab="tab-poster">
+                <i class="fa-solid fa-print"></i> Configuration Affiche
+            </button>
+        </nav>
+
+        <!-- Tab Content 1: Associations -->
+        <div id="tab-associations" class="tab-content active">
+            <div class="admin-grid">
+                <!-- Left Column: Form -->
+                <div style="display: flex; flex-direction: column; gap: 2rem; overflow-y: auto; padding-right: 0.5rem;">
+                    <div class="admin-card">
+                        <h3 id="form-title" style="font-size: 1.15rem; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;"><i class="fa-solid fa-location-plus" style="color: var(--accent-color)"></i> Nouvelle Association</h3>
+                        <form id="add-address-form" style="display: flex; flex-direction: column; gap: 1.25rem;">
+                            <div class="form-group">
+                                <label for="assoc-name">Nom de l'association</label>
+                                <input type="text" id="assoc-name" placeholder="Ex: DITIB STRASBOURG" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="assoc-address">Adresse complète (pour géocodage automatique)</label>
+                                <input type="text" id="assoc-address" placeholder="Ex: 3 rue thomas mann 67200 Strasbourg">
+                            </div>
+                            
+                            <button type="button" id="btn-geocode" class="btn-secondary" style="width: 100%; font-weight: 600;">
+                                <i class="fa-solid fa-magnifying-glass-location"></i> Vérifier par l'adresse
+                            </button>
+                            
+                            <!-- Geocoding Preview Panel -->
+                            <div id="geocode-preview" class="preview-box" style="display: none;">
+                                <!-- Dynamically filled on verification -->
+                            </div>
+
+                            <!-- Coordonnées géographiques modifiables -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                 <div class="form-group">
+                                     <label for="assoc-lat">Latitude (Point)</label>
+                                     <input type="number" step="any" id="assoc-lat" placeholder="Ex: 48.69" required>
+                                 </div>
+                                 <div class="form-group">
+                                     <label for="assoc-lon">Longitude (Point)</label>
+                                     <input type="number" step="any" id="assoc-lon" placeholder="Ex: 7.56" required>
+                                 </div>
+                            </div>
+
+                            <!-- Département modifiable -->
+                            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem;">
+                                 <div class="form-group">
+                                     <label for="assoc-dept-code">Code Dept</label>
+                                     <input type="text" id="assoc-dept-code" placeholder="Ex: 67" required>
+                                 </div>
+                                 <div class="form-group">
+                                     <label for="assoc-dept-name">Nom Département</label>
+                                     <input type="text" id="assoc-dept-name" placeholder="Ex: Bas-Rhin" required>
+                                 </div>
+                            </div>
+
+                            <div class="form-group" style="display: none;">
+                                 <input type="text" id="assoc-postcode" placeholder="Code postal">
+                                 <input type="text" id="assoc-resolved" placeholder="Adresse résolue">
+                            </div>
+
+                            <!-- Admin Map Panel -->
+                            <div class="form-group" style="margin-top: 0.5rem;">
+                                <label><i class="fa-solid fa-map-location-dot"></i> Positionnement sur la carte</label>
+                                <div id="admin-map" style="height: 230px; border-radius: 10px; border: 1px solid var(--border-color); z-index: 5;"></div>
+                                <span style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem; line-height: 1.3; display: block;">
+                                    <i class="fa-solid fa-circle-info"></i> Glissez le marqueur rouge ou double-cliquez n'importe où sur la carte pour définir la position.
+                                </span>
+                            </div>
+                            
+                            <div style="display: flex; gap: 10px;">
+                                <button type="button" id="btn-cancel" class="btn-secondary" style="flex: 1; display: none; font-weight: 600; background-color: rgba(107, 114, 128, 0.1); color: var(--text-secondary);">
+                                    Annuler
+                                </button>
+                                <button type="submit" id="btn-submit" class="btn-primary" style="flex: 2; font-weight: 600;">
+                                    <i class="fa-solid fa-circle-check"></i> Enregistrer
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Right Panel: Address Management Table -->
+                <div class="admin-card address-list-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+                        <h3 style="font-size: 1.15rem; font-weight: 700;"><i class="fa-solid fa-list-check" style="color: var(--accent-cyan)"></i> Base des Associations</h3>
+                        <span id="assoc-count" class="badge-dept">0 adresses</span>
+                    </div>
+                    
+                    <div class="list-search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="table-search" placeholder="Rechercher par nom, ville, département...">
+                    </div>
+                    
+                    <!-- Table of Addresses -->
+                    <div class="address-table-container">
+                        <table class="admin-table" id="address-table">
+                            <thead>
+                                <tr>
+                                    <th>Association</th>
+                                    <th>Adresse géocodée</th>
+                                    <th style="text-align: center;">Dept</th>
+                                    <th style="text-align: center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body">
+                                <!-- Dynamic Table Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content 2: Affiche Imprimable -->
+        <div id="tab-poster" class="tab-content">
+            <div class="admin-grid">
+                <!-- Left Column: Logo & Config Forms -->
+                <div style="display: flex; flex-direction: column; gap: 2rem;">
+                    <!-- Card: Logo Upload -->
+                    <div class="admin-card">
+                        <h3 style="font-size: 1.15rem; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;"><i class="fa-solid fa-image" style="color: var(--accent-cyan)"></i> Logo de l'Affiche</h3>
+                        <div style="display: flex; flex-direction: column; gap: 1rem; align-items: center; text-align: center;">
+                            <div style="background-color: var(--bg-input); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem; width: 100%; display: flex; justify-content: center; min-height: 100px; align-items: center;">
+                                <img id="logo-preview-img" src="/api/logo" style="max-height: 80px; max-width: 100%; object-fit: contain;" onerror="this.style.display='none'; document.getElementById('logo-preview-fallback').style.display='block';">
+                                <span id="logo-preview-fallback" style="display: none; font-size: 0.8rem; color: var(--text-muted);">Aucun logo personnalisé (DITIB par défaut)</span>
+                            </div>
+                            <div style="width: 100%;">
+                                <label for="logo-file-input" class="btn-secondary" style="display: inline-block; width: 100%; text-align: center; cursor: pointer; padding: 0.75rem; border-radius: 10px;">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i> Choisir une image
+                                </label>
+                                <input type="file" id="logo-file-input" accept=".png,.jpg,.jpeg,.svg" style="display: none;">
+                            </div>
+                            <button id="btn-upload-logo" class="btn-primary" style="width: 100%;" disabled>
+                                <i class="fa-solid fa-upload"></i> Téléverser le logo
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Card: Poster Settings -->
+                    <div class="admin-card">
+                        <h3 style="font-size: 1.15rem; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;"><i class="fa-solid fa-sliders" style="color: var(--accent-color)"></i> Textes de l'Affiche</h3>
+                        <form id="poster-config-form" style="display: flex; flex-direction: column; gap: 1.25rem;">
+                            <div class="form-group">
+                                <label for="config-title-tr">Titre Turc</label>
+                                <input type="text" id="config-title-tr" placeholder="Ex: Derneklerimiz" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="config-title-fr">Titre Français</label>
+                                <input type="text" id="config-title-fr" placeholder="Ex: Nos Associations" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="config-strasbourg-sub">Sous-titre Strasbourg</label>
+                                <input type="text" id="config-strasbourg-sub" placeholder="Ex: Ditib Merkez Camii" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="config-website-url">Lien Site Internet (Bas Droite)</label>
+                                <input type="text" id="config-website-url" placeholder="Ex: www.ditibstrasbourg.fr" required>
+                            </div>
+                            <button type="submit" id="btn-save-config" class="btn-primary" style="width: 100%; font-weight: 600;">
+                                <i class="fa-solid fa-floppy-disk"></i> Enregistrer les Textes
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Card: Text Styles -->
+                    <div class="admin-card">
+                        <h3 style="font-size: 1.15rem; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+                            <i class="fa-solid fa-palette" style="color: var(--accent-cyan)"></i> Style des Textes de la Carte
+                        </h3>
+                        <form id="poster-styles-form" style="display: flex; flex-direction: column; gap: 1.25rem;">
+                            <!-- Department labels style -->
+                            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; align-items: flex-end;">
+                                <div class="form-group">
+                                    <label for="style-dept-font">Taille Noms Départements (rem)</label>
+                                    <input type="number" step="0.1" id="style-dept-font" value="1.4" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="style-dept-color">Couleur</label>
+                                    <input type="color" id="style-dept-color" value="#7e1e3f" style="height: 42px; padding: 0.2rem; cursor: pointer;">
+                                </div>
+                            </div>
+                            
+                            <!-- Association labels style -->
+                            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; align-items: flex-end;">
+                                <div class="form-group">
+                                    <label for="style-assoc-font">Taille Noms Villes (px)</label>
+                                    <input type="number" step="1" id="style-assoc-font" value="10" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="style-assoc-color">Couleur</label>
+                                    <input type="color" id="style-assoc-color" value="#000000" style="height: 42px; padding: 0.2rem; cursor: pointer;">
+                                </div>
+                            </div>
+                            
+                            <!-- Strasbourg Main label style -->
+                            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; align-items: flex-end;">
+                                <div class="form-group">
+                                    <label for="style-stras-main-font">Strasbourg Principal (px)</label>
+                                    <input type="number" step="1" id="style-stras-main-font" value="12" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="style-stras-main-color">Couleur</label>
+                                    <input type="color" id="style-stras-main-color" value="#c22026" style="height: 42px; padding: 0.2rem; cursor: pointer;">
+                                </div>
+                            </div>
+                            
+                            <!-- Strasbourg Sub label style -->
+                            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; align-items: flex-end;">
+                                <div class="form-group">
+                                    <label for="style-stras-sub-font">Strasbourg Sous-titre (px)</label>
+                                    <input type="number" step="1" id="style-stras-sub-font" value="9" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="style-stras-sub-color">Couleur</label>
+                                    <input type="color" id="style-stras-sub-color" value="#000000" style="height: 42px; padding: 0.2rem; cursor: pointer;">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Right Column: Interactive Print Preview -->
+                <div class="admin-card" style="display: flex; flex-direction: column; gap: 1.5rem; height: 100%;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+                        <h3 style="font-size: 1.15rem; font-weight: 700;"><i class="fa-solid fa-eye" style="color: var(--accent-cyan)"></i> Aperçu A4 Imprimable</h3>
+                        <a href="print.html" target="_blank" class="btn-primary" style="text-decoration: none; padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fa-solid fa-up-right-from-square"></i> Ouvrir / Imprimer l'Affiche
+                        </a>
+                    </div>
+                    
+                    <div style="flex: 1; border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; background-color: #ffffff; display: flex; justify-content: center; align-items: center; min-height: 480px; position: relative;">
+                        <!-- Embed print.html in an iframe for live preview -->
+                        <iframe id="poster-preview-iframe" src="print.html" style="width: 100%; height: 100%; min-height: 480px; border: none; background-color: #ffffff;"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card: Adjust labels and points -->
+            <div class="admin-card" style="margin-top: 2rem; display: flex; flex-direction: column; gap: 1.5rem;">
+                <h3 style="font-size: 1.15rem; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+                    <i class="fa-solid fa-map-pin" style="color: var(--accent-color)"></i> Ajustement Graphique de l'Affiche (Points et Textes)
+                </h3>
+                
+                <div style="display: grid; grid-template-columns: 1.6fr 1fr; gap: 2rem; min-height: 450px;">
+                    <!-- Map Column -->
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">
+                            <i class="fa-solid fa-circle-info"></i> Glissez les marqueurs bleus (villes) ou violets (départements) pour ajuster leur position sur l'affiche.
+                        </label>
+                        <div id="poster-adjust-map" style="height: 400px; border-radius: 12px; border: 1px solid var(--border-color); background-color: #ffffff; z-index: 5;"></div>
+                    </div>
+                    
+                    <!-- Form Column -->
+                    <div style="display: flex; flex-direction: column; gap: 1.25rem; background-color: var(--bg-input); border-radius: 12px; padding: 1.5rem; border: 1px solid var(--border-color);">
+                        <h4 style="font-size: 1rem; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; color: var(--accent-cyan);">
+                            <i class="fa-solid fa-pen"></i> Modifier l'élément sélectionné
+                        </h4>
+                        
+                        <div class="form-group">
+                            <label for="adjust-select-item">Sélectionner un élément à ajuster</label>
+                            <select id="adjust-select-item" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--bg-sidebar); color: var(--text-primary); font-family: inherit;">
+                                <option value="">-- Choisissez un point ou une étiquette --</option>
+                                <optgroup label="Étiquettes des Départements" id="optgroup-depts">
+                                    <!-- Populated dynamically -->
+                                </optgroup>
+                                <optgroup label="Villes / Associations" id="optgroup-assocs">
+                                    <!-- Populated dynamically -->
+                                </optgroup>
+                            </select>
+                        </div>
+                        
+                        <div id="adjust-details-form" style="display: none; flex-direction: column; gap: 1.25rem;">
+                            <div class="form-group">
+                                <label for="adjust-name">Nom affiché sur la carte</label>
+                                <input type="text" id="adjust-name" placeholder="Ex: Strasbourg">
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div class="form-group">
+                                    <label for="adjust-lat">Latitude</label>
+                                    <input type="number" step="any" id="adjust-lat">
+                                </div>
+                                <div class="form-group">
+                                    <label for="adjust-lon">Longitude</label>
+                                    <input type="number" step="any" id="adjust-lon">
+                                </div>
+                            </div>
+                            
+                            <!-- Label position relative to dot (Only for cities) -->
+                            <div class="form-group" id="group-adjust-pos">
+                                <label for="adjust-label-pos">Position du texte par rapport au point</label>
+                                <select id="adjust-label-pos" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--bg-sidebar); color: var(--text-primary); font-family: inherit;">
+                                    <option value="right">Droite (Par défaut)</option>
+                                    <option value="left">Gauche</option>
+                                    <option value="top">Haut (Centré)</option>
+                                    <option value="bottom">Bas (Centré)</option>
+                                    <option value="top-right">Haut Droite</option>
+                                    <option value="top-left">Haut Gauche</option>
+                                    <option value="bottom-right">Bas Droite</option>
+                                    <option value="bottom-left">Bas Gauche</option>
+                                </select>
+                            </div>
+                            
+                            <div style="display: flex; gap: 10px; margin-top: 0.5rem;">
+                                <button type="button" id="btn-adjust-reset" class="btn-secondary" style="flex: 1; padding: 0.6rem; font-size: 0.85rem;">
+                                    <i class="fa-solid fa-rotate-left"></i> Réinitialiser
+                                </button>
+                                <button type="button" id="btn-adjust-apply" class="btn-primary" style="flex: 1.5; padding: 0.6rem; font-size: 0.85rem;">
+                                    <i class="fa-solid fa-square-check"></i> Valider l'élément
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="adjust-no-selection" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                            <i class="fa-solid fa-mouse-pointer" style="font-size: 2rem; margin-bottom: 0.5rem; display: block; color: var(--text-muted);"></i>
+                            Cliquez sur un marqueur sur la carte ou sélectionnez-le dans la liste pour le configurer.
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Global Save Button for all changes in tab-poster -->
+                <div style="display: flex; justify-content: flex-end; padding-top: 1rem; border-top: 1px solid var(--border-color); gap: 10px; align-items: center;">
+                    <button id="btn-reset-entire-poster" type="button" style="margin-right: auto; background-color: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-family: inherit; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.2s ease;">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Réinitialiser à Zéro
+                    </button>
+                    <button id="btn-cancel-poster-changes" type="button" style="background-color: rgba(107, 114, 128, 0.1); color: var(--text-secondary); border: 1px solid var(--border-color); padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-family: inherit; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.2s ease;">
+                        <i class="fa-solid fa-rotate-left"></i> Retour en Arrière
+                    </button>
+                    <button id="btn-save-all-poster" class="btn-primary" style="padding: 0.75rem 2rem; font-size: 1rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem;">
+                        <i class="fa-solid fa-floppy-disk"></i> Enregistrer et Appliquer toute l'Affiche
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div id="toast" class="toast-notification">
+        <i class="fa-solid fa-circle-check"></i> <span id="toast-text">Opération réussie</span>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
+            crossorigin=""></script>
+    <script src="departements.js"></script>
+    <script src="adresses.js" onerror="console.warn('Fichier adresses.js introuvable.')"></script>
+    <script>
+        // Global variables
+        let addressList = [];
+        let activeGeocodeResult = null;
+        let editModeId = null;
+        
+        // Admin Map variables
+        let adminMap = null;
+        let activeMarker = null;
+        let otherMarkersGroup = null;
+        
+        // Setup Theme
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeToggleIcon(savedTheme);
+        }
+        
+        function updateThemeToggleIcon(theme) {
+            const btn = document.getElementById('theme-toggle');
+            if (!btn) return;
+            const icon = btn.querySelector('i');
+            if (theme === 'dark') {
+                icon.className = 'fa-solid fa-sun';
+                btn.title = 'Passer au mode clair';
+            } else {
+                icon.className = 'fa-solid fa-moon';
+                btn.title = 'Passer au mode sombre';
+            }
+        }
+        
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeToggleIcon(newTheme);
+            
+            // Also update map tile layer
+            if (adminMap) {
+                adminMap.eachLayer(layer => {
+                    if (layer instanceof L.TileLayer) {
+                        adminMap.removeLayer(layer);
+                    }
+                });
+                const TILE_URLS = {
+                    dark: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+                    light: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
+                };
+                L.tileLayer(TILE_URLS[newTheme], {
+                    maxZoom: 20
+                }).addTo(adminMap);
+            }
+        });
+
+        // Show Toast Notification
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastText = document.getElementById('toast-text');
+            const icon = toast.querySelector('i');
+            
+            toastText.textContent = message;
+            
+            if (isError) {
+                toast.classList.add('error');
+                icon.className = 'fa-solid fa-circle-xmark';
+            } else {
+                toast.classList.remove('error');
+                icon.className = 'fa-solid fa-circle-check';
+            }
+            
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Ray-casting (point-in-polygon) algorithm for department detection
+        function isPointInPolygon(point, vs) {
+            const x = point[0], y = point[1];
+            let inside = false;
+            for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+                const xi = vs[i][0], yi = vs[i][1];
+                const xj = vs[j][0], yj = vs[j][1];
+                const intersect = ((yi > y) !== (yj > y))
+                    && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+                if (intersect) inside = !inside;
+            }
+            return inside;
+        }
+
+        function findDepartmentForCoords(lat, lon) {
+            if (typeof DEPARTEMENTS_GEOJSON === 'undefined') return null;
+            const pt = [lon, lat];
+            for (const feature of DEPARTEMENTS_GEOJSON.features) {
+                const geom = feature.geometry;
+                if (!geom) continue;
+                if (geom.type === 'Polygon') {
+                    if (isPointInPolygon(pt, geom.coordinates[0])) {
+                        return feature.properties;
+                    }
+                } else if (geom.type === 'MultiPolygon') {
+                    for (const poly of geom.coordinates) {
+                        if (isPointInPolygon(pt, poly[0])) {
+                            return feature.properties;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        function resolveDeptFromCoords(lat, lon) {
+            const dept = findDepartmentForCoords(lat, lon);
+            if (dept) {
+                document.getElementById('assoc-dept-code').value = dept.code;
+                document.getElementById('assoc-dept-name').value = dept.nom || dept.name || '';
+                showToast(`Département résolu : ${dept.nom || dept.name} (${dept.code})`);
+            }
+        }
+
+        // Initialize admin map
+        function initAdminMap() {
+            if (adminMap) return;
+            
+            const centerPoint = [48.15, 6.6]; 
+            const initialZoom = 7;
+            
+            adminMap = L.map('admin-map', {
+                zoomControl: true,
+                attributionControl: false
+            }).setView(centerPoint, initialZoom);
+            
+            const TILE_URLS = {
+                dark: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+                light: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
+            };
+            
+            const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+            L.tileLayer(TILE_URLS[theme] || TILE_URLS.dark, {
+                maxZoom: 20
+            }).addTo(adminMap);
+            
+            otherMarkersGroup = L.layerGroup().addTo(adminMap);
+            
+            // Double click to place marker
+            adminMap.doubleClickZoom.disable();
+            adminMap.on('dblclick', (e) => {
+                const lat = e.latlng.lat;
+                const lon = e.latlng.lng;
+                
+                document.getElementById('assoc-lat').value = lat.toFixed(6);
+                document.getElementById('assoc-lon').value = lon.toFixed(6);
+                
+                updateActiveMarker(lat, lon, true);
+            });
+        }
+
+        // Update active association marker
+        function updateActiveMarker(lat, lon, autoResolveDept = false) {
+            if (!adminMap) return;
+            
+            const latlng = [parseFloat(lat), parseFloat(lon)];
+            if (isNaN(latlng[0]) || isNaN(latlng[1])) return;
+            
+            if (activeMarker) {
+                activeMarker.setLatLng(latlng);
+            } else {
+                const redIcon = L.divIcon({
+                    className: 'active-admin-marker',
+                    iconSize: [16, 16],
+                    iconAnchor: [8, 8],
+                    html: '<div style="background-color: #ef4444; border: 2.5px solid #ffffff; width: 16px; height: 16px; border-radius: 50%; box-shadow: 0 0 10px rgba(239,68,68,0.8); cursor: move;"></div>'
+                });
+                
+                activeMarker = L.marker(latlng, {
+                    icon: redIcon,
+                    draggable: true
+                }).addTo(adminMap);
+                
+                activeMarker.on('drag', (e) => {
+                    const pos = e.target.getLatLng();
+                    document.getElementById('assoc-lat').value = pos.lat.toFixed(6);
+                    document.getElementById('assoc-lon').value = pos.lng.toFixed(6);
+                });
+                
+                activeMarker.on('dragend', (e) => {
+                    const pos = e.target.getLatLng();
+                    resolveDeptFromCoords(pos.lat, pos.lng);
+                });
+            }
+            
+            adminMap.setView(latlng, Math.max(adminMap.getZoom(), 9));
+            
+            if (autoResolveDept) {
+                resolveDeptFromCoords(lat, lon);
+            }
+        }
+
+        // Render other database markers as small blue dots
+        function renderOtherMarkers() {
+            if (!adminMap || !otherMarkersGroup) return;
+            
+            otherMarkersGroup.clearLayers();
+            
+            addressList.forEach(item => {
+                if (editModeId && item.id === editModeId) return;
+                
+                const lat = parseFloat(item.lat);
+                const lon = parseFloat(item.lon);
+                if (isNaN(lat) || isNaN(lon)) return;
+                
+                const blueIcon = L.divIcon({
+                    className: 'other-admin-marker',
+                    iconSize: [8, 8],
+                    iconAnchor: [4, 4],
+                    html: '<div style="background-color: #3b82f6; border: 1px solid #ffffff; width: 8px; height: 8px; border-radius: 50%; opacity: 0.7;"></div>'
+                });
+                
+                const marker = L.marker([lat, lon], {
+                    icon: blueIcon
+                });
+                
+                marker.bindTooltip(item.name.replace(/^DITIB\s+/i, ''), {
+                    direction: 'top',
+                    className: 'admin-marker-tooltip'
+                });
+                
+                marker.addTo(otherMarkersGroup);
+            });
+        }
+
+        // Initialize address table
+        async function initData() {
+            initAdminMap();
+            try {
+                const response = await fetch('adresses.json?t=' + Date.now());
+                if (!response.ok) throw new Error("Impossible de charger les données");
+                addressList = await response.json();
+            } catch (err) {
+                console.error("Erreur de récupération réseau de adresses.json, repli sur script:", err);
+                if (typeof ADRESSES_DATA !== 'undefined' && Array.isArray(ADRESSES_DATA)) {
+                    addressList = ADRESSES_DATA;
+                }
+            }
+            renderTable();
+        }
+
+        // Render Table Rows
+        function renderTable() {
+            const tbody = document.getElementById('table-body');
+            const searchVal = document.getElementById('table-search').value.toLowerCase();
+            const countBadge = document.getElementById('assoc-count');
+            
+            // Filter List
+            const filtered = addressList.filter(item => {
+                return item.name.toLowerCase().includes(searchVal) ||
+                       item.resolvedAddress.toLowerCase().includes(searchVal) ||
+                       item.postcode.includes(searchVal) ||
+                       item.departmentName.toLowerCase().includes(searchVal) ||
+                       item.departmentCode.includes(searchVal);
+            });
+            
+            countBadge.textContent = `${filtered.length} association${filtered.length > 1 ? 's' : ''}`;
+            
+            // Re-render markers if map is initialized
+            renderOtherMarkers();
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                            <i class="fa-solid fa-folder-open" style="font-size: 1.5rem; margin-bottom: 0.5rem; display: block;"></i>
+                            Aucune association trouvée
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Render table HTML
+            tbody.innerHTML = filtered.map(item => {
+                return `
+                    <tr>
+                        <td><strong>${item.name}</strong></td>
+                        <td style="color: var(--text-secondary); max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            ${item.resolvedAddress || item.query}
+                        </td>
+                        <td style="text-align: center;"><span class="badge-dept">${item.departmentCode}</span></td>
+                        <td style="text-align: center; display: flex; justify-content: center; gap: 8px;">
+                            <button class="btn-edit" onclick="startEditAddress('${item.id}')" style="background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); padding: 0.4rem 0.6rem; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.35rem; font-size: 0.8rem;">
+                                <i class="fa-solid fa-pen-to-square"></i> Modifier
+                            </button>
+                            <button class="btn-delete" onclick="deleteAddress('${item.id}', '${item.name.replace(/'/g, "\\'")}')">
+                                <i class="fa-solid fa-trash-can"></i> Supprimer
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Geocoding function
+        async function geocodeAddress() {
+            const addressInput = document.getElementById('assoc-address').value.trim();
+            const previewBox = document.getElementById('geocode-preview');
+            const submitBtn = document.getElementById('btn-submit');
+            
+            if (!addressInput) {
+                showToast("Veuillez saisir une adresse.", true);
+                return;
+            }
+            
+            // Reset preview
+            previewBox.style.display = 'none';
+            previewBox.innerHTML = '';
+            submitBtn.style.display = 'none';
+            activeGeocodeResult = null;
+            
+            const geocodeBtn = document.getElementById('btn-geocode');
+            const origText = geocodeBtn.innerHTML;
+            geocodeBtn.disabled = true;
+            geocodeBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Recherche...';
+            
+            try {
+                // Call French Government Geocoding API
+                const url = `https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(addressInput)}&limit=1`;
+                const response = await fetch(url);
+                
+                if (!response.ok) throw new Error("Erreur de connexion à l'API de géocodage");
+                
+                const data = await response.json();
+                
+                if (!data.features || data.features.length === 0) {
+                    showToast("Adresse introuvable. Soyez plus précis.", true);
+                    return;
+                }
+                
+                const match = data.features[0];
+                const props = match.properties;
+                const coords = match.geometry.coordinates; // [lon, lat]
+                
+                // Extract Department Info from context (format: "code, name, region")
+                const contextParts = props.context ? props.context.split(',') : [];
+                const deptCode = contextParts[0] ? contextParts[0].trim() : props.postcode.substring(0, 2);
+                const deptName = contextParts[1] ? contextParts[1].trim() : "Autre";
+                activeGeocodeResult = {
+                    name: document.getElementById('assoc-name').value.trim(),
+                    query: addressInput,
+                    resolvedAddress: props.label
+                };
+                
+                // Pre-fill coordinates and department fields
+                document.getElementById('assoc-lat').value = coords[1];
+                document.getElementById('assoc-lon').value = coords[0];
+                document.getElementById('assoc-dept-code').value = deptCode;
+                document.getElementById('assoc-dept-name').value = deptName;
+                document.getElementById('assoc-postcode').value = props.postcode;
+                document.getElementById('assoc-resolved').value = props.label;
+                
+                // Update Map Marker
+                updateActiveMarker(coords[1], coords[0]);
+                
+                // Show Preview Box
+                previewBox.innerHTML = `
+                    <div class="preview-title">
+                        <i class="fa-solid fa-location-crosshairs"></i> Adresse Géocodée
+                    </div>
+                    <div class="preview-info">
+                        <strong>Adresse exacte :</strong> ${props.label}<br>
+                        <strong>Département :</strong> ${deptName} (${deptCode})
+                    </div>
+                `;
+                previewBox.style.display = 'flex';
+                showToast("Géocodage réussi ! Coordonnées mises à jour dans le formulaire et sur la carte.");
+                
+            } catch (err) {
+                console.error(err);
+                showToast("Erreur lors du géocodage : " + err.message, true);
+            } finally {
+                geocodeBtn.disabled = false;
+                geocodeBtn.innerHTML = origText;
+            }
+        }
+
+        // Start Edit mode
+        function startEditAddress(id) {
+            const item = addressList.find(a => a.id === id);
+            if (!item) return;
+            
+            editModeId = id;
+            
+            // Update form header
+            const formTitle = document.getElementById('form-title');
+            formTitle.innerHTML = `<i class="fa-solid fa-pen-to-square" style="color: var(--accent-color)"></i> Modifier l'Association`;
+            
+            // Pre-fill all fields
+            document.getElementById('assoc-name').value = item.name;
+            document.getElementById('assoc-address').value = item.query || item.resolvedAddress || '';
+            document.getElementById('assoc-lat').value = item.lat;
+            document.getElementById('assoc-lon').value = item.lon;
+            document.getElementById('assoc-dept-code').value = item.departmentCode;
+            document.getElementById('assoc-dept-name').value = item.departmentName;
+            document.getElementById('assoc-postcode').value = item.postcode || '';
+            document.getElementById('assoc-resolved').value = item.resolvedAddress || '';
+            
+            // Update Map active marker
+            updateActiveMarker(item.lat, item.lon);
+            renderOtherMarkers();
+            
+            // Show cancel button
+            document.getElementById('btn-cancel').style.display = 'block';
+            document.getElementById('btn-submit').style.display = 'block';
+            activeGeocodeResult = item;
+            
+            // Scroll to form
+            formTitle.scrollIntoView({ behavior: 'smooth' });
+            showToast("Mode édition activé.");
+        }
+
+        // Cancel Edit mode
+        function cancelEdit() {
+            editModeId = null;
+            document.getElementById('form-title').innerHTML = `<i class="fa-solid fa-location-plus" style="color: var(--accent-color)"></i> Nouvelle Association`;
+            document.getElementById('add-address-form').reset();
+            document.getElementById('geocode-preview').style.display = 'none';
+            document.getElementById('btn-cancel').style.display = 'none';
+            document.getElementById('btn-submit').style.display = 'none';
+            
+            // Clear active marker
+            if (activeMarker) {
+                adminMap.removeLayer(activeMarker);
+                activeMarker = null;
+            }
+            renderOtherMarkers();
+        }
+
+        // Add/Edit submit handler
+        async function submitAddress(e) {
+            e.preventDefault();
+            
+            const assocName = document.getElementById('assoc-name').value.trim();
+            const lat = parseFloat(document.getElementById('assoc-lat').value);
+            const lon = parseFloat(document.getElementById('assoc-lon').value);
+            const deptCode = document.getElementById('assoc-dept-code').value.trim();
+            const deptName = document.getElementById('assoc-dept-name').value.trim();
+            
+            if (!assocName || isNaN(lat) || isNaN(lon) || !deptCode || !deptName) {
+                showToast("Veuillez remplir tous les champs obligatoires.", true);
+                return;
+            }
+            
+            const payload = {
+                name: assocName,
+                query: document.getElementById('assoc-address').value.trim(),
+                resolvedAddress: document.getElementById('assoc-resolved').value || document.getElementById('assoc-address').value.trim(),
+                postcode: document.getElementById('assoc-postcode').value || deptCode + "000",
+                departmentCode: deptCode,
+                departmentName: deptName,
+                lat: lat,
+                lon: lon
+            };
+            
+            const submitBtn = document.getElementById('btn-submit');
+            submitBtn.disabled = true;
+            
+            let url = '/api/add-address';
+            if (editModeId) {
+                payload.id = editModeId;
+                url = '/api/edit-address';
+            }
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                     },
+                     body: JSON.stringify(payload)
+                 });
+                 
+                 if (!response.ok) throw new Error("Erreur serveur lors de l'enregistrement");
+                 
+                 const resData = await response.json();
+                 
+                 if (resData.success) {
+                     if (editModeId) {
+                         showToast(`Association "${assocName}" modifiée avec succès !`);
+                         cancelEdit();
+                     } else {
+                         showToast(`Association "${assocName}" ajoutée avec succès !`);
+                         document.getElementById('add-address-form').reset();
+                         document.getElementById('geocode-preview').style.display = 'none';
+                         if (activeMarker) {
+                             adminMap.removeLayer(activeMarker);
+                             activeMarker = null;
+                         }
+                     }
+                     
+                     // Reload table dynamically
+                     await initData();
+                 } else {
+                     throw new Error(resData.error || "Erreur inconnue");
+                 }
+             } catch (err) {
+                 console.error(err);
+                 showToast("Erreur lors de l'enregistrement : " + err.message, true);
+             } finally {
+                 submitBtn.disabled = false;
+             }
+        }
+
+        // Delete Address
+        async function deleteAddress(id, name) {
+            if (!confirm(`Voulez-vous vraiment supprimer "${name}" de la carte ?`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/delete-address', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id: id })
+                });
+                
+                if (!response.ok) throw new Error("Erreur de communication avec le serveur");
+                
+                const resData = await response.json();
+                
+                if (resData.success) {
+                    showToast(`Association "${name}" supprimée avec succès.`);
+                    
+                    // Reload table dynamically
+                    await initData();
+                } else {
+                    throw new Error(resData.error || "Erreur inconnue");
+                }
+            } catch (err) {
+                console.error(err);
+                showToast("Erreur lors de la suppression : " + err.message, true);
+            }
+        }
+
+        // Global config model
+        let posterConfig = {};
+        let posterAdjustMap = null;
+        let posterMarkersGroup = null;
+        let activeAdjustItem = null;
+
+        function updateLivePreview() {
+            const iframe = document.getElementById('poster-preview-iframe');
+            if (iframe && iframe.contentWindow) {
+                const tempConfig = {
+                    titleTr: document.getElementById('config-title-tr').value.trim(),
+                    titleFr: document.getElementById('config-title-fr').value.trim(),
+                    strasbourgSub: document.getElementById('config-strasbourg-sub').value.trim(),
+                    websiteUrl: document.getElementById('config-website-url').value.trim(),
+                    styles: {
+                        deptLabelFontSize: document.getElementById('style-dept-font').value.trim(),
+                        deptLabelColor: document.getElementById('style-dept-color').value.trim(),
+                        assocLabelFontSize: document.getElementById('style-assoc-font').value.trim(),
+                        assocLabelColor: document.getElementById('style-assoc-color').value.trim(),
+                        strasbourgMainFontSize: document.getElementById('style-stras-main-font').value.trim(),
+                        strasbourgMainColor: document.getElementById('style-stras-main-color').value.trim(),
+                        strasbourgSubFontSize: document.getElementById('style-stras-sub-font').value.trim(),
+                        strasbourgSubColor: document.getElementById('style-stras-sub-color').value.trim()
+                    },
+                    departmentLabels: posterConfig.departmentLabels,
+                    associationsOverrides: posterConfig.associationsOverrides
+                };
+                iframe.contentWindow.postMessage({ type: 'updateConfig', config: tempConfig }, '*');
+            }
+        }
+
+        // Load Poster configuration
+        async function loadPosterConfig() {
+            try {
+                const response = await fetch('/api/config?t=' + Date.now());
+                if (!response.ok) throw new Error("Impossible de charger la config");
+                posterConfig = await response.json();
+                
+                document.getElementById('config-title-tr').value = posterConfig.titleTr || '';
+                document.getElementById('config-title-fr').value = posterConfig.titleFr || '';
+                document.getElementById('config-strasbourg-sub').value = posterConfig.strasbourgSub || '';
+                document.getElementById('config-website-url').value = posterConfig.websiteUrl || '';
+
+                if (posterConfig.styles) {
+                    const s = posterConfig.styles;
+                    document.getElementById('style-dept-font').value = s.deptLabelFontSize || '1.4';
+                    document.getElementById('style-dept-color').value = s.deptLabelColor || '#7e1e3f';
+                    document.getElementById('style-assoc-font').value = s.assocLabelFontSize || '10';
+                    document.getElementById('style-assoc-color').value = s.assocLabelColor || '#000000';
+                    document.getElementById('style-stras-main-font').value = s.strasbourgMainFontSize || '12';
+                    document.getElementById('style-stras-main-color').value = s.strasbourgMainColor || '#c22026';
+                    document.getElementById('style-stras-sub-font').value = s.strasbourgSubFontSize || '9';
+                    document.getElementById('style-stras-sub-color').value = s.strasbourgSubColor || '#000000';
+                }
+
+                // Initialize adjustments
+                populatePosterAdjustDropdown();
+                initPosterAdjustMap();
+            } catch (err) {
+                console.error("Erreur de récupération de config:", err);
+            }
+        }
+
+        // Initialize adjustment map
+        function initPosterAdjustMap() {
+            if (posterAdjustMap) {
+                renderPosterMarkers();
+                return;
+            }
+            
+            const centerPoint = [48.20, 6.55]; 
+            const initialZoom = 7.5;
+            
+            posterAdjustMap = L.map('poster-adjust-map', {
+                zoomControl: true,
+                attributionControl: false
+            }).setView(centerPoint, initialZoom);
+            
+            const TILE_URL = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+            L.tileLayer(TILE_URL, {
+                maxZoom: 20
+            }).addTo(posterAdjustMap);
+            
+            if (typeof DEPARTEMENTS_GEOJSON !== 'undefined') {
+                L.geoJSON(DEPARTEMENTS_GEOJSON, {
+                    style: {
+                        fillColor: '#e2e6ea',
+                        weight: 1.5,
+                        opacity: 0.8,
+                        color: '#475569',
+                        fillOpacity: 0.8
+                    }
+                }).addTo(posterAdjustMap);
+            }
+            
+            posterMarkersGroup = L.layerGroup().addTo(posterAdjustMap);
+            renderPosterMarkers();
+        }
+
+        // Render draggable markers on adjust map
+        function renderPosterMarkers() {
+            if (!posterAdjustMap || !posterMarkersGroup) return;
+            
+            posterMarkersGroup.clearLayers();
+            
+            const overrides = posterConfig.associationsOverrides || {};
+            
+            // 1. Render Department Labels
+            const depts = posterConfig.departmentLabels || [];
+            depts.forEach(dept => {
+                const coords = [parseFloat(dept.coords[0]), parseFloat(dept.coords[1])];
+                if (isNaN(coords[0]) || isNaN(coords[1])) return;
+                
+                const deptIcon = L.divIcon({
+                    className: 'dept-label-adjust',
+                    html: `<div style="background-color: #7e1e3f; border: 1.5px solid #ffffff; width: 14px; height: 14px; border-radius: 50%; box-shadow: 0 0 6px #7e1e3f; cursor: move;"></div>
+                           <div style="font-family: Outfit; font-weight: 800; font-size: 11px; color: #7e1e3f; background-color: rgba(255,255,255,0.85); border-radius: 4px; padding: 1px 4px; border: 1px solid #7e1e3f; margin-left: 20px; margin-top: -15px; white-space: nowrap;">${dept.name} (${dept.code})</div>`,
+                    iconSize: [14, 14],
+                    iconAnchor: [7, 7]
+                });
+                
+                const marker = L.marker(coords, { icon: deptIcon, draggable: true }).addTo(posterMarkersGroup);
+                
+                marker.on('drag', (e) => {
+                    const pos = e.target.getLatLng();
+                    dept.coords = [pos.lat, pos.lng];
+                    
+                    const selectedValue = document.getElementById('adjust-select-item').value;
+                    if (selectedValue === `dept-${dept.code}`) {
+                        document.getElementById('adjust-lat').value = pos.lat.toFixed(6);
+                        document.getElementById('adjust-lon').value = pos.lng.toFixed(6);
+                    }
+                    updateLivePreview();
+                });
+                
+                marker.on('click', () => {
+                    document.getElementById('adjust-select-item').value = `dept-${dept.code}`;
+                    showAdjustDetails(`dept-${dept.code}`);
+                });
+            });
+            
+            // 2. Render Associations
+            const assocs = addressList || [];
+            assocs.forEach(addr => {
+                const isStrasbourg = addr.name.toLowerCase().includes("strasbourg");
+                const o = overrides[addr.id] || {};
+                
+                const nameToDisplay = o.customName || addr.name.replace(/^DITIB\s+/i, '');
+                const lat = o.customLat !== undefined ? parseFloat(o.customLat) : addr.lat;
+                const lon = o.customLon !== undefined ? parseFloat(o.customLon) : addr.lon;
+                if (isNaN(lat) || isNaN(lon)) return;
+                
+                const dotColor = isStrasbourg ? '#c22026' : '#3b82f6';
+                const labelPos = o.labelPos || 'right';
+                
+                const assocIcon = L.divIcon({
+                    className: 'association-marker-icon-adjust',
+                    html: `<div class="marker-dot-adjust" style="background-color: ${dotColor};"></div>
+                           <span class="marker-label-adjust lbl-${labelPos}">${nameToDisplay}</span>`,
+                    iconSize: [12, 12],
+                    iconAnchor: [6, 6]
+                });
+                
+                const marker = L.marker([lat, lon], { icon: assocIcon, draggable: true }).addTo(posterMarkersGroup);
+                
+                marker.on('drag', (e) => {
+                    const pos = e.target.getLatLng();
+                    if (!posterConfig.associationsOverrides[addr.id]) {
+                        posterConfig.associationsOverrides[addr.id] = {};
+                    }
+                    posterConfig.associationsOverrides[addr.id].customLat = pos.lat;
+                    posterConfig.associationsOverrides[addr.id].customLon = pos.lng;
+                    
+                    const selectedValue = document.getElementById('adjust-select-item').value;
+                    if (selectedValue === `assoc-${addr.id}`) {
+                        document.getElementById('adjust-lat').value = pos.lat.toFixed(6);
+                        document.getElementById('adjust-lon').value = pos.lng.toFixed(6);
+                    }
+                    updateLivePreview();
+                });
+                
+                marker.on('click', () => {
+                    document.getElementById('adjust-select-item').value = `assoc-${addr.id}`;
+                    showAdjustDetails(`assoc-${addr.id}`);
+                });
+            });
+        }
+
+        // Populate dropdown menu for adjustments
+        function populatePosterAdjustDropdown() {
+            const deptsGroup = document.getElementById('optgroup-depts');
+            const assocsGroup = document.getElementById('optgroup-assocs');
+            if (!deptsGroup || !assocsGroup) return;
+            
+            deptsGroup.innerHTML = '';
+            assocsGroup.innerHTML = '';
+            
+            const depts = posterConfig.departmentLabels || [];
+            depts.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = `dept-${d.code}`;
+                opt.textContent = `${d.code} - ${d.name}`;
+                deptsGroup.appendChild(opt);
+            });
+            
+            const assocs = addressList || [];
+            const sortedAssocs = [...assocs].sort((a, b) => a.name.localeCompare(b.name));
+            sortedAssocs.forEach(a => {
+                const opt = document.createElement('option');
+                opt.value = `assoc-${a.id}`;
+                opt.textContent = a.name.replace(/^DITIB\s+/i, '') + ` (${a.departmentCode})`;
+                assocsGroup.appendChild(opt);
+            });
+        }
+
+        // Show adjustment inputs for selected item
+        function showAdjustDetails(value) {
+            const detailsForm = document.getElementById('adjust-details-form');
+            const noSelection = document.getElementById('adjust-no-selection');
+            const groupAdjustPos = document.getElementById('group-adjust-pos');
+            
+            if (!value) {
+                detailsForm.style.display = 'none';
+                noSelection.style.display = 'block';
+                activeAdjustItem = null;
+                return;
+            }
+            
+            detailsForm.style.display = 'flex';
+            noSelection.style.display = 'none';
+            
+            const parts = value.split('-');
+            const type = parts[0];
+            const id = parts.slice(1).join('-');
+            
+            if (type === 'dept') {
+                const dept = posterConfig.departmentLabels.find(d => d.code === id);
+                if (!dept) return;
+                
+                activeAdjustItem = { type: 'dept', id: id, data: dept };
+                
+                document.getElementById('adjust-name').value = dept.name;
+                document.getElementById('adjust-name').placeholder = dept.name;
+                document.getElementById('adjust-lat').value = parseFloat(dept.coords[0]).toFixed(6);
+                document.getElementById('adjust-lon').value = parseFloat(dept.coords[1]).toFixed(6);
+                
+                groupAdjustPos.style.display = 'none';
+            } else {
+                const assoc = addressList.find(a => a.id === id);
+                if (!assoc) return;
+                
+                const overrides = posterConfig.associationsOverrides || {};
+                const o = overrides[id] || {};
+                
+                activeAdjustItem = { type: 'assoc', id: id, data: assoc };
+                
+                document.getElementById('adjust-name').value = o.customName || '';
+                document.getElementById('adjust-name').placeholder = assoc.name.replace(/^DITIB\s+/i, '');
+                
+                const lat = o.customLat !== undefined ? o.customLat : assoc.lat;
+                const lon = o.customLon !== undefined ? o.customLon : assoc.lon;
+                document.getElementById('adjust-lat').value = parseFloat(lat).toFixed(6);
+                document.getElementById('adjust-lon').value = parseFloat(lon).toFixed(6);
+                
+                groupAdjustPos.style.display = 'block';
+                document.getElementById('adjust-label-pos').value = o.labelPos || 'right';
+            }
+        }
+
+        // Apply changes from adjustment form fields
+        function applyAdjustChanges() {
+            if (!activeAdjustItem) return;
+            
+            const name = document.getElementById('adjust-name').value.trim();
+            const lat = parseFloat(document.getElementById('adjust-lat').value);
+            const lon = parseFloat(document.getElementById('adjust-lon').value);
+            
+            if (isNaN(lat) || isNaN(lon)) {
+                showToast("Coordonnées de l'affiche invalides.", true);
+                return;
+            }
+            
+            if (activeAdjustItem.type === 'dept') {
+                const dept = activeAdjustItem.data;
+                dept.name = name || dept.name;
+                dept.coords = [lat, lon];
+            } else {
+                const assocId = activeAdjustItem.id;
+                
+                if (!posterConfig.associationsOverrides[assocId]) {
+                    posterConfig.associationsOverrides[assocId] = {};
+                }
+                
+                const labelPos = document.getElementById('adjust-label-pos').value;
+                
+                if (name) {
+                    posterConfig.associationsOverrides[assocId].customName = name;
+                } else {
+                    delete posterConfig.associationsOverrides[assocId].customName;
+                }
+                
+                posterConfig.associationsOverrides[assocId].customLat = lat;
+                posterConfig.associationsOverrides[assocId].customLon = lon;
+                posterConfig.associationsOverrides[assocId].labelPos = labelPos;
+            }
+            
+            renderPosterMarkers();
+            showToast("Ajustement validé localement. N'oubliez pas d'enregistrer.");
+            updateLivePreview();
+        }
+
+        // Reset adjustments for selected item to default
+        function resetAdjustItem() {
+            if (!activeAdjustItem) return;
+            
+            if (confirm("Voulez-vous réinitialiser cet élément à sa position et ses valeurs par défaut ?")) {
+                if (activeAdjustItem.type === 'dept') {
+                    const defaults = {
+                        "55": [48.96, 5.28], "57": [49.02, 6.45], "67": [48.69, 7.56], 
+                        "68": [47.88, 7.28], "88": [48.18, 6.45], "54": [48.55, 6.00], 
+                        "52": [48.00, 5.15], "70": [47.63, 5.95], "25": [47.16, 6.18], 
+                        "90": [47.53, 6.95]
+                    };
+                    const defaultNames = {
+                        "55": "Bar-le-Duc", "57": "Metz", "67": "Strasbourg", "68": "Colmar",
+                        "88": "Épinal", "54": "Nancy", "52": "Chaumont", "70": "Vesoul",
+                        "25": "Besançon", "90": "Belfort"
+                    };
+                    const code = activeAdjustItem.id;
+                    const dept = activeAdjustItem.data;
+                    dept.name = defaultNames[code] || dept.name;
+                    dept.coords = defaults[code] || dept.coords;
+                } else {
+                    const assocId = activeAdjustItem.id;
+                    if (posterConfig.associationsOverrides) {
+                        delete posterConfig.associationsOverrides[assocId];
+                    }
+                }
+                
+                showAdjustDetails(document.getElementById('adjust-select-item').value);
+                renderPosterMarkers();
+                showToast("Élément réinitialisé.");
+                updateLivePreview();
+            }
+        }
+
+        // Unified Save function
+        async function saveAllPosterConfig(e) {
+            if (e && e.preventDefault) e.preventDefault();
+            
+            // 1. Text content
+            posterConfig.titleTr = document.getElementById('config-title-tr').value.trim();
+            posterConfig.titleFr = document.getElementById('config-title-fr').value.trim();
+            posterConfig.strasbourgSub = document.getElementById('config-strasbourg-sub').value.trim();
+            posterConfig.websiteUrl = document.getElementById('config-website-url').value.trim();
+            
+            // 2. Styles config
+            if (!posterConfig.styles) posterConfig.styles = {};
+            posterConfig.styles.deptLabelFontSize = document.getElementById('style-dept-font').value.trim();
+            posterConfig.styles.deptLabelColor = document.getElementById('style-dept-color').value.trim();
+            posterConfig.styles.assocLabelFontSize = document.getElementById('style-assoc-font').value.trim();
+            posterConfig.styles.assocLabelColor = document.getElementById('style-assoc-color').value.trim();
+            posterConfig.styles.strasbourgMainFontSize = document.getElementById('style-stras-main-font').value.trim();
+            posterConfig.styles.strasbourgMainColor = document.getElementById('style-stras-main-color').value.trim();
+            posterConfig.styles.strasbourgSubFontSize = document.getElementById('style-stras-sub-font').value.trim();
+            posterConfig.styles.strasbourgSubColor = document.getElementById('style-stras-sub-color').value.trim();
+            
+            const saveBtns = [
+                document.getElementById('btn-save-config'),
+                document.getElementById('btn-save-all-poster')
+            ];
+            
+            saveBtns.forEach(btn => {
+                if (btn) {
+                    btn.disabled = true;
+                    btn.setAttribute('data-orig-html', btn.innerHTML);
+                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enregistrement...';
+                }
+            });
+            
+            try {
+                const response = await fetch('/api/save-config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(posterConfig)
+                });
+                
+                if (!response.ok) throw new Error("Erreur serveur lors de la sauvegarde.");
+                const res = await response.json();
+                
+                if (res.success) {
+                    showToast("La configuration de l'affiche a été enregistrée avec succès !");
+                    
+                    // Reload iframe preview to show changes
+                    const iframe = document.getElementById('poster-preview-iframe');
+                    if (iframe) {
+                        iframe.src = 'print.html?t=' + Date.now();
+                    }
+                } else {
+                    throw new Error(res.error || "Erreur inconnue");
+                }
+            } catch (err) {
+                console.error(err);
+                showToast("Erreur de sauvegarde : " + err.message, true);
+            } finally {
+                saveBtns.forEach(btn => {
+                    if (btn) {
+                        btn.disabled = false;
+                        const orig = btn.getAttribute('data-orig-html');
+                        if (orig) btn.innerHTML = orig;
+                    }
+                });
+            }
+        }
+
+        // Reload saved poster config from server (Cancel/Back function)
+        async function reloadSavedPosterConfig() {
+            if (confirm("Voulez-vous annuler toutes vos modifications non enregistrées et recharger la configuration précédente ?")) {
+                await loadPosterConfig();
+                showToast("Modifications annulées. Configuration d'origine rechargée.");
+                document.getElementById('adjust-select-item').value = '';
+                showAdjustDetails('');
+                updateLivePreview();
+            }
+        }
+
+        // Reset poster configuration to factory defaults
+        async function resetAllPosterConfig() {
+            if (confirm("ATTENTION : Voulez-vous vraiment réinitialiser TOUTES les personnalisations de l'affiche (positions des villes, textes et styles) aux valeurs d'origine ? Cette opération est irréversible.")) {
+                posterConfig = {
+                    "titleTr": "Derneklerimiz",
+                    "titleFr": "Nos Associations",
+                    "strasbourgSub": "Ditib Merkez Camii",
+                    "websiteUrl": "www.ditibstrasbourg.fr",
+                    "styles": {
+                        "deptLabelFontSize": "1.4",
+                        "deptLabelColor": "#7e1e3f",
+                        "assocLabelFontSize": "10",
+                        "assocLabelColor": "#000000",
+                        "strasbourgMainFontSize": "12",
+                        "strasbourgMainColor": "#c22026",
+                        "strasbourgSubFontSize": "9",
+                        "strasbourgSubColor": "#000000"
+                    },
+                    "departmentLabels": [
+                        { "name": "Bar-le-Duc", "code": "55", "coords": [48.96, 5.28] },
+                        { "name": "Metz", "code": "57", "coords": [49.02, 6.45] },
+                        { "name": "Strasbourg", "code": "67", "coords": [48.69, 7.56] },
+                        { "name": "Colmar", "code": "68", "coords": [47.88, 7.28] },
+                        { "name": "Épinal", "code": "88", "coords": [48.18, 6.45] },
+                        { "name": "Nancy", "code": "54", "coords": [48.55, 6.00] },
+                        { "name": "Chaumont", "code": "52", "coords": [48.00, 5.15] },
+                        { "name": "Vesoul", "code": "70", "coords": [47.63, 5.95] },
+                        { "name": "Besançon", "code": "25", "coords": [47.16, 6.18] },
+                        { "name": "Belfort", "code": "90", "coords": [47.53, 6.95] }
+                    ],
+                    "associationsOverrides": {}
+                };
+                
+                try {
+                    const response = await fetch('/api/save-config', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(posterConfig)
+                    });
+                    
+                    if (!response.ok) throw new Error("Erreur de sauvegarde");
+                    const res = await response.json();
+                    
+                    if (res.success) {
+                        showToast("L'affiche a été entièrement réinitialisée !");
+                        
+                        // Update inputs
+                        document.getElementById('config-title-tr').value = posterConfig.titleTr;
+                        document.getElementById('config-title-fr').value = posterConfig.titleFr;
+                        document.getElementById('config-strasbourg-sub').value = posterConfig.strasbourgSub;
+                        document.getElementById('config-website-url').value = posterConfig.websiteUrl;
+                        
+                        const s = posterConfig.styles;
+                        document.getElementById('style-dept-font').value = s.deptLabelFontSize;
+                        document.getElementById('style-dept-color').value = s.deptLabelColor;
+                        document.getElementById('style-assoc-font').value = s.assocLabelFontSize;
+                        document.getElementById('style-assoc-color').value = s.assocLabelColor;
+                        document.getElementById('style-stras-main-font').value = s.strasbourgMainFontSize;
+                        document.getElementById('style-stras-main-color').value = s.strasbourgMainColor;
+                        document.getElementById('style-stras-sub-font').value = s.strasbourgSubFontSize;
+                        document.getElementById('style-stras-sub-color').value = s.strasbourgSubColor;
+                        
+                        document.getElementById('adjust-select-item').value = '';
+                        showAdjustDetails('');
+                        
+                        renderPosterMarkers();
+                        
+                        const iframe = document.getElementById('poster-preview-iframe');
+                        if (iframe) {
+                            iframe.src = 'print.html?t=' + Date.now();
+                        }
+                    } else {
+                        throw new Error(res.error);
+                    }
+                } catch (err) {
+                    console.error(err);
+                    showToast("Erreur lors de la réinitialisation : " + err.message, true);
+                }
+            }
+        }
+
+        // Listeners
+        document.getElementById('btn-geocode').addEventListener('click', geocodeAddress);
+        document.getElementById('add-address-form').addEventListener('submit', submitAddress);
+        document.getElementById('btn-cancel').addEventListener('click', cancelEdit);
+        document.getElementById('table-search').addEventListener('input', renderTable);
+        document.getElementById('poster-config-form').addEventListener('submit', saveAllPosterConfig);
+        document.getElementById('btn-save-all-poster').addEventListener('click', saveAllPosterConfig);
+        document.getElementById('btn-cancel-poster-changes').addEventListener('click', reloadSavedPosterConfig);
+        document.getElementById('btn-reset-entire-poster').addEventListener('click', resetAllPosterConfig);
+        document.getElementById('adjust-select-item').addEventListener('change', (e) => {
+            showAdjustDetails(e.target.value);
+        });
+        document.getElementById('btn-adjust-apply').addEventListener('click', applyAdjustChanges);
+        document.getElementById('btn-adjust-reset').addEventListener('click', resetAdjustItem);
+        
+        // Tab switching logic
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                btn.classList.add('active');
+                
+                const tabId = btn.getAttribute('data-tab');
+                const tabContent = document.getElementById(tabId);
+                if (tabContent) {
+                    tabContent.classList.add('active');
+                }
+                
+                if (tabId === 'tab-associations' && adminMap) {
+                    setTimeout(() => {
+                        adminMap.invalidateSize();
+                    }, 100);
+                }
+                
+                if (tabId === 'tab-poster') {
+                    const iframe = document.getElementById('poster-preview-iframe');
+                    if (iframe) {
+                        iframe.src = 'print.html?t=' + Date.now();
+                    }
+                    setTimeout(() => {
+                        initPosterAdjustMap();
+                        if (posterAdjustMap) {
+                            posterAdjustMap.invalidateSize();
+                        }
+                    }, 100);
+                }
+            });
+        });
+
+        // Listeners: Coordinates manual change sync with map
+        document.getElementById('assoc-lat').addEventListener('change', (e) => {
+            const lat = parseFloat(e.target.value);
+            const lon = parseFloat(document.getElementById('assoc-lon').value);
+            if (!isNaN(lat) && !isNaN(lon)) {
+                updateActiveMarker(lat, lon);
+            }
+        });
+        document.getElementById('assoc-lon').addEventListener('change', (e) => {
+            const lat = parseFloat(document.getElementById('assoc-lat').value);
+            const lon = parseFloat(e.target.value);
+            if (!isNaN(lat) && !isNaN(lon)) {
+                updateActiveMarker(lat, lon);
+            }
+        });
+
+        // Listeners: Logo Upload
+        const logoInput = document.getElementById('logo-file-input');
+        const uploadBtn = document.getElementById('btn-upload-logo');
+        const previewImg = document.getElementById('logo-preview-img');
+        const fallbackText = document.getElementById('logo-preview-fallback');
+
+        logoInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                previewImg.src = event.target.result;
+                previewImg.style.display = 'block';
+                fallbackText.style.display = 'none';
+                uploadBtn.disabled = false;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        uploadBtn.addEventListener('click', async () => {
+            const file = logoInput.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                const base64Data = event.target.result;
+                uploadBtn.disabled = true;
+                uploadBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Envoi...';
+
+                try {
+                    const response = await fetch('/api/upload-logo', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            filename: file.name,
+                            data: base64Data
+                        })
+                    });
+
+                    if (!response.ok) throw new Error("Erreur de téléversement");
+
+                    const res = await response.json();
+                    if (res.success) {
+                        showToast("Le logo a été mis à jour avec succès !");
+                        uploadBtn.disabled = true;
+                        uploadBtn.innerHTML = '<i class="fa-solid fa-upload"></i> Téléverser le logo';
+                        
+                        // Force refresh all images referencing /api/logo on page
+                        const timestamp = Date.now();
+                        const imgs = document.querySelectorAll('img[src^="/api/logo"]');
+                        imgs.forEach(img => {
+                            img.src = '/api/logo?t=' + timestamp;
+                        });
+
+                        // Refresh preview iframe
+                        const iframe = document.getElementById('poster-preview-iframe');
+                        if (iframe) {
+                            iframe.src = 'print.html?t=' + timestamp;
+                        }
+                    } else {
+                        throw new Error(res.error);
+                    }
+                } catch (err) {
+                    console.error(err);
+                    showToast("Erreur : " + err.message, true);
+                    uploadBtn.disabled = false;
+                    uploadBtn.innerHTML = '<i class="fa-solid fa-upload"></i> Téléverser le logo';
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+        
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            initData();
+            loadPosterConfig();
+            
+            // Real-time styling and config input synchronizers
+            document.getElementById('poster-styles-form').addEventListener('input', updateLivePreview);
+            document.getElementById('poster-config-form').addEventListener('input', updateLivePreview);
+            
+            // Iframe load listener to sync state upon reloading/changing tabs
+            const previewIframe = document.getElementById('poster-preview-iframe');
+            if (previewIframe) {
+                previewIframe.addEventListener('load', () => {
+                    updateLivePreview();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Affiche Officielle - Nos Associations DITIB</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Leaflet Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+          crossorigin=""/>
+
+    <style>
+        :root {
+            --poster-bg: #ffffff; /* Fond blanc pur comme sur la photo */
+            --dept-fill: #e2e6ea;  /* Gris clair pour les départements */
+            --dept-border: #475569; /* Bordure foncée */
+            --text-dark: #000000;
+            --purple-label: #7e1e3f; /* Couleur bordeaux chic pour les départements */
+            --red-ditib: #c22026; /* Rouge officiel */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #e2e8f0;
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
+        /* Conteneur principal A4 Portrait */
+        .poster-container {
+            background-color: var(--poster-bg);
+            width: 210mm;
+            height: 297mm;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #cbd5e1;
+        }
+
+        /* Zone de la Carte (Occupe 100% de la hauteur) */
+        .map-print-container {
+            height: 100%;
+            width: 100%;
+            background-color: var(--poster-bg);
+            z-index: 1;
+        }
+
+        /* En-tête superposé en haut à droite */
+        .poster-title-block {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            z-index: 1000;
+            text-align: right;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .poster-title-block .title-tr {
+            font-size: 2.2rem;
+            font-weight: 500;
+            color: #000000;
+            line-height: 1.1;
+            letter-spacing: 0.5px;
+        }
+
+        .poster-title-block .title-fr {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: #000000;
+            line-height: 1.1;
+            letter-spacing: 0.5px;
+        }
+
+        /* Logo et URL (Bas Droite de la page) superposés */
+        .poster-logo-block {
+            position: absolute;
+            bottom: 45px;
+            right: 45px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            pointer-events: none;
+        }
+
+        .poster-logo-block .website-url {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #000000;
+            text-align: center;
+        }
+
+        /* Boutons d'action écran */
+        .actions-panel {
+            position: fixed;
+            top: 24px;
+            left: 24px;
+            z-index: 9999;
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-action {
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background-color: #ffffff;
+            color: #1e293b;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-action:hover {
+            background-color: #f8fafc;
+            border-color: #94a3b8;
+            transform: translateY(-1px);
+        }
+
+        .btn-print-primary {
+            background: linear-gradient(135deg, var(--red-ditib), #ef4444);
+            color: #ffffff;
+            border: none;
+        }
+
+        .btn-print-primary:hover {
+            opacity: 0.95;
+            color: #ffffff;
+        }
+
+        /* Étiquettes violettes géantes des départements sur la carte */
+        .dept-label-print {
+            color: var(--purple-label);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 1.4rem;
+            text-align: center;
+            white-space: nowrap;
+            text-shadow: 0px 0px 4px #ffffff, 0px 0px 4px #ffffff;
+            pointer-events: none;
+        }
+
+        /* Points sur la carte */
+        .association-marker-icon {
+            width: 12px;
+            height: 12px;
+            pointer-events: none;
+            overflow: visible;
+        }
+
+        .marker-dot {
+            position: absolute;
+            left: 1px;
+            top: 1px;
+            width: 10px;
+            height: 10px;
+            background-color: #3b82f6; /* Bleu de la photo */
+            border: 1.2px solid #000000;
+            border-radius: 50%;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            z-index: 2;
+        }
+
+        .marker-label {
+            position: absolute;
+            font-family: 'Outfit', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            color: #000000;
+            text-shadow: 1.5px 1.5px 0px #ffffff, -1.5px -1.5px 0px #ffffff, 1.5px -1.5px 0px #ffffff, -1.5px 1.5px 0px #ffffff;
+            white-space: nowrap;
+            z-index: 1;
+        }
+
+        /* Classes de positionnement pour les 8 directions */
+        .marker-label.lbl-right {
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            text-align: left;
+        }
+        .marker-label.lbl-left {
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            text-align: right;
+        }
+        .marker-label.lbl-top {
+            left: 50%;
+            bottom: 15px;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+        .marker-label.lbl-bottom {
+            left: 50%;
+            top: 15px;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+        .marker-label.lbl-top-right {
+            left: 12px;
+            bottom: 8px;
+            text-align: left;
+        }
+        .marker-label.lbl-top-left {
+            right: 12px;
+            bottom: 8px;
+            text-align: right;
+        }
+        .marker-label.lbl-bottom-right {
+            left: 12px;
+            top: 8px;
+            text-align: left;
+        }
+        .marker-label.lbl-bottom-left {
+            right: 12px;
+            top: 8px;
+            text-align: right;
+        }
+
+        /* Strasbourg en Rouge */
+        .association-marker-icon.red-marker {
+            width: 16px;
+            height: 16px;
+        }
+
+        .marker-dot.red {
+            position: absolute;
+            left: 1px;
+            top: 1px;
+            background-color: var(--red-ditib);
+            width: 14px;
+            height: 14px;
+            border: 1.5px solid #000000;
+            box-shadow: 0 1px 3px rgba(194, 32, 38, 0.4);
+            z-index: 2;
+        }
+
+        .marker-label.red-label {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.15;
+            z-index: 1;
+        }
+
+        .strasbourg-main {
+            color: var(--red-ditib);
+            font-size: 12px;
+            font-weight: 800;
+            text-shadow: 1.5px 1.5px 0px #ffffff, -1.5px -1.5px 0px #ffffff, 1.5px -1.5px 0px #ffffff, -1.5px 1.5px 0px #ffffff;
+        }
+
+        .strasbourg-sub {
+            color: #000000;
+            font-size: 9px;
+            font-weight: 600;
+            text-shadow: 1.5px 1.5px 0px #ffffff, -1.5px -1.5px 0px #ffffff, 1.5px -1.5px 0px #ffffff, -1.5px 1.5px 0px #ffffff;
+        }
+
+        /* Masquage lors de l'impression */
+        @media print {
+            body {
+                background-color: #ffffff;
+                padding: 0;
+                margin: 0;
+                display: block;
+            }
+
+            .actions-panel {
+                display: none !important;
+            }
+
+            .poster-container {
+                width: 100%;
+                height: 100vh;
+                border: none;
+                box-shadow: none;
+            }
+
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Actions Écran -->
+    <div class="actions-panel">
+        <a href="index.html" class="btn-action">
+            <i class="fa-solid fa-arrow-left"></i> Retour à la Carte
+        </a>
+        <button onclick="window.print()" class="btn-action btn-print-primary">
+            <i class="fa-solid fa-print"></i> Imprimer l'Affiche
+        </button>
+    </div>
+
+    <!-- Page A4 -->
+    <div class="poster-container" id="printable-area">
+        <!-- Carte Leaflet (sans routes) -->
+        <div id="map-print" class="map-print-container"></div>
+
+        <!-- En-tête superposé -->
+        <div class="poster-title-block">
+            <span class="title-tr" id="poster-title-tr">Derneklerimiz</span>
+            <span class="title-fr" id="poster-title-fr">Nos Associations</span>
+        </div>
+
+        <!-- Logo officiel et URL superposés -->
+        <div class="poster-logo-block">
+            <img id="custom-logo" src="/api/logo" style="max-height: 84px; max-width: 140px; object-fit: contain;" onerror="this.style.display='none'; document.getElementById('default-logo-svg').style.display='block';">
+            <svg id="default-logo-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120" width="140" height="84" style="display: none;">
+                <!-- Ellipse rouge de fond -->
+                <ellipse cx="100" cy="60" rx="90" ry="52" fill="#c22026" />
+                <!-- Ligne blanche fine interne -->
+                <ellipse cx="100" cy="60" rx="84" ry="46" fill="none" stroke="white" stroke-width="1.2" />
+                
+                <!-- Lettres stylisées DİTİB (Coupole de Mosquée) -->
+                <g stroke="white" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+                    <!-- D (Gauche) -->
+                    <path d="M 68,69 H 45 C 39,69 36,66 36,60 V 33 C 36,27 39,24 44,24 C 49,24 49,30 49,69" />
+                    <!-- B (Droite) -->
+                    <path d="M 132,69 H 155 C 161,69 164,66 164,60 V 33 C 164,27 161,24 156,24 C 151,24 151,30 151,69" />
+                    
+                    <!-- İ gauche-centre -->
+                    <path d="M 84,46 V 69" />
+                    <!-- İ droite-centre -->
+                    <path d="M 116,46 V 69" />
+                    
+                    <!-- T centre -->
+                    <path d="M 100,38 V 69" />
+                    <path d="M 76,36 H 124" />
+                </g>
+                
+                <!-- Points carrés au-dessus des İ -->
+                <rect x="81.25" y="37" width="5.5" height="5.5" fill="white" />
+                <rect x="113.25" y="37" width="5.5" height="5.5" fill="white" />
+                
+                <!-- Ligne blanche horizontale de séparation -->
+                <line x1="32" y1="81" x2="168" y2="81" stroke="white" stroke-width="1.5" />
+                
+                <!-- Texte STRASBOURG -->
+                <text x="100" y="95" fill="white" font-family="'Outfit', sans-serif" font-size="10.5" font-weight="800" text-anchor="middle" letter-spacing="2.8">STRASBOURG</text>
+            </svg>
+            <div class="website-url" id="website-url">www.ditibstrasbourg.fr</div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
+            crossorigin=""></script>
+
+    <!-- Fichiers de données locales -->
+    <script src="departements.js"></script>
+    <script src="adresses.js"></script>
+
+    <script>
+        // Centres des départements pour l'affichage des noms
+        const DEPARTMENTS_LABELS = [
+            { name: "Bar-le-Duc", code: "55", coords: [48.96, 5.28] },
+            { name: "Metz", code: "57", coords: [49.02, 6.45] },
+            { name: "Strasbourg", code: "67", coords: [48.69, 7.56] },
+            { name: "Colmar", code: "68", coords: [47.88, 7.28] },
+            { name: "Épinal", code: "88", coords: [48.18, 6.45] },
+            { name: "Nancy", code: "54", coords: [48.55, 6.00] },
+            { name: "Chaumont", code: "52", coords: [48.00, 5.15] },
+            { name: "Vesoul", code: "70", coords: [47.63, 5.95] },
+            { name: "Besançon", code: "25", coords: [47.16, 6.18] },
+            { name: "Belfort", code: "90", coords: [47.53, 6.95] }
+        ];
+
+        let map;
+        let dynamicLayerGroup;
+        let strasbourgSubText = "Ditib Merkez Camii";
+        let currentConfig = {};
+
+        // Fonction de nettoyage des noms de villes
+        function getCleanCityName(name) {
+            let clean = name.replace(/^DITIB\s+/i, '');
+            const overrides = {
+                "BENFELD / HUTTENHEIM": "Benfeld",
+                "ST-JEAN ROHRBACH": "St.J. Rohrbach",
+                "ST-DIÉ": "Saint-Dié",
+                "ST-DIZIER": "Saint-Dizier",
+                "REICHSHOFFEN": "Reichshoffen",
+                "PUTTELANGE-AUX-LACS": "Puttelange-aux-Lacs",
+                "PUTTELANGE AUX LACS": "Puttelange-aux-Lacs",
+                "FAREBERSVILLER": "Farébersviller",
+                "FOLSCHWILLER": "Folschwiller",
+                "BOUZONVILLE": "Bouzonville",
+                "BOULAY-MOSELLE": "Boulay-Moselle",
+                "BOULAY MOSELLE": "Boulay-Moselle",
+                "PONT-A-MOUSSON": "Pont-à-Mousson",
+                "PONT A MOUSSON": "Pont-à-Mousson",
+                "REVIGNY-SUR-ORNAIN": "Revigny-sur-Ornain",
+                "REVIGNY SUR ORNAIN": "Revigny-sur-Ornain",
+                "LUXEUIL-LES-BAINS": "Luxeuil-les-Bains",
+                "LUXEUIL LES BAINS": "Luxeuil-les-Bains",
+                "VALENTIGNEY": "Valentigney"
+            };
+
+            if (overrides[clean.toUpperCase()]) {
+                return overrides[clean.toUpperCase()];
+            }
+
+            return clean.split(' ').map(w => {
+                if (w.includes('-')) {
+                    return w.split('-').map(sub => sub.charAt(0).toUpperCase() + sub.slice(1).toLowerCase()).join('-');
+                }
+                return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+            }).join(' ');
+        }
+
+        function applyPosterConfig(config) {
+            currentConfig = config;
+            
+            // Text values
+            if (config.titleTr) document.getElementById('poster-title-tr').textContent = config.titleTr;
+            if (config.titleFr) document.getElementById('poster-title-fr').textContent = config.titleFr;
+            if (config.websiteUrl) document.getElementById('website-url').textContent = config.websiteUrl;
+            
+            // Strasbourg subtext
+            const strasSub = config.strasbourgSub || strasbourgSubText;
+
+            // Styles
+            let styleEl = document.getElementById('dynamic-poster-styles');
+            if (!styleEl) {
+                styleEl = document.createElement('style');
+                styleEl.id = 'dynamic-poster-styles';
+                document.head.appendChild(styleEl);
+            }
+            
+            const styles = config.styles || {};
+            styleEl.innerHTML = `
+                .dept-label-print {
+                    font-size: ${styles.deptLabelFontSize || 1.4}rem !important;
+                    color: ${styles.deptLabelColor || '#7e1e3f'} !important;
+                }
+                .marker-label:not(.red-label) {
+                    font-size: ${styles.assocLabelFontSize || 10}px !important;
+                    color: ${styles.assocLabelColor || '#000000'} !important;
+                }
+                .strasbourg-main {
+                    font-size: ${styles.strasbourgMainFontSize || 12}px !important;
+                    color: ${styles.strasbourgMainColor || '#c22026'} !important;
+                }
+                .strasbourg-sub {
+                    font-size: ${styles.strasbourgSubFontSize || 9}px !important;
+                    color: ${styles.strasbourgSubColor || '#000000'} !important;
+                }
+            `;
+
+            // Clear old dynamic elements
+            if (dynamicLayerGroup) {
+                dynamicLayerGroup.clearLayers();
+            }
+
+            // 1. Department labels
+            const deptLabels = config.departmentLabels || DEPARTMENTS_LABELS;
+            deptLabels.forEach(dept => {
+                const labelIcon = L.divIcon({
+                    className: 'dept-label-print',
+                    html: `${dept.name}<br>(${dept.code})`,
+                    iconSize: [120, 50],
+                    iconAnchor: [60, 25]
+                });
+                const coords = [parseFloat(dept.coords[0]), parseFloat(dept.coords[1])];
+                if (isNaN(coords[0]) || isNaN(coords[1])) return;
+                L.marker(coords, { icon: labelIcon, zIndexOffset: -1000 }).addTo(dynamicLayerGroup);
+            });
+
+            // 2. Associations markers
+            const adressesList = (typeof ADRESSES_DATA !== 'undefined' && Array.isArray(ADRESSES_DATA)) ? ADRESSES_DATA : [];
+            const assocOverrides = config.associationsOverrides || {};
+            const markersList = [];
+
+            adressesList.forEach(addr => {
+                const isStrasbourg = addr.name.toLowerCase().includes("strasbourg");
+                const o = assocOverrides[addr.id] || {};
+                
+                const lat = o.customLat !== undefined ? parseFloat(o.customLat) : addr.lat;
+                const lon = o.customLon !== undefined ? parseFloat(o.customLon) : addr.lon;
+                if (isNaN(lat) || isNaN(lon)) return;
+                const labelPos = o.labelPos || 'right';
+                
+                let markerIcon;
+                const nameToDisplay = o.customName || getCleanCityName(addr.name);
+
+                if (isStrasbourg) {
+                    markerIcon = L.divIcon({
+                        className: 'association-marker-icon red-marker',
+                        iconSize: [16, 16],
+                        iconAnchor: [8, 8],
+                        html: `
+                            <div class="marker-dot red"></div>
+                            <div class="marker-label red-label lbl-${labelPos}">
+                                <span class="strasbourg-main">${o.customName || 'Strasbourg'}</span>
+                                <span class="strasbourg-sub">${strasSub}</span>
+                            </div>
+                        `
+                    });
+                } else {
+                    markerIcon = L.divIcon({
+                        className: 'association-marker-icon',
+                        iconSize: [12, 12],
+                        iconAnchor: [6, 6],
+                        html: `
+                            <div class="marker-dot"></div>
+                            <span class="marker-label lbl-${labelPos}">${nameToDisplay}</span>
+                        `
+                    });
+                }
+
+                const marker = L.marker([lat, lon], { icon: markerIcon });
+                marker.addTo(dynamicLayerGroup);
+                markersList.push(marker);
+            });
+
+            // Fit bounds
+            if (markersList.length > 0) {
+                const markersGroup = L.featureGroup(markersList);
+                setTimeout(() => {
+                    if (map) {
+                        map.invalidateSize();
+                        map.fitBounds(markersGroup.getBounds(), {
+                            padding: [50, 50]
+                        });
+                    }
+                }, 50);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Initialisation de la carte (Centrage large sur l'Est, sans contrôles)
+            map = L.map('map-print', {
+                zoomControl: false,
+                attributionControl: false,
+                dragging: false,
+                scrollWheelZoom: false,
+                doubleClickZoom: false,
+                boxZoom: false
+            }).setView([48.20, 6.55], 8);
+
+            // 1. Charger le GeoJSON des départements (Gris uniforme de fond sur fond de page blanc)
+            if (typeof DEPARTEMENTS_GEOJSON !== 'undefined') {
+                L.geoJSON(DEPARTEMENTS_GEOJSON, {
+                    style: {
+                        fillColor: '#e2e6ea',
+                        weight: 1.8,
+                        opacity: 1,
+                        color: '#475569',
+                        fillOpacity: 1
+                    }
+                }).addTo(map);
+            }
+
+            dynamicLayerGroup = L.layerGroup().addTo(map);
+
+            let config = {};
+            // Charger la configuration dynamique
+            try {
+                const configRes = await fetch('/api/config?t=' + Date.now());
+                if (configRes.ok) {
+                    config = await configRes.json();
+                }
+            } catch (e) {
+                console.warn("Impossible de charger la config dynamique, repli par défaut", e);
+            }
+
+            applyPosterConfig(config);
+
+            // Listener pour la synchronisation en temps réel via postMessage
+            window.addEventListener('message', (event) => {
+                if (event.data && event.data.type === 'updateConfig') {
+                    applyPosterConfig(event.data.config);
+                }
+            });
+            
+            // Forcer un recalcul après 300ms au cas où l'iframe a été rendu à l'état masqué initialement
+            setTimeout(() => {
+                if (map) {
+                    map.invalidateSize();
+                    const markers = [];
+                    dynamicLayerGroup.eachLayer(layer => {
+                        if (layer instanceof L.Marker && !(layer.options.icon.options.className.includes('dept-label-print'))) {
+                            markers.push(layer);
+                        }
+                    });
+                    if (markers.length > 0) {
+                        const markersGroup = L.featureGroup(markers);
+                        map.fitBounds(markersGroup.getBounds(), {
+                            padding: [50, 50]
+                        });
+                    }
+                }
+            }, 300);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+{
+  "12 rue de wissembourg, 67300 schiltigheim||schiltigheim": {
+    "Latitude": 48.608782,
+    "Longitude": 7.747961,
+    "Postcode": "67300",
+    "DepartmentCode": "67",
+    "DepartmentName": "Bas-Rhin"
+  },
+  "3 rue de l\u0027industrie, 67800 bischheim||bischheim": {
+    "Latitude": 48.613914,
+    "Longitude": 7.742573,
+    "Postcode": "67800",
+    "DepartmentCode": "67",
+    "DepartmentName": "Bas-Rhin"
+  },
+  "20 route de lyon, 67400 illkirch-graffenstaden||illkirch": {
+    "Latitude": 48.529013,
+    "Longitude": 7.714542,
+    "Postcode": "67400",
+    "DepartmentCode": "67",
+    "DepartmentName": "Bas-Rhin"
+  },
+  "45 rue du mar\u00E9chal foch, 67380 lingolsheim||lingolsheim": {
+    "Latitude": 48.558632,
+    "Longitude": 7.687315,
+    "Postcode": "67380",
+    "DepartmentCode": "67",
+    "DepartmentName": "Bas-Rhin"
+  }
+}

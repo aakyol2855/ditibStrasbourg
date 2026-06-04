@@ -5,7 +5,7 @@ namespace DitibStasbourg.Services
 {
     public interface IMenuService
     {
-        Task<List<MenuItem>> GetUserMenuAsync(ClaimsPrincipal user);
+        Task<SidebarViewModel> GetSidebarMenuAsync(ClaimsPrincipal user);
         Task<List<MenuItem>> GetBreadcrumbsAsync(string controller, string action);
     }
 }

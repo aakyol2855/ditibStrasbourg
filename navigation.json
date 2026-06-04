@@ -1,86 +1,90 @@
-[
-  {
-    "Title": "Dashboard",
-    "Icon": "bi bi-speedometer2",
-    "Controller": "Home",
-    "Action": "Index",
-    "RequiredClaim": "Home-Index"
-  },
-  {
-    "Title": "Dernek İşlemleri",
-    "Icon": "bi bi-building",
-    "Controller": "DernekIslemleri",
-    "Action": "Index",
-    "RequiredClaim": "DernekIslemleri-Index"
-  },
-  {
-    "Title": "Görevli Yönetimi",
-    "Icon": "bi bi-person-badge",
-    "Controller": "Gorevli",
-    "Action": "Index",
-    "RequiredClaim": "Gorevli-Index"
-  },
-  {
-    "Title": "Kurban Bağış",
-    "Icon": "bi bi-heart-fill",
-    "Controller": "Kurban",
-    "Action": "Index",
-    "RequiredClaim": "Kurban-Index"
-  },
-  {
-    "Title": "Dinamik Tanımlamalar",
-    "Icon": "bi bi-gear-wide-connected",
-    "RequiredClaim": "Tanimlamalar-Index",
-    "Children": [
-      {
-        "Title": "Sistem Parametreleri",
-        "Icon": "bi bi-sliders",
-        "Controller": "Tanimlamalar",
-        "Action": "Index",
-        "RequiredClaim": "Tanimlamalar-Index"
-      },
-      {
-        "Title": "Sözlük Yönetimi",
-        "Icon": "bi bi-book",
-        "Controller": "LookupAdmin",
-        "Action": "Index",
-        "RequiredClaim": "LookupAdmin-Index"
-      },
-      {
-        "Title": "Kullanıcı Yönetimi",
-        "Icon": "bi bi-people",
-        "Controller": "UserManagement",
-        "Action": "Index",
-        "RequiredClaim": "UserManagement-Index"
-      },
-      {
-        "Title": "Rol ve Yetki Şablonları",
-        "Icon": "bi bi-shield-check",
-        "Controller": "RoleTemplate",
-        "Action": "Index",
-        "RequiredClaim": "RoleTemplate-Index"
-      }
-    ]
-  },
-  {
-    "Title": "Yönetici Araçları",
-    "Icon": "bi bi-tools",
-    "RequiredClaim": "SuperAdmin",
-    "Children": [
-      {
-        "Title": "Veri Bakım & Araçlar",
-        "Icon": "bi bi-database-fill-gear",
-        "Controller": "Admin",
-        "Action": "Index",
-        "RequiredClaim": "SuperAdmin"
-      },
-      {
-        "Title": "Sistem Günlüğü",
-        "Icon": "bi bi-journal-text",
-        "Controller": "Admin",
-        "Action": "Index",
-        "RequiredClaim": "SuperAdmin"
-      }
-    ]
-  }
-]
+{
+  "MainMenu": [
+    {
+      "Title": "Dashboard",
+      "Icon": "bi bi-speedometer2",
+      "Controller": "Home",
+      "Action": "Index",
+      "RequiredClaim": "Home-Index"
+    },
+    {
+      "Title": "Dernek İşlemleri",
+      "Icon": "bi bi-building",
+      "Controller": "DernekIslemleri",
+      "Action": "Index",
+      "RequiredClaim": "DernekIslemleri-Index"
+    },
+    {
+      "Title": "Görevli Yönetimi",
+      "Icon": "bi bi-person-badge",
+      "Controller": "Gorevli",
+      "Action": "Index",
+      "RequiredClaim": "Gorevli-Index"
+    },
+    {
+      "Title": "Kurban Bağış",
+      "Icon": "bi bi-heart-fill",
+      "Controller": "Kurban",
+      "Action": "Index",
+      "RequiredClaim": "Kurban-Index"
+    }
+  ],
+  "AdminMenu": [
+    {
+      "Title": "Dinamik Tanımlamalar",
+      "Icon": "bi bi-gear-wide-connected",
+      "RequiredClaim": "Tanimlamalar-Index",
+      "Children": [
+        {
+          "Title": "Sistem Parametreleri",
+          "Icon": "bi bi-sliders",
+          "Controller": "Tanimlamalar",
+          "Action": "Index",
+          "RequiredClaim": "Tanimlamalar-Index"
+        },
+        {
+          "Title": "Sözlük Yönetimi",
+          "Icon": "bi bi-book",
+          "Controller": "LookupAdmin",
+          "Action": "Index",
+          "RequiredClaim": "LookupAdmin-Index"
+        },
+        {
+          "Title": "Kullanıcı Yönetimi",
+          "Icon": "bi bi-people",
+          "Controller": "UserManagement",
+          "Action": "Index",
+          "RequiredClaim": "UserManagement-Index"
+        },
+        {
+          "Title": "Rol ve Yetki Şablonları",
+          "Icon": "bi bi-shield-check",
+          "Controller": "RoleTemplate",
+          "Action": "Index",
+          "RequiredClaim": "RoleTemplate-Index"
+        }
+      ]
+    },
+    {
+      "Title": "Yönetici Araçları",
+      "Icon": "bi bi-tools",
+      "RequiredClaim": "SuperAdmin",
+      "Children": [
+        {
+          "Title": "Veri Bakım & Araçlar",
+          "Icon": "bi bi-database-fill-gear",
+          "Controller": "Admin",
+          "Action": "Index",
+          "RequiredClaim": "SuperAdmin"
+        },
+        {
+          "Title": "Sistem Günlüğü",
+          "Icon": "bi bi-journal-text",
+          "Controller": "Admin",
+          "Action": "Index",
+          "RequiredClaim": "SuperAdmin"
+        }
+      ]
+    }
+  ]
+}

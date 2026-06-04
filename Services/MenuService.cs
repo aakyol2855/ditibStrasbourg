@@ -2,6 +2,11 @@ using System.Security.Claims;
 using System.Text.Json;
 using DitibStasbourg.Models.Navigation;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DitibStasbourg.Services
 {
@@ -17,31 +22,36 @@ namespace DitibStasbourg.Services
             _cache = cache;
         }
 
-        private async Task<List<MenuItem>> GetAllMenuItemsAsync()
+        private async Task<NavigationConfig> GetNavigationConfigAsync()
         {
-            if (!_cache.TryGetValue(CacheKey, out List<MenuItem>? menuItems))
+            if (!_cache.TryGetValue(CacheKey, out NavigationConfig? config))
             {
                 var filePath = Path.Combine(_env.ContentRootPath, "navigation.json");
                 if (File.Exists(filePath))
                 {
                     var json = await File.ReadAllTextAsync(filePath);
-                    menuItems = JsonSerializer.Deserialize<List<MenuItem>>(json) ?? new List<MenuItem>();
+                    config = JsonSerializer.Deserialize<NavigationConfig>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new NavigationConfig();
                 }
                 else
                 {
-                    menuItems = new List<MenuItem>();
+                    config = new NavigationConfig();
                 }
 
-                _cache.Set(CacheKey, menuItems, TimeSpan.FromMinutes(30));
+                _cache.Set(CacheKey, config, TimeSpan.FromMinutes(30));
             }
 
-            return menuItems ?? new List<MenuItem>();
+            return config ?? new NavigationConfig();
         }
 
-        public async Task<List<MenuItem>> GetUserMenuAsync(ClaimsPrincipal user)
+        public async Task<SidebarViewModel> GetSidebarMenuAsync(ClaimsPrincipal user)
         {
-            var allItems = await GetAllMenuItemsAsync();
-            return FilterMenuForUser(allItems, user);
+            var config = await GetNavigationConfigAsync();
+            
+            return new SidebarViewModel
+            {
+                MainMenu = FilterMenuForUser(config.MainMenu, user),
+                AdminMenu = FilterMenuForUser(config.AdminMenu, user)
+            };
         }
 
         private List<MenuItem> FilterMenuForUser(List<MenuItem> items, ClaimsPrincipal user)
@@ -50,8 +60,6 @@ namespace DitibStasbourg.Services
 
             foreach (var item in items)
             {
-                // If it requires a claim and user doesn't have it, skip entirely
-                // Special case: If RequiredClaim is "SuperAdmin", check role too
                 bool hasAccess = false;
                 if (string.IsNullOrEmpty(item.RequiredClaim))
                 {
@@ -81,7 +89,6 @@ namespace DitibStasbourg.Services
                 {
                     clone.Children = FilterMenuForUser(item.Children, user);
                     
-                    // If it's a parent menu (no direct link) and all children were filtered out, hide the parent too
                     if (string.IsNullOrEmpty(clone.Controller) && !clone.Children.Any())
                     {
                         continue;
@@ -96,7 +103,11 @@ namespace DitibStasbourg.Services
 
         public async Task<List<MenuItem>> GetBreadcrumbsAsync(string controller, string action)
         {
-            var allItems = await GetAllMenuItemsAsync();
+            var config = await GetNavigationConfigAsync();
+            var allItems = new List<MenuItem>();
+            allItems.AddRange(config.MainMenu);
+            allItems.AddRange(config.AdminMenu);
+            
             var trail = new List<MenuItem>();
             FindTrail(allItems, controller, action, trail);
             return trail;
@@ -129,6 +140,12 @@ namespace DitibStasbourg.Services
             }
 
             return false;
+        }
+
+        private class NavigationConfig
+        {
+            public List<MenuItem> MainMenu { get; set; } = new();
+            public List<MenuItem> AdminMenu { get; set; } = new();
         }
     }
 }
