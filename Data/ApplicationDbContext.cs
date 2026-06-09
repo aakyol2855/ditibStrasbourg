@@ -47,6 +47,7 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<Kurbanlik> Kurbanliklar { get; set; }
     public DbSet<Hissedar> Hissedarlar { get; set; }
     public DbSet<DashboardPreference> DashboardPreferences { get; set; }
+    public DbSet<SystemAuditLog> SystemAuditLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

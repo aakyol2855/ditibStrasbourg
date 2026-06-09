@@ -71,7 +71,7 @@ namespace DitibStasbourg.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!_context.Ref_GorevliDurums.Any(e => e.Id == id)) return NotFound();
+                    if (!await _context.Ref_GorevliDurums.AnyAsync(e => e.Id == id)) return NotFound();
                     else throw;
                 }
                 return RedirectToAction(nameof(GorevliDurumList));
@@ -182,8 +182,6 @@ namespace DitibStasbourg.Controllers
                  .OrderBy(x => x.Ad)
                 .ToListAsync());
         }
-        
-        // Similar CRUD for KurumTuru - Implementing basic list for now, will expand if needed or assume copy-paste pattern
         
         public IActionResult KurumTuruCreate() => View();
         

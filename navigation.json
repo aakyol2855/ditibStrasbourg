@@ -74,14 +74,14 @@
           "Title": "Veri Bakım & Araçlar",
           "Icon": "bi bi-database-fill-gear",
           "Controller": "Admin",
-          "Action": "Index",
+          "Action": "DataMaintenance",
           "RequiredClaim": "SuperAdmin"
         },
         {
           "Title": "Sistem Günlüğü",
           "Icon": "bi bi-journal-text",
           "Controller": "Admin",
-          "Action": "Index",
+          "Action": "SystemLog",
           "RequiredClaim": "SuperAdmin"
         }
       ]

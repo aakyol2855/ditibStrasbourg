@@ -14,6 +14,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
                        throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD")
+    ?? throw new InvalidOperationException(
+        "Required environment variable 'DB_PASSWORD' is not set. " +
+        "Set it via your container environment, .env file (gitignored), or OS secrets manager.");
+connectionString = connectionString.Replace("{DB_PASSWORD}", dbPassword);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddScoped<ILookupService, LookupService>();
@@ -29,7 +34,11 @@ builder.Services.AddScoped<IAssociationImportService, AssociationImportService>(
 builder.Services.AddScoped<IKurbanService, KurbanService>();
 builder.Services.AddScoped<IDashboardPreferenceService, DashboardPreferenceService>();
 builder.Services.AddScoped<IDynamicExportService, DynamicExportService>();
+builder.Services.AddScoped<ISystemAuditLogService, SystemAuditLogService>();
+builder.Services.AddScoped<IDataMaintenanceService, DataMaintenanceService>();
+builder.Services.AddSingleton<ImportProgressTracker>();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+builder.Services.AddHttpContextAccessor();
 
 // Register application services
 builder.Services.AddMemoryCache();

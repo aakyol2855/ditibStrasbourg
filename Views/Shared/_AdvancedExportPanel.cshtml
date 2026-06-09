@@ -1,0 +1,319 @@
+@*
+   _AdvancedExportPanel.cshtml — Glassmorphic Dynamic Excel Export Panel
+   ─────────────────────────────────────────────────────────────────────
+   Usage:  @await Html.PartialAsync("_AdvancedExportPanel", "Gorevli")
+   Modules: Gorevli | Dernek | Hissedar | Kurbanlik
+*@
+@model string
+@{
+    // Compute a CSS-safe unique ID for this panel instance
+    var pid = "ep-" + Model.ToLower().Replace(" ", "-");
+    var qFormId  = pid + "-qf";
+    var fFormId  = pid + "-ff";
+    var gridId   = pid + "-grid";
+    var countId  = pid + "-cnt";
+    var badgeId  = pid + "-rbadge";
+    var rowCntId = pid + "-rcnt";
+    var colsId   = pid + "-cols";
+}
+
+<style type="text/css">
+    .@(pid) {
+        background: rgba(255,255,255,0.07);
+        backdrop-filter: blur(18px) saturate(1.6);
+        -webkit-backdrop-filter: blur(18px) saturate(1.6);
+        border: 1px solid rgba(255,255,255,0.15);
+        border-radius: 1.25rem;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.18);
+        padding: 1.4rem 1.75rem 1.6rem;
+        margin-bottom: 1.5rem;
+        transition: box-shadow 0.3s ease;
+    }
+    .@(pid):hover {
+        box-shadow: 0 14px 40px rgba(30,58,95,0.35), inset 0 1px 0 rgba(255,255,255,0.22);
+    }
+    .@(pid) .ep-header {
+        display: flex; align-items: center; gap: 0.6rem;
+        cursor: pointer; user-select: none;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid rgba(255,255,255,0.12);
+        margin-bottom: 1.1rem;
+    }
+    .@(pid) .ep-header h6 {
+        font-size: 0.78rem; font-weight: 700;
+        letter-spacing: 0.08em; text-transform: uppercase;
+        color: rgba(255,255,255,0.85); margin: 0; flex: 1;
+    }
+    .@(pid) .ep-chevron {
+        color: rgba(255,255,255,0.5);
+        transition: transform 0.25s ease;
+        font-size: 0.75rem;
+    }
+    .@(pid).ep-closed .ep-chevron { transform: rotate(-90deg); }
+    .@(pid) .ep-body { display: block; }
+    .@(pid).ep-closed .ep-body { display: none; }
+    .@(pid) .ep-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+        gap: 0.42rem 0.9rem;
+        max-height: 215px; overflow-y: auto;
+        padding-right: 0.4rem; margin-bottom: 1rem;
+        scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.2) transparent;
+    }
+    .@(pid) .ep-grid::-webkit-scrollbar { width: 4px; }
+    .@(pid) .ep-grid::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.22); border-radius: 2px; }
+    .@(pid) .ep-col-item {
+        display: flex; align-items: center; gap: 0.45rem;
+        padding: 0.28rem 0.5rem;
+        background: rgba(255,255,255,0.055);
+        border-radius: 0.45rem;
+        border: 1px solid rgba(255,255,255,0.08);
+        cursor: pointer;
+        transition: background 0.15s, border-color 0.15s;
+    }
+    .@(pid) .ep-col-item:hover,
+    .@(pid) .ep-col-item.ep-on {
+        background: rgba(59,130,246,0.22);
+        border-color: rgba(59,130,246,0.45);
+    }
+    .@(pid) .ep-col-item input[type="checkbox"] {
+        accent-color: #3b82f6; width: 13px; height: 13px; flex-shrink: 0; cursor: pointer;
+    }
+    .@(pid) .ep-col-item label {
+        font-size: 0.72rem; color: rgba(255,255,255,0.8);
+        cursor: pointer; margin: 0;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .@(pid) .ep-loading {
+        display: flex; align-items: center; gap: 0.5rem;
+        color: rgba(255,255,255,0.45); font-size: 0.77rem;
+        padding: 0.5rem;
+    }
+    .@(pid) .ep-loading .spinner-border { width: 13px; height: 13px; border-width: 2px; }
+    .@(pid) .ep-actions {
+        display: flex; flex-wrap: wrap; gap: 0.55rem; align-items: center;
+    }
+    .@(pid) .ep-cnt {
+        font-size: 0.69rem; color: rgba(255,255,255,0.45); margin-left: auto;
+    }
+    .@(pid) .ep-row-badge {
+        font-size: 0.69rem; color: rgba(251,191,36,0.8);
+        display: none; align-items: center; gap: 0.35rem; margin-top: 0.5rem;
+    }
+    .ep-btn-quick {
+        background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+        color: #fff; border: none; border-radius: 0.6rem;
+        padding: 0.42rem 1rem; font-size: 0.77rem; font-weight: 600;
+        cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem;
+        box-shadow: 0 2px 8px rgba(37,99,235,0.35);
+        transition: transform 0.14s, box-shadow 0.14s;
+    }
+    .ep-btn-quick:hover { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(37,99,235,0.5); }
+    .ep-btn-filtered {
+        background: linear-gradient(135deg, #065f46 0%, #10b981 100%);
+        color: #fff; border: none; border-radius: 0.6rem;
+        padding: 0.42rem 1rem; font-size: 0.77rem; font-weight: 600;
+        cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem;
+        box-shadow: 0 2px 8px rgba(16,185,129,0.35);
+        transition: transform 0.14s, box-shadow 0.14s;
+    }
+    .ep-btn-filtered:hover { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(16,185,129,0.5); }
+    .ep-btn-selall {
+        background: transparent;
+        border: 1px solid rgba(255,255,255,0.18);
+        color: rgba(255,255,255,0.6);
+        border-radius: 0.45rem; padding: 0.38rem 0.8rem;
+        font-size: 0.71rem; cursor: pointer;
+        transition: all 0.14s;
+    }
+    .ep-btn-selall:hover { border-color: rgba(255,255,255,0.38); color: rgba(255,255,255,0.88); }
+</style>
+
+<div class="@(pid) ep-closed">
+    <div class="ep-header" onclick="epToggle('@pid')">
+        <i class="bi bi-file-earmark-spreadsheet-fill" style="color:#22c55e;font-size:1rem;"></i>
+        <h6>&#x1F4CA; Gelişmiş Raporlama &amp; Excel Dışa Aktarım</h6>
+        <span class="ep-chevron"><i class="bi bi-chevron-down"></i></span>
+    </div>
+
+    <div class="ep-body">
+        <p style="font-size:0.71rem;color:rgba(255,255,255,0.5);margin-bottom:0.65rem;">
+            Dışa aktarılacak sütunları seçin veya <strong style="color:rgba(255,255,255,0.7);">Hızlı Dışa Aktarım</strong> ile tüm standart sütunları indirin.
+        </p>
+
+        <div class="ep-grid" id="@gridId">
+            <div class="ep-loading">
+                <div class="spinner-border text-light" role="status">
+                    <span class="visually-hidden">Yükleniyor...</span>
+                </div>
+                <span>Sütun şeması yükleniyor...</span>
+            </div>
+        </div>
+
+        <div class="ep-actions">
+            <button type="button" class="ep-btn-quick"
+                    onclick="epQuickExport('@Model','@pid')">
+                <i class="bi bi-lightning-fill"></i>
+                Hızlı Dışa Aktarım (Tüm Standart Sütunlar)
+            </button>
+
+            <button type="button" class="ep-btn-filtered"
+                    onclick="epFilteredExport('@Model','@pid')">
+                <i class="bi bi-funnel-fill"></i>
+                Seçili Sütunları İndir
+            </button>
+
+            <button type="button" class="ep-btn-selall"
+                    onclick="epToggleAll('@pid')">
+                <i class="bi bi-check2-all"></i> Tümünü Seç / Temizle
+            </button>
+
+            <span class="ep-cnt" id="@countId">0 sütun seçili</span>
+        </div>
+
+        <div class="ep-row-badge" id="@badgeId">
+            <i class="bi bi-filter-circle-fill"></i>
+            <span id="@rowCntId"></span> satır seçili — yalnızca bu satırlar aktarılacak.
+        </div>
+    </div>
+</div>
+
+<form id="@qFormId" method="post" action="/Export/Quick" style="display:none">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="module" value="@Model" />
+    <input type="hidden" name="selectedIds" id="@(pid)-qids" />
+</form>
+
+<form id="@fFormId" method="post" action="/Export/Filtered" style="display:none">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="module" value="@Model" />
+    <input type="hidden" name="selectedIds" id="@(pid)-fids" />
+    <div id="@colsId"></div>
+</form>
+
+<script>
+(function () {
+    'use strict';
+    var PID     = '@pid';
+    var MOD     = '@Model';
+    var GRID    = '@gridId';
+    var CNT     = '@countId';
+    var BADGE   = '@badgeId';
+    var ROWCNT  = '@rowCntId';
+    var COLS_ID = '@colsId';
+    var QFID    = '@qFormId';
+    var FFID    = '@fFormId';
+    var _loaded = false;
+
+    window.epToggle = window.epToggle || function (id) {};
+    window.epToggle = function (id) {
+        var el = document.querySelector('.' + id);
+        if (!el) return;
+        var closing = !el.classList.contains('ep-closed');
+        el.classList.toggle('ep-closed', closing);
+        if (!closing && !_loaded) { _loaded = true; _fetchCols(); }
+    };
+
+    function _fetchCols() {
+        fetch('/Export/Columns?module=' + encodeURIComponent(MOD))
+            .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+            .then(_renderGrid)
+            .catch(function () {
+                var g = document.getElementById(GRID);
+                if (g) g.innerHTML = '<span style="color:rgba(255,100,100,0.8);font-size:0.74rem;">' +
+                    '<i class="bi bi-exclamation-triangle-fill me-1"></i>Sütun listesi yüklenemedi.</span>';
+            });
+    }
+
+    function _renderGrid(cols) {
+        var grid = document.getElementById(GRID);
+        if (!grid) return;
+        grid.innerHTML = '';
+        cols.forEach(function (col) {
+            var wrap = document.createElement('div');
+            wrap.className = 'ep-col-item' + (col.includeInQuickExport ? ' ep-on' : '');
+
+            var cb    = document.createElement('input');
+            cb.type   = 'checkbox';
+            cb.id     = PID + '-c-' + col.propertyName;
+            cb.value  = col.propertyName;
+            cb.checked = !!col.includeInQuickExport;
+            cb.addEventListener('change', function () {
+                wrap.classList.toggle('ep-on', cb.checked);
+                _updateCount();
+            });
+
+            var lbl = document.createElement('label');
+            lbl.htmlFor     = cb.id;
+            lbl.title       = col.displayName;
+            lbl.textContent = col.displayName;
+
+            wrap.appendChild(cb);
+            wrap.appendChild(lbl);
+            grid.appendChild(wrap);
+        });
+        _updateCount();
+        _updateBadge();
+    }
+
+    function _updateCount() {
+        var n  = document.querySelectorAll('#' + GRID + ' input:checked').length;
+        var el = document.getElementById(CNT);
+        if (el) el.textContent = n + ' sütun seçili';
+    }
+
+    window.epToggleAll = window.epToggleAll || function () {};
+    window.epToggleAll = function (id) {
+        if (id !== PID) return;
+        var boxes = document.querySelectorAll('#' + GRID + ' input[type="checkbox"]');
+        var allOn = true;
+        boxes.forEach(function (b) { if (!b.checked) allOn = false; });
+        boxes.forEach(function (b) {
+            b.checked = !allOn;
+            var item = b.closest('.ep-col-item');
+            if (item) item.classList.toggle('ep-on', !allOn);
+        });
+        _updateCount();
+    };
+
+    function _updateBadge() {
+        var ids   = window.selectedEntityIds || [];
+        var badge = document.getElementById(BADGE);
+        var cnt   = document.getElementById(ROWCNT);
+        if (!badge) return;
+        if (ids.length > 0) {
+            badge.style.display = 'flex';
+            if (cnt) cnt.textContent = ids.length;
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+
+    window.epQuickExport = window.epQuickExport || function () {};
+    window.epQuickExport = function (mod, id) {
+        if (id !== PID) return;
+        var ids = window.selectedEntityIds || [];
+        document.getElementById(PID + '-qids').value = ids.length ? JSON.stringify(ids) : '';
+        document.getElementById(QFID).submit();
+    };
+
+    window.epFilteredExport = window.epFilteredExport || function () {};
+    window.epFilteredExport = function (mod, id) {
+        if (id !== PID) return;
+        var checked = document.querySelectorAll('#' + GRID + ' input:checked');
+        if (!checked.length) { alert('Lütfen en az bir sütun seçin.'); return; }
+        var colsDiv = document.getElementById(COLS_ID);
+        colsDiv.innerHTML = '';
+        checked.forEach(function (box) {
+            var inp = document.createElement('input');
+            inp.type = 'hidden'; inp.name = 'columns'; inp.value = box.value;
+            colsDiv.appendChild(inp);
+        });
+        var ids = window.selectedEntityIds || [];
+        document.getElementById(PID + '-fids').value = ids.length ? JSON.stringify(ids) : '';
+        document.getElementById(FFID).submit();
+    };
+
+    window.epUpdateRowBadge = _updateBadge;
+}());
+</script>

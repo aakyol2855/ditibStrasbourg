@@ -1,0 +1,493 @@
+@model DitibStasbourg.Models.ViewModels.DataMaintenanceViewModel
+@{
+    ViewData["Title"] = "Veri Bakım & Akıllı Migratör";
+}
+
+<style>
+    /* Premium Data Maintenance & Migrator CSS Styling */
+    .maintenance-card {
+        border-radius: var(--border-radius-lg);
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        box-shadow: 0 4px 25px -3px rgba(15, 23, 42, 0.04);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+    }
+
+    .maintenance-card:hover {
+        box-shadow: 0 12px 30px -5px rgba(15, 23, 42, 0.08);
+        border-color: rgba(30, 64, 175, 0.2);
+    }
+
+    .dropzone-area {
+        border: 2px dashed #cbd5e1;
+        background: rgba(248, 250, 252, 0.6);
+        border-radius: var(--border-radius-md);
+        padding: 2.5rem 1.5rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .dropzone-area:hover, .dropzone-area.dragover {
+        border-color: #3b82f6;
+        background: rgba(59, 130, 246, 0.05);
+    }
+
+    .terminal-console {
+        background: #0f172a;
+        color: #38bdf8;
+        font-family: 'Courier New', Courier, monospace;
+        border-radius: var(--border-radius-md);
+        padding: 1rem;
+        max-height: 200px;
+        overflow-y: auto;
+        font-size: 0.85rem;
+        box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    .stat-badge {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 fw-bold text-slate-800 d-flex align-items-center gap-2">
+                <i class="bi bi-shield-shaded text-primary"></i> Veri Bakım & Akıllı Migratör
+            </h1>
+            <p class="text-muted mb-0">Contextual mükerrer tespiti, otomatik çift tıklama veri temizliği ve memory-optimized Excel yükleme merkezi.</p>
+        </div>
+        <div>
+            <a href="/Admin/Index" class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1">
+                <i class="bi bi-arrow-left"></i> Yönetim Paneline Dön
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="maintenance-card p-3 d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="stat-label">Toplam Darboğaz</span>
+                    <div class="stat-badge mt-1" id="stat-total">@Model.TotalPotentialBottlenecks</div>
+                </div>
+                <div class="bg-light p-2 rounded text-danger fs-3">
+                    <i class="bi bi-exclamation-octagon"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="maintenance-card p-3 d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="stat-label">Hissedar Mükerrer</span>
+                    <div class="stat-badge mt-1" id="stat-hissedar">@Model.HissedarDuplicatesCount</div>
+                </div>
+                <div class="bg-light p-2 rounded text-warning fs-3">
+                    <i class="bi bi-people"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="maintenance-card p-3 d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="stat-label">Görevli Mükerrer</span>
+                    <div class="stat-badge mt-1" id="stat-gorevli">@Model.GorevliDuplicatesCount</div>
+                </div>
+                <div class="bg-light p-2 rounded text-info fs-3">
+                    <i class="bi bi-person-badge"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="maintenance-card p-3 d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="stat-label">Dernek Mükerrer</span>
+                    <div class="stat-badge mt-1" id="stat-dernek">@Model.DernekDuplicatesCount</div>
+                </div>
+                <div class="bg-light p-2 rounded text-success fs-3">
+                    <i class="bi bi-building"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Module A: Smart Maintenance Tracker -->
+        <div class="col-lg-7">
+            <div class="maintenance-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <h5 class="fw-bold text-slate-800 m-0 d-flex align-items-center gap-2">
+                        <i class="bi bi-regex text-danger"></i> Akıllı Mükerrer Tespiti & Temizliği
+                    </h5>
+                    <div class="d-flex gap-2">
+                        <button id="btn-delete-selected-dupes" class="btn btn-sm btn-danger d-flex align-items-center gap-1" disabled onclick="deleteSelectedDuplicates()">
+                            <i class="bi bi-trash-fill"></i> Seçilenleri Güvenli Sil
+                        </button>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-danger dropdown-toggle" type="button" id="purgeDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-trash3-fill"></i> Sistem Şişmelerini Temizle
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="purgeDropdown">
+                                <li><a class="dropdown-menu-item dropdown-item text-danger" href="javascript:void(0)" onclick="purgeModuleDuplicates('Hissedar')">Kurban Hissedar Çift Tıklamaları</a></li>
+                                <li><a class="dropdown-menu-item dropdown-item" href="javascript:void(0)" onclick="purgeModuleDuplicates('Gorevli')">Görevli Mükerrerleri</a></li>
+                                <li><a class="dropdown-menu-item dropdown-item" href="javascript:void(0)" onclick="purgeModuleDuplicates('Dernek')">Dernek Mükerrerleri</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive" style="max-height: 480px; overflow-y: auto;">
+                    <table class="table table-hover align-middle" id="duplicates-table">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th style="width: 5%;"><input type="checkbox" id="select-all-dupes" class="form-check-input" /></th>
+                                <th>Ad / Kurum / Modül</th>
+                                <th>Zaman Farkı</th>
+                                <th>Detaylı Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!Model.FlaggedDuplicates.Any())
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center py-4 text-muted">
+                                        <i class="bi bi-check2-circle text-success fs-2 d-block mb-2"></i>
+                                        Sistemde herhangi bir mükerrer veya çakışan kayıt bulunamadı. Veri tabanı optimize edilmiş durumda.
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var item in Model.FlaggedDuplicates)
+                                {
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" class="dupe-checkbox form-check-input" value="@item.Id" data-module="@item.TargetModule" />
+                                        </td>
+                                        <td>
+                                            <div class="fw-semibold text-slate-800">@item.Name</div>
+                                            <span class="badge @(item.TargetModule == "Hissedar" ? "bg-warning text-dark" : item.TargetModule == "Gorevli" ? "bg-info text-dark" : "bg-success") btn-xs">
+                                                @item.TargetModule
+                                            </span>
+                                        </td>
+                                        <td>
+                                            @if (item.TimeGapSeconds.HasValue)
+                                            {
+                                                <span class="text-danger fw-semibold">
+                                                    <i class="bi bi-clock-history"></i> @item.TimeGapSeconds.Value.ToString("F1") sn
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                        <td class="text-muted small">@item.Details</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Module B: High-Volume Data Migrator -->
+        <div class="col-lg-5">
+            <div class="maintenance-card p-4 h-100">
+                <h5 class="fw-bold text-slate-800 mb-3 d-flex align-items-center gap-2">
+                    <i class="bi bi-cloud-arrow-up-fill text-primary"></i> Parça Parça Excel Veri Yükleyici
+                </h5>
+                <p class="text-muted small">Büyük boyutlu Excel dosyalarını sunucu tarafında memory-optimized pipeline kullanarak 50'şerlik transaction batch'leri ile okur ve asenkron aktarır.</p>
+
+                <!-- Context Form -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold text-slate-700">Hedef Veri Şablonu</label>
+                    <select class="form-select" id="import-module" onchange="updateDownloadLink()">
+                        <option value="Kurban">Kurbanlık Hayvan Listesi</option>
+                        <option value="Gorevli">Görevli Kadrosu Listesi</option>
+                        <option value="Dernek" selected>Dernek Listesi (DERNEK ASIL İSİM VE ADRESLERİ.xlsx)</option>
+                    </select>
+                    <div class="mt-2 text-end">
+                        <a href="/Admin/DownloadSampleExcel?module=Dernek" id="download-template-link" class="btn btn-link btn-sm p-0 text-primary text-decoration-none small">
+                            <i class="bi bi-download"></i> Seçili Şablon Excel Dosyasını İndir
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Dropzone Area -->
+                <div class="mb-4">
+                    <div class="dropzone-area" id="dropzone" onclick="document.getElementById('excel-file').click()">
+                        <i class="bi bi-file-earmark-excel-fill text-success fs-1 mb-2 d-block"></i>
+                        <span class="fw-semibold text-slate-700 d-block">Yüklemek istediğiniz .xlsx dosyasını sürükleyin</span>
+                        <span class="text-muted small">veya gözatmak için buraya tıklayın</span>
+                        <input type="file" id="excel-file" accept=".xlsx" class="d-none" onchange="handleFileSelected(this.files)" />
+                    </div>
+                    <div id="file-name" class="mt-2 small fw-semibold text-primary d-none"></div>
+                </div>
+
+                <!-- Action Button -->
+                <button class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2 mb-4" id="btn-start-import" disabled onclick="startExcelImport()">
+                    <i class="bi bi-play-circle-fill"></i> İçe Aktarma İşlemini Başlat
+                </button>
+
+                <!-- Progress Section -->
+                <div id="progress-container" class="d-none mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="small fw-semibold text-slate-700">Aktarım Durumu</span>
+                        <span class="small fw-bold text-primary" id="progress-percentage">0%</span>
+                    </div>
+                    <div class="progress" style="height: 10px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;" id="import-progress-bar"></div>
+                    </div>
+                </div>
+
+                <!-- Console Output -->
+                <div>
+                    <label class="form-label fw-semibold text-slate-700">Pipeline Terminal Çıktısı</label>
+                    <div class="terminal-console" id="terminal">
+                        [READY] Dosya yüklenmeye hazır. Lütfen bir şablon seçip Excel belgesi ekleyin...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    let selectedFile = null;
+    let progressInterval = null;
+
+    function logToTerminal(message, isError = false) {
+        const terminal = document.getElementById('terminal');
+        const timestamp = new Date().toLocaleTimeString();
+        const color = isError ? 'text-danger' : 'text-info';
+        terminal.innerHTML += `<div class="${color}">[${timestamp}] ${message}</div>`;
+        terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    function handleFileSelected(files) {
+        if (files.length > 0) {
+            selectedFile = files[0];
+            const fileNameDiv = document.getElementById('file-name');
+            fileNameDiv.innerText = `Seçilen Dosya: ${selectedFile.name} (${(selectedFile.size / 1024).toFixed(1)} KB)`;
+            fileNameDiv.classList.remove('d-none');
+            document.getElementById('btn-start-import').disabled = false;
+            logToTerminal(`Dosya seçildi: ${selectedFile.name}`);
+        }
+    }
+
+    // Drag and Drop implementation
+    const dropzone = document.getElementById('dropzone');
+    dropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropzone.classList.add('dragover');
+    });
+    dropzone.addEventListener('dragleave', () => {
+        dropzone.classList.remove('dragover');
+    });
+    dropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('dragover');
+        if (e.dataTransfer.files.length > 0) {
+            handleFileSelected(e.dataTransfer.files);
+        }
+    });
+
+    async function purgeModuleDuplicates(module) {
+        if (!confirm(`${module} modülündeki mükerrer kayıtları temizlemek istediğinizden emin misiniz?`)) return;
+
+        try {
+            const response = await fetch(`/Admin/PurgeDuplicates?module=${module}`, {
+                method: 'POST'
+            });
+            const result = await response.json();
+            if (result.success) {
+                alert(`${result.count} adet mükerrer kayıt sistemden başarıyla temizlendi.`);
+                location.reload();
+            } else {
+                alert('Mükerrer temizleme işlemi sırasında bir hata oluştu.');
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Sunucuyla bağlantı kurulamadı.');
+        }
+    }
+
+    function startExcelImport() {
+        if (!selectedFile) return;
+
+        const module = document.getElementById('import-module').value;
+        const progressKey = 'progress_' + Math.random().toString(36).substring(2, 15);
+        
+        document.getElementById('btn-start-import').disabled = true;
+        document.getElementById('import-module').disabled = true;
+        document.getElementById('progress-container').classList.remove('d-none');
+        
+        logToTerminal(`İthalat başlatılıyor... Modül: ${module}`);
+        logToTerminal(`Stream kanalı açılıyor, chunking aktif.`);
+
+        // Start progress polling
+        progressInterval = setInterval(async () => {
+            try {
+                const res = await fetch(`/Admin/GetImportProgress?key=${progressKey}`);
+                const data = await res.json();
+                const progress = data.progress;
+
+                if (progress === -1) {
+                    clearInterval(progressInterval);
+                    logToTerminal('İthalat sırasında hata algılandı! İşlem iptal edildi.', true);
+                    document.getElementById('import-progress-bar').classList.add('bg-danger');
+                    resetFormState();
+                } else {
+                    document.getElementById('import-progress-bar').style.width = progress + '%';
+                    document.getElementById('progress-percentage').innerText = progress + '%';
+                    logToTerminal(`Batch aktarım durumu: %${progress}`);
+                    
+                    if (progress >= 100) {
+                        clearInterval(progressInterval);
+                        logToTerminal('Excel belgesi parça parça başarıyla veritabanına aktarıldı ve transaction commit edildi.');
+                        document.getElementById('import-progress-bar').classList.remove('progress-bar-animated');
+                        document.getElementById('import-progress-bar').classList.add('bg-success');
+                        setTimeout(() => {
+                            alert('Excel veri aktarımı başarıyla tamamlandı!');
+                            location.reload();
+                        }, 1000);
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }, 800);
+
+        // Perform actual upload via AJAX form data
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        formData.append('module', module);
+        formData.append('progressKey', progressKey);
+
+        fetch('/Admin/UploadExcel', {
+            method: 'POST',
+            body: formData
+        }).then(async (response) => {
+            const result = await response.json();
+            if (!result.success) {
+                clearInterval(progressInterval);
+                logToTerminal(`Sunucu Hatası: ${result.message}`, true);
+                document.getElementById('import-progress-bar').classList.add('bg-danger');
+                resetFormState();
+            }
+        }).catch((err) => {
+            clearInterval(progressInterval);
+            logToTerminal(`Bağlantı Hatası: ${err.message}`, true);
+            resetFormState();
+        });
+    }
+
+    function resetFormState() {
+        document.getElementById('btn-start-import').disabled = false;
+        document.getElementById('import-module').disabled = false;
+    }
+
+    function updateDownloadLink() {
+        const module = document.getElementById('import-module').value;
+        const link = document.getElementById('download-template-link');
+        link.href = `/Admin/DownloadSampleExcel?module=${module}`;
+    }
+
+    $(document).ready(function() {
+        // Master checkbox logic
+        $('#select-all-dupes').on('change', function() {
+            const isChecked = $(this).is(':checked');
+            $('.dupe-checkbox').prop('checked', isChecked);
+            updateDeleteSelectedDupesButton();
+        });
+
+        // Individual checkbox change
+        $(document).on('change', '.dupe-checkbox', function() {
+            const total = $('.dupe-checkbox').length;
+            const checked = $('.dupe-checkbox:checked').length;
+            $('#select-all-dupes').prop('checked', total === checked && total > 0);
+            updateDeleteSelectedDupesButton();
+        });
+
+        function updateDeleteSelectedDupesButton() {
+            const checkedCount = $('.dupe-checkbox:checked').length;
+            const btn = $('#btn-delete-selected-dupes');
+            btn.prop('disabled', checkedCount === 0);
+            if (checkedCount > 0) {
+                btn.html(`<i class="bi bi-trash-fill"></i> Seçilenleri Güvenli Sil (${checkedCount})`);
+            } else {
+                btn.html(`<i class="bi bi-trash-fill"></i> Seçilenleri Güvenli Sil`);
+            }
+        }
+    });
+
+    async function deleteSelectedDuplicates() {
+        const checkedBoxes = document.querySelectorAll('.dupe-checkbox:checked');
+        if (checkedBoxes.length === 0) return;
+
+        if (!confirm(`Seçilen ${checkedBoxes.length} kaydı güvenli bir şekilde silmek istediğinize emin misiniz?`)) return;
+
+        // Group ids by module
+        const groups = {};
+        checkedBoxes.forEach(cb => {
+            const mod = cb.getAttribute('data-module');
+            const id = parseInt(cb.value);
+            if (!groups[mod]) {
+                groups[mod] = [];
+            }
+            groups[mod].push(id);
+        });
+
+        let successCount = 0;
+        let errors = [];
+
+        for (const module in groups) {
+            const ids = groups[module];
+            try {
+                const response = await fetch(`/Admin/BatchDelete?module=${module}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(ids)
+                });
+                const result = await response.json();
+                if (result.success) {
+                    successCount += ids.length;
+                } else {
+                    errors.push(`${module}: ${result.message}`);
+                }
+            } catch (e) {
+                console.error(e);
+                errors.push(`${module} modülünde sunucu hatası.`);
+            }
+        }
+
+        if (errors.length > 0) {
+            alert('Bazı silme işlemleri başarısız oldu:\n' + errors.join('\n'));
+        }
+
+        if (successCount > 0) {
+            alert(`${successCount} adet seçilmiş mükerrer kayıt güvenli şekilde silindi.`);
+            location.reload();
+        }
+    }
+</script>
+}

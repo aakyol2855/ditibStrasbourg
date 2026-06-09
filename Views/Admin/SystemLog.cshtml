@@ -1,0 +1,453 @@
+@model DitibStasbourg.Models.ViewModels.SystemLogViewModel
+@{
+    ViewData["Title"] = "Sistem Günlüğü & DevOps Dashboard";
+}
+
+<style>
+    /* Premium Glassmorphic & Modern Dashboard Styling */
+    .metric-card {
+        border-radius: var(--border-radius-lg);
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+        border-color: rgba(30, 64, 175, 0.25);
+    }
+    
+    .metric-icon-wrapper {
+        width: 48px;
+        height: 48px;
+        border-radius: var(--border-radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+    
+    /* Pulsing Status Indicators */
+    .status-pulse {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+        position: relative;
+    }
+    
+    .status-pulse-green {
+        background-color: var(--platform-success);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+        animation: pulse-green 2s infinite;
+    }
+    
+    .status-pulse-red {
+        background-color: var(--platform-danger);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+        animation: pulse-red 2s infinite;
+    }
+    
+    @@keyframes pulse-green {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+    
+    @@keyframes pulse-red {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    /* Log Stream Table Rows Coloring */
+    .log-row-info {
+        background-color: rgba(59, 130, 246, 0.05) !important;
+        color: #1e293b !important;
+        border-left: 4px solid var(--platform-info) !important;
+    }
+    
+    .log-row-warning {
+        background-color: rgba(245, 158, 11, 0.06) !important;
+        color: #78350f !important;
+        border-left: 4px solid var(--platform-warning) !important;
+    }
+    
+    .log-row-error, .log-row-critical {
+        background-color: rgba(239, 68, 68, 0.07) !important;
+        color: #991b1b !important;
+        font-weight: 500;
+        border-left: 4px solid var(--platform-danger) !important;
+    }
+    
+    /* Log stream height constraint */
+    .log-console-container {
+        max-height: 580px;
+        overflow-y: auto;
+    }
+    
+    /* Custom flat badges */
+    .badge-info-flat {
+        background-color: rgba(59, 130, 246, 0.15);
+        color: #1d4ed8;
+    }
+    .badge-warning-flat {
+        background-color: rgba(245, 158, 11, 0.15);
+        color: #b45309;
+    }
+    .badge-danger-flat {
+        background-color: rgba(239, 68, 68, 0.15);
+        color: #b91c1c;
+    }
+</style>
+
+<div class="container-fluid px-0">
+    <div class="row g-4 mb-4 align-items-center">
+        <div class="col-md-8">
+            <h1 class="fw-bold mb-1"><i class="bi bi-cpu text-primary me-2"></i> Sistem Günlüğü & Altyapı Kontrol Merkezi</h1>
+            <p class="text-muted mb-0">Canlı uygulama logları, ilişkisel veritabanı durumları ve sunucu çalışma zamanı metrikleri.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <span class="badge bg-dark px-3 py-2 rounded-pill"><i class="bi bi-clock me-1"></i> Son Güncelleme: <span id="last-updated-time">@DateTime.Now.ToString("HH:mm:ss")</span></span>
+        </div>
+    </div>
+
+    <!-- SECTION A: INFRASTRUCTURE DIAGNOSTICS -->
+    <div class="row g-4 mb-4">
+        <!-- Database Connection Card -->
+        <div class="col-md-6">
+            <div class="card metric-card border-0 h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div>
+                            <span class="text-uppercase text-muted small fw-bold d-block">İlişkisel Veri Katmanı</span>
+                            <h4 class="mb-0 fw-bold mt-1" id="db-status-text">@Model.DatabaseStatus</h4>
+                        </div>
+                        <div class="metric-icon-wrapper bg-success-subtle text-success" id="db-icon-wrapper">
+                            <i class="bi bi-database"></i>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mt-2 pt-2 border-top">
+                        <span id="db-pulse" class="status-pulse @(Model.DatabaseHealthy ? "status-pulse-green" : "status-pulse-red")"></span>
+                        <small class="text-muted" id="db-detail-text">MS SQL Server - localhost:14331</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Environment Statistics Card -->
+        <div class="col-md-6">
+            <div class="card metric-card border-0 h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div>
+                            <span class="text-uppercase text-muted small fw-bold d-block">Sunucu Bellek / İş Parçacığı</span>
+                            <h4 class="mb-0 fw-bold mt-1" id="sys-metrics-text">@Model.MemoryUsageMB MB / @Model.ThreadCount Threads</h4>
+                        </div>
+                        <div class="metric-icon-wrapper bg-info-subtle text-info">
+                            <i class="bi bi-speedometer2"></i>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mt-2 pt-2 border-top">
+                        <span class="status-pulse status-pulse-green"></span>
+                        <small class="text-muted">.NET 10.0 Runtime Environment</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- SECTION B: ACTIVE FILTER LOG STREAM -->
+        <div class="col-lg-9">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3 border-bottom d-flex align-items-center justify-content-between">
+                    <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-terminal me-2"></i> Aktif Sistem Denetim İzi (Audit Trail)</h5>
+                    <div class="d-flex gap-2">
+                        <select id="filter-level" class="form-select form-select-sm" style="width: 150px;">
+                            <option value="All">Tüm Seviyeler</option>
+                            <option value="Information">Information</option>
+                            <option value="Warning">Warning</option>
+                            <option value="Error">Error</option>
+                            <option value="Critical">Critical</option>
+                        </select>
+                        <button id="btn-delete-selected-logs" class="btn btn-danger btn-sm d-flex align-items-center gap-1" disabled onclick="deleteSelectedLogs()">
+                            <i class="bi bi-trash-fill"></i> Seçilenleri Güvenli Sil
+                        </button>
+                        <input type="text" id="search-logs" class="form-control form-control-sm" placeholder="Ara (Kullanıcı, IP, İşlem...)" style="width: 220px;" />
+                        <button id="btn-refresh" class="btn btn-light btn-sm"><i class="bi bi-arrow-clockwise"></i> Yenile</button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="log-console-container">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 3%;"><input type="checkbox" id="select-all-logs" class="form-check-input" /></th>
+                                        <th style="width: 15%;">Zaman (UTC)</th>
+                                        <th style="width: 10%;">Seviye</th>
+                                        <th style="width: 12%;">Bileşen</th>
+                                        <th style="width: 12%;">Kullanıcı</th>
+                                        <th style="width: 12%;">IP Adresi</th>
+                                        <th style="width: 36%;">Detay / Aksiyon</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="log-rows-container">
+                                    @if (!Model.RecentLogs.Any())
+                                    {
+                                        <tr>
+                                            <td colspan="7" class="text-center text-muted py-4">
+                                                <i class="bi bi-database-exclamation fs-3 d-block mb-2"></i>
+                                                Sistemde kayıtlı denetim izi bulunamadı.
+                                            </td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        @foreach (var log in Model.RecentLogs)
+                                        {
+                                            string rowClass = log.LogLevel switch
+                                            {
+                                                "Warning" => "log-row-warning",
+                                                "Error" => "log-row-error",
+                                                "Critical" => "log-row-critical",
+                                                _ => "log-row-info"
+                                            };
+                                            string badgeClass = log.LogLevel switch
+                                            {
+                                                "Warning" => "badge-warning-flat",
+                                                "Error" => "badge-danger-flat",
+                                                "Critical" => "bg-danger text-white",
+                                                _ => "badge-info-flat"
+                                            };
+                                            <tr class="@rowClass">
+                                                <td><input type="checkbox" class="log-checkbox form-check-input" value="@log.Id" /></td>
+                                                <td class="text-nowrap small text-muted">@log.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                                <td><span class="badge @badgeClass rounded-pill">@log.LogLevel</span></td>
+                                                <td><code class="small text-dark">@log.Component</code></td>
+                                                <td class="fw-semibold">@log.Username</td>
+                                                <td><small class="text-muted">@log.IpAddress</small></td>
+                                                <td class="small">@log.Action</td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION C: ADMINISTRATIVE ACTIONS (INTERVENTION CONTROLS) -->
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-sliders me-2"></i> Müdahale Kontrolleri</h5>
+                </div>
+                <div class="card-body d-flex flex-column gap-3">
+                    <!-- Clear Log Entries -->
+                    <button id="btn-purge-logs" class="btn btn-outline-danger w-100 py-2.5">
+                        <i class="bi bi-trash3-fill me-1"></i> Sistem Günlüğünü Temizle
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card border-0 shadow-sm">
+                <div class="card-body bg-light rounded-3 border p-3">
+                    <h6 class="fw-bold mb-2"><i class="bi bi-shield-check text-primary me-2"></i> Denetim Standartları</h6>
+                    <p class="text-muted small mb-0">
+                        Bu platformda yapılan her operasyon, ACID standartlarına uygun olarak ilişkisel veritabanı denetim izine (Audit Trail) kaydedilmektedir.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Function to load and render logs asynchronously
+            function fetchLogs() {
+                const level = $('#filter-level').val();
+                const search = $('#search-logs').val();
+                
+                $.ajax({
+                    url: '@Url.Action("GetLogs", "Admin")',
+                    type: 'GET',
+                    data: { logLevel: level, search: search },
+                    success: function(data) {
+                        renderLogs(data);
+                        $('#last-updated-time').text(new Date().toLocaleTimeString());
+                    },
+                    error: function(err) {
+                        console.error("Logs couldn't be loaded: ", err);
+                    }
+                });
+            }
+
+            function renderLogs(logs) {
+                const container = $('#log-rows-container');
+                container.empty();
+                $('#select-all-logs').prop('checked', false);
+                updateDeleteSelectedLogsButton();
+                
+                if (logs.length === 0) {
+                    container.html(`
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                <i class="bi bi-database-exclamation fs-3 d-block mb-2"></i>
+                                Filtrelere uygun denetim izi bulunamadı.
+                            </td>
+                        </tr>
+                    `);
+                    return;
+                }
+
+                logs.forEach(function(log) {
+                    let rowClass = "log-row-info";
+                    let badgeClass = "badge-info-flat";
+                    
+                    if (log.logLevel === "Warning") {
+                        rowClass = "log-row-warning";
+                        badgeClass = "badge-warning-flat";
+                    } else if (log.logLevel === "Error" || log.logLevel === "Critical") {
+                        rowClass = log.logLevel === "Critical" ? "log-row-critical bg-danger text-white" : "log-row-error";
+                        badgeClass = log.logLevel === "Critical" ? "bg-danger text-white" : "badge-danger-flat";
+                    }
+                    
+                    container.append(`
+                        <tr class="${rowClass}">
+                            <td><input type="checkbox" class="log-checkbox form-check-input" value="${log.id}" /></td>
+                            <td class="text-nowrap small text-muted">${log.timestamp}</td>
+                            <td><span class="badge ${badgeClass} rounded-pill">${log.logLevel}</span></td>
+                            <td><code class="small text-dark">${log.component}</code></td>
+                            <td class="fw-semibold">${log.username}</td>
+                            <td><small class="text-muted">${log.ipAddress}</small></td>
+                            <td class="small">${log.action}</td>
+                        </tr>
+                    `);
+                });
+            }
+
+            // Checkbox multi-select event logic
+            $(document).on('change', '#select-all-logs', function() {
+                const isChecked = $(this).is(':checked');
+                $('.log-checkbox').prop('checked', isChecked);
+                updateDeleteSelectedLogsButton();
+            });
+
+            $(document).on('change', '.log-checkbox', function() {
+                const total = $('.log-checkbox').length;
+                const checked = $('.log-checkbox:checked').length;
+                $('#select-all-logs').prop('checked', total === checked && total > 0);
+                updateDeleteSelectedLogsButton();
+            });
+
+            function updateDeleteSelectedLogsButton() {
+                const checkedCount = $('.log-checkbox:checked').length;
+                const btn = $('#btn-delete-selected-logs');
+                btn.prop('disabled', checkedCount === 0);
+                if (checkedCount > 0) {
+                    btn.html(`<i class="bi bi-trash-fill"></i> Seçilenleri Güvenli Sil (${checkedCount})`);
+                } else {
+                    btn.html(`<i class="bi bi-trash-fill"></i> Seçilenleri Güvenli Sil`);
+                }
+            }
+
+            window.deleteSelectedLogs = function() {
+                const checkedBoxes = $('.log-checkbox:checked');
+                if (checkedBoxes.length === 0) return;
+
+                if (!confirm(`Seçilen ${checkedBoxes.length} log kaydını güvenli bir şekilde silmek istediğinize emin misiniz?`)) return;
+
+                const ids = [];
+                checkedBoxes.each(function() {
+                    ids.push(parseInt($(this).val()));
+                });
+
+                $.ajax({
+                    url: '/Admin/BatchDelete?module=SystemAuditLog',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(ids),
+                    success: function(res) {
+                        if (res.success) {
+                            alert(`${res.count} adet log kaydı başarıyla silindi.`);
+                            fetchLogs();
+                        } else {
+                            alert('Silme işlemi sırasında hata oluştu: ' + res.message);
+                        }
+                    },
+                    error: function(err) {
+                        alert('Hata: Sunucuyla bağlantı kurulamadı.');
+                    }
+                });
+            };
+
+            // Bind filters and search events
+            $('#filter-level').on('change', fetchLogs);
+            
+            let searchTimeout = null;
+            $('#search-logs').on('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(fetchLogs, 300);
+            });
+
+            $('#btn-refresh').on('click', function() {
+                const btn = $(this);
+                btn.prop('disabled', true).html('<i class="bi bi-arrow-clockwise spinner-border spinner-border-sm text-primary"></i> Yükleniyor...');
+                
+                $.ajax({
+                    url: window.location.href,
+                    type: 'GET',
+                    success: function(htmlHtml) {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(htmlHtml, 'text/html');
+                        
+                        $('#db-status-text').html($(doc).find('#db-status-text').html());
+                        $('#db-pulse').attr('class', $(doc).find('#db-pulse').attr('class'));
+                        $('#sys-metrics-text').html($(doc).find('#sys-metrics-text').html());
+                        
+                        fetchLogs();
+                        btn.prop('disabled', false).html('<i class="bi bi-arrow-clockwise"></i> Yenile');
+                    },
+                    error: function() {
+                        fetchLogs();
+                        btn.prop('disabled', false).html('<i class="bi bi-arrow-clockwise"></i> Yenile');
+                    }
+                });
+            });
+
+            // Purge Logs Action
+            $('#btn-purge-logs').on('click', function() {
+                if (confirm('Sistem günlüğünü silmek istediğinize emin misiniz? Bu işlem geri alınamaz.')) {
+                    $.ajax({
+                        url: '@Url.Action("PurgeLogs", "Admin")',
+                        type: 'POST',
+                        success: function(res) {
+                            if (res.success) {
+                                alert('Sistem günlüğü başarıyla temizlendi.');
+                                fetchLogs();
+                            }
+                        },
+                        error: function(err) {
+                            alert('Hata: Loglar temizlenemedi.');
+                        }
+                    });
+                }
+            });
+            
+            // Initial log fetch
+            fetchLogs();
+        });
+    </script>
+}

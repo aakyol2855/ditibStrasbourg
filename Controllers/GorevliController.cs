@@ -143,13 +143,11 @@ namespace DitibStasbourg.Controllers
         {
             if (columns == null || !columns.Any())
             {
-                columns = new List<string> { "Ad", "Soyad", "Email", "TCKimlikNo" }; // Default
+                columns = new List<string> { "Ad", "Soyad", "Email", "TCKimlikNo" };
             }
 
-            var query = _gorevliService.GetQueryable();
-            // Note: In a real scenario, you'd apply the same filters as BuildFilterQuery
-            // For the foundation, we'll export based on the current queryable
-            var content = await _exportService.ExportToExcelAsync(query, columns);
+            var query = _gorevliService.GetFilteredQueryable(filter);
+            var content = await _exportService.ExportFilteredAsync(query, columns, "Görevliler");
             var fileName = $"Custom_Export_{DateTime.Now:yyyyMMdd}.xlsx";
             return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }

@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using DitibStasbourg.Models.Attributes;
 
 namespace DitibStasbourg.Models
 {
@@ -10,21 +11,29 @@ namespace DitibStasbourg.Models
 
         [Required]
         [StringLength(50)]
-        public string TagNumber { get; set; } // Küpe No
+        [ExportColumn("Küpe No", Order = 1)]
+        public string TagNumber { get; set; }
 
         [Required]
-        public string Species { get; set; } // Tür (Büyükbaş, Küçükbaş) - From Lookup
+        [ExportColumn("Tür", Order = 2)]
+        public string Species { get; set; }
 
-        public decimal Weight { get; set; } // Tahmini Kilo
+        [ExportColumn("Tahmini Kilo (kg)", Order = 3, Format = "N2")]
+        public decimal Weight { get; set; }
 
-        public decimal Price { get; set; } // Alış Fiyatı
+        [ExportColumn("Alış Fiyatı (€)", Order = 4, Format = "N2")]
+        public decimal Price { get; set; }
 
-        public int TotalShares { get; set; } = 7; // Toplam Hisse (Büyükbaş için 7)
+        [ExportColumn("Toplam Hisse", Order = 5)]
+        public int TotalShares { get; set; } = 7;
 
-        public int RemainingShares { get; set; } // Kalan Hisse
+        [ExportColumn("Kalan Hisse", Order = 6)]
+        public int RemainingShares { get; set; }
 
-        public string Status { get; set; } = "Available"; // Satışta, Dolu, Kesildi
+        [ExportColumn("Durum", Order = 7)]
+        public string Status { get; set; } = "Available";
 
+        [ExportColumn("Oluşturulma Tarihi", Order = 8, Format = "dd.MM.yyyy", IncludeInQuickExport = false)]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public virtual ICollection<Hissedar> Hissedarlar { get; set; } = new List<Hissedar>();

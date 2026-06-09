@@ -1,17 +1,21 @@
+using DitibStasbourg.Core.Utilities;
 using DitibStasbourg.Data;
 using DitibStasbourg.Models;
 using DitibStasbourg.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace DitibStasbourg.Services.Implementations
 {
     public class DernekIslemleriService : IDernekIslemleriService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMemoryCache _cache;
 
-        public DernekIslemleriService(ApplicationDbContext context)
+        public DernekIslemleriService(ApplicationDbContext context, IMemoryCache cache)
         {
             _context = context;
+            _cache   = cache;
         }
 
         public IQueryable<Kurum> GetFilteredQueryable(string? search = null, string? sehir = null, string? bolge = null)
@@ -75,7 +79,12 @@ namespace DitibStasbourg.Services.Implementations
 
         public async Task<Kurum> CreateDernekAsync(Kurum dernek)
         {
-            dernek.Tip = KurumTip.Dernek;
+            // ── 60-second deduplication guard ──────────────────────
+            var fingerprint = DeduplicationGuard.BuildFingerprint(dernek.Isim, dernek.DernekBaskaniIletisim);
+            if (DeduplicationGuard.IsDuplicate(_cache, "Dernek", fingerprint))
+                throw new InvalidOperationException("Bu dernek kaydı son 60 saniye içinde zaten gönderildi. Lütfen bekleyin.");
+
+            dernek.Tip    = KurumTip.Dernek;
             dernek.AktifMi = true;
             _context.Add(dernek);
             await _context.SaveChangesAsync();

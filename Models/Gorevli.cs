@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using DitibStasbourg.Models.Attributes;
 
 namespace DitibStasbourg.Models
 {
@@ -9,20 +10,24 @@ namespace DitibStasbourg.Models
 
         [Required]
         [Display(Name = "Ad")]
+        [ExportColumn("Ad", Order = 1)]
         public string Ad { get; set; } = string.Empty;
 
         [Required]
         [Display(Name = "Soyad")]
+        [ExportColumn("Soyad", Order = 2)]
         public string Soyad { get; set; } = string.Empty;
 
         [Display(Name = "E-posta")]
         [EmailAddress]
+        [ExportColumn("E-posta", Order = 3)]
         public string? Email { get; set; }
 
         [Display(Name = "Ad Soyad")]
         public string AdSoyad => $"{Ad} {Soyad}";
 
         [Display(Name = "Cinsiyet")]
+        [ExportColumn("Cinsiyet", Order = 4)]
         public string? Cinsiyet { get; set; } // 'E' or 'K'
 
         [Display(Name = "Görevli Durumu")]
@@ -40,30 +45,38 @@ namespace DitibStasbourg.Models
         // Identity
         [Display(Name = "TC Kimlik No")]
         [StringLength(11)]
+        [ExportColumn("TC Kimlik No", Order = 5, IncludeInQuickExport = false)]
         public string? TCKimlikNo { get; set; }
 
         [Display(Name = "Baba Adı")]
+        [ExportColumn("Baba Adı", Order = 10, IncludeInQuickExport = false)]
         public string? BabaAdi { get; set; }
 
         [Display(Name = "Anne Adı")]
+        [ExportColumn("Anne Adı", Order = 11, IncludeInQuickExport = false)]
         public string? AnneAdi { get; set; }
 
         [Display(Name = "Doğum Yeri")]
+        [ExportColumn("Doğum Yeri", Order = 12, IncludeInQuickExport = false)]
         public string? DogumYeri { get; set; }
 
         [Display(Name = "Doğum Tarihi")]
         [DataType(DataType.Date)]
+        [ExportColumn("Doğum Tarihi", Order = 13, Format = "dd.MM.yyyy", IncludeInQuickExport = false)]
         public DateTime? DogumTarihi { get; set; }
 
         // Contact
         [Display(Name = "Cep Telefonu")]
+        [ExportColumn("Cep Telefonu", Order = 6)]
         public string? CepTelefonu { get; set; }
 
         [Display(Name = "Ev Telefonu")]
+        [ExportColumn("Ev Telefonu", Order = 7, IncludeInQuickExport = false)]
         public string? EvTelefonu { get; set; }
 
         [Display(Name = "Adres")]
         [StringLength(500)]
+        [ExportColumn("Adres", Order = 8, IncludeInQuickExport = false, FixedWidth = 40)]
         public string? Adres { get; set; }
 
         // Education
@@ -73,9 +86,11 @@ namespace DitibStasbourg.Models
         public Ref_EgitimDurumu? EgitimDurumu { get; set; }
 
         [Display(Name = "Mezuniyet Okul")]
+        [ExportColumn("Mezuniyet Okul", Order = 14, IncludeInQuickExport = false)]
         public string? MezuniyetOkul { get; set; }
 
         [Display(Name = "Mezuniyet Bölüm")]
+        [ExportColumn("Mezuniyet Bölüm", Order = 15, IncludeInQuickExport = false)]
         public string? MezuniyetBolum { get; set; }
 
         [Display(Name = "Hafızlık Durumu")]
@@ -106,21 +121,26 @@ namespace DitibStasbourg.Models
 
         // Career
         [Display(Name = "Derece")]
+        [ExportColumn("Derece", Order = 16, IncludeInQuickExport = false)]
         public string? Derece { get; set; }
 
         [Display(Name = "Kademe")]
+        [ExportColumn("Kademe", Order = 17, IncludeInQuickExport = false)]
         public string? Kademe { get; set; }
 
         [Display(Name = "İlk Göreve Başlama Tarihi")]
         [DataType(DataType.Date)]
+        [ExportColumn("İlk Göreve Başlama", Order = 9, Format = "dd.MM.yyyy")]
         public DateTime? IlkGoreveBaslamaTarihi { get; set; }
 
         [Display(Name = "Emeklilik Tarihi")]
         [DataType(DataType.Date)]
+        [ExportColumn("Emeklilik Tarihi", Order = 18, Format = "dd.MM.yyyy", IncludeInQuickExport = false)]
         public DateTime? EmeklilikTarihi { get; set; }
 
         [Display(Name = "Diyanet Giriş Tarihi")]
         [DataType(DataType.Date)]
+        [ExportColumn("Diyanet Giriş Tarihi", Order = 19, Format = "dd.MM.yyyy", IncludeInQuickExport = false)]
         public DateTime? DiyanetGirisTarihi { get; set; }
 
         // Other
@@ -163,12 +183,3 @@ namespace DitibStasbourg.Models
         Kirmizi = 3
     }
 }
-/*todo : 
-Görevliler sekmesinde hangi görevliler aktif , hangileri gelmiş girmiş belli değil. Ayrıca durum konusunda bir kafa karışıklığı var.
-durum kısmı görevlinin aktif durumu değil , yönetici için daha sonrası için bir bilgilendirme kısmı. yani bu kişiyi bir daha görevlendirelim mi sorusu için
-referans olması açısından orada duruyor. Bu bağlamda kişinin kırmızı turuncu ve yeşil olarak renklendirilen durum statüsü , sadece görevlendirmesi bitmiş(bitiş tarihi geçmiş)
-ya da özel durumlar için elle değiştirilecek olamlı. yeni görevli eklendiğinde casual olarak nötr gelmeli(gri renkli). İsActive kısmı ise eğer görevli hala başlangıç ve bitiş 
-tarihleri arasında ise active olmalı. Değilse bool değer otomatik olarak false olmalı ve bunu da view'da göstermeliyiz. Ayrıca Görevliler sekmesinde ad-soyad , son görev yeri
-başlangıç , bitiş tarihi yanında ; isactive alanını gösteren Görevde mi? alanı bulunmalı.
-
-*/

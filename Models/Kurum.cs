@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using DitibStasbourg.Models.Attributes;
 
 namespace DitibStasbourg.Models
 {
@@ -15,13 +16,16 @@ namespace DitibStasbourg.Models
 
         [Required]
         [Display(Name = "İsim")]
+        [ExportColumn("Dernek / Kurum Adı", Order = 1)]
         public string Isim { get; set; } = string.Empty;
 
         [Display(Name = "Adres")]
+        [ExportColumn("Adres", Order = 8, FixedWidth = 40, IncludeInQuickExport = false)]
         public string? Adres { get; set; }
 
         [Required]
         [Display(Name = "Tip")]
+        [ExportColumn("Kurum Tipi", Order = 9, IncludeInQuickExport = false)]
         public KurumTip Tip { get; set; }
 
         [Display(Name = "Üst Kurum")]
@@ -31,34 +35,43 @@ namespace DitibStasbourg.Models
         public Ref_KurumTuru? UstKurum { get; set; }
 
         [Display(Name = "Şehir")]
+        [ExportColumn("Şehir", Order = 3)]
         public string? Sehir { get; set; }
 
         [Display(Name = "Aktif mi?")]
+        [ExportColumn("Aktif mi?", Order = 10)]
         public bool AktifMi { get; set; } = true;
 
-        // New Fields for Dernek Operations
         [Display(Name = "Başkonsolosluk Bölgesi")]
+        [ExportColumn("Başkonsolosluk Bölgesi", Order = 2)]
         public string? BaskonsoloslukBolgesi { get; set; }
 
         [Display(Name = "CRM Üyelik Form Durumu")]
-        public string? CrmUyelikFormDurumu { get; set; } // e.g., "Var", "Yok", "Beklemede"
+        [ExportColumn("CRM Form Durumu", Order = 7, IncludeInQuickExport = false)]
+        public string? CrmUyelikFormDurumu { get; set; }
 
         [Display(Name = "Kuruluş Kanunu")]
+        [ExportColumn("Kuruluş Kanunu", Order = 6, IncludeInQuickExport = false)]
         public string? KurulusKanunu { get; set; }
 
         [Display(Name = "Bölge")]
+        [ExportColumn("Bölge", Order = 4)]
         public string? Bolge { get; set; }
 
         [Display(Name = "Dernek Başkanı Adı")]
+        [ExportColumn("Başkan Adı", Order = 5)]
         public string? DernekBaskaniAd { get; set; }
 
         [Display(Name = "Dernek Başkanı İletişim")]
+        [ExportColumn("Başkan İletişim", Order = 11)]
         public string? DernekBaskaniIletisim { get; set; }
 
         [Display(Name = "Din Görevlisi Adı")]
+        [ExportColumn("Din Görevlisi", Order = 12)]
         public string? DinGorevlisiAd { get; set; }
 
         [Display(Name = "Din Görevlisi İletişim")]
+        [ExportColumn("Din Görevlisi İletişim", Order = 13, IncludeInQuickExport = false)]
         public string? DinGorevlisiIletisim { get; set; }
 
         // Navigation property for assignments

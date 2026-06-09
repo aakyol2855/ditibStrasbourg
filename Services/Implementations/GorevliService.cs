@@ -1,3 +1,4 @@
+using DitibStasbourg.Core.Utilities;
 using DitibStasbourg.Data;
 using DitibStasbourg.Models;
 using DitibStasbourg.Models.ViewModels;
@@ -6,13 +7,20 @@ using DitibStasbourg.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using ClosedXML.Excel;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace DitibStasbourg.Services.Implementations
 {
     public class GorevliService : BaseService<Gorevli>, IGorevliService
     {
-        public GorevliService(ApplicationDbContext context, ILogger<GorevliService> logger) : base(context, logger)
+        private readonly IMemoryCache _cache;
+
+        public GorevliService(
+            ApplicationDbContext context,
+            ILogger<GorevliService> logger,
+            IMemoryCache cache) : base(context, logger)
         {
+            _cache = cache;
         }
 
         public async Task<List<object>> SearchStaffAsync(string term)
@@ -311,10 +319,20 @@ namespace DitibStasbourg.Services.Implementations
                         {
                             var ad = GetCellValue(row, "ad", "adı", "isim", "name", "first name");
                             var soyad = GetCellValue(row, "soyad", "soyadı", "surname", "last name");
+                            var cep  = GetCellValue(row, "cep telefonu", "telefon", "cep", "phone", "mobile");
 
                             if (string.IsNullOrEmpty(ad) || string.IsNullOrEmpty(soyad))
                             {
                                 errors.Add($"Satır {row.RowNumber()}: Ad ve Soyad zorunludur");
+                                errorCount++;
+                                continue;
+                            }
+
+                            // ── 60-second deduplication guard ───────────────
+                            var fingerprint = DeduplicationGuard.BuildFingerprint($"{ad} {soyad}", cep);
+                            if (DeduplicationGuard.IsDuplicate(_cache, "Gorevli", fingerprint))
+                            {
+                                errors.Add($"Satır {row.RowNumber()}: Mükerrer kayıt tespit edildi ({ad} {soyad}), atlandı.");
                                 errorCount++;
                                 continue;
                             }
@@ -326,7 +344,7 @@ namespace DitibStasbourg.Services.Implementations
                                 Email = GetCellValue(row, "email", "e-posta", "eposta", "e-mail"),
                                 TCKimlikNo = GetCellValue(row, "tc", "tc kimlik no", "tckimlikno", "tc no"),
                                 Cinsiyet = GetCellValue(row, "cinsiyet", "gender", "sex")?.ToUpper().Substring(0, 1),
-                                CepTelefonu = GetCellValue(row, "cep telefonu", "telefon", "cep", "phone", "mobile"),
+                                CepTelefonu = cep,
                                 EvTelefonu = GetCellValue(row, "ev telefonu", "ev tel", "home phone"),
                                 Adres = GetCellValue(row, "adres", "address"),
                                 BabaAdi = GetCellValue(row, "baba adı", "babaadi", "father name", "baba"),
@@ -342,7 +360,7 @@ namespace DitibStasbourg.Services.Implementations
 
                             _context.Gorevli.Add(gorevli);
                             await _context.SaveChangesAsync();
-                            
+
                             importResults.Add($"✓ {ad} {soyad} başarıyla eklendi");
                             successCount++;
                         }

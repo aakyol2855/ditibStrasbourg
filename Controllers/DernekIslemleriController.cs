@@ -38,8 +38,15 @@ namespace DitibStasbourg.Controllers
             
             if (ModelState.IsValid)
             {
-                await _dernekService.CreateDernekAsync(dernek);
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    await _dernekService.CreateDernekAsync(dernek);
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (InvalidOperationException ex)
+                {
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                }
             }
             
             ViewBag.Sehirler = await _dernekService.GetSehirlerAsync();
