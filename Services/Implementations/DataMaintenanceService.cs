@@ -216,7 +216,7 @@ namespace DitibStasbourg.Services.Implementations
 
                 _progressTracker.SetProgress(progressKey, 100);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 _progressTracker.SetProgress(progressKey, -1); // -1 signifies an error
                 throw;
@@ -234,8 +234,17 @@ namespace DitibStasbourg.Services.Implementations
                         var kurumlar = new List<Kurum>();
                         foreach (var row in batch)
                         {
-                            var isim = GetVal(row, "Derneğin resmi adı", "Dernek Adı", "Isim", "Name", "AssociationName");
-                            if (string.IsNullOrEmpty(isim)) continue;
+                            var isim = GetVal(row, "Derneğin resmi adı", "Dernek Adı", "Kurum İsmi");
+                            if (string.IsNullOrEmpty(isim) || 
+                                isim.Contains("Sıra No", StringComparison.OrdinalIgnoreCase) || 
+                                isim.Contains("S.N.", StringComparison.OrdinalIgnoreCase) || 
+                                isim.Equals("No", StringComparison.OrdinalIgnoreCase) || 
+                                isim.Equals("S.No", StringComparison.OrdinalIgnoreCase) ||
+                                int.TryParse(isim, out _) || 
+                                double.TryParse(isim, out _))
+                            {
+                                continue;
+                            }
 
                             var kurum = new Kurum
                             {
@@ -264,13 +273,45 @@ namespace DitibStasbourg.Services.Implementations
                             var soyad = GetVal(row, "Soyad", "LastName");
                             if (string.IsNullOrEmpty(ad) || string.IsNullOrEmpty(soyad)) continue;
 
+                            var email = GetVal(row, "E-posta", "Email", "Mail");
+                            var cep = GetVal(row, "Cep Telefonu", "Telefon", "Phone", "Mobile");
+                            var tc = GetVal(row, "TC Kimlik No", "TC", "NationalId");
+
+                            // Explicit database lookup constraint
+                            bool existsInDb = false;
+                            if (!string.IsNullOrEmpty(tc))
+                            {
+                                existsInDb = await _context.Gorevli.AnyAsync(g => g.TCKimlikNo == tc);
+                            }
+                            else
+                            {
+                                if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(cep))
+                                {
+                                    existsInDb = await _context.Gorevli.AnyAsync(g => g.Email == email || g.CepTelefonu == cep);
+                                }
+                                else if (!string.IsNullOrEmpty(email))
+                                {
+                                    existsInDb = await _context.Gorevli.AnyAsync(g => g.Email == email);
+                                }
+                                else if (!string.IsNullOrEmpty(cep))
+                                {
+                                    existsInDb = await _context.Gorevli.AnyAsync(g => g.CepTelefonu == cep);
+                                }
+                            }
+
+                            if (existsInDb)
+                            {
+                                continue;
+                            }
+
                             var gorevli = new Gorevli
                             {
                                 Ad = ad,
                                 Soyad = soyad,
-                                Email = GetVal(row, "E-posta", "Email", "Mail"),
-                                CepTelefonu = GetVal(row, "Cep Telefonu", "Telefon", "Phone", "Mobile"),
-                                TCKimlikNo = GetVal(row, "TC Kimlik No", "TC", "NationalId")
+                                Email = email,
+                                CepTelefonu = cep,
+                                TCKimlikNo = tc,
+                                IsDeleted = false
                             };
                             gorevliler.Add(gorevli);
                         }
@@ -322,12 +363,41 @@ namespace DitibStasbourg.Services.Implementations
 
         private string? GetVal(IDictionary<string, object> row, params string[] possibleKeys)
         {
+            if (possibleKeys.Contains("Dernek Adı", StringComparer.OrdinalIgnoreCase))
+            {
+                foreach (var k in row.Keys)
+                {
+                    var val = k.Trim().ToLowerInvariant().Replace("ı", "i").Replace("ğ", "g").Replace("ü", "u").Replace("ş", "s").Replace("ö", "o").Replace("ç", "c");
+                    
+                    if (val.Contains("sira no") || val.Contains("s.n.") || val == "no" || val == "s.no")
+                        continue;
+
+                    if (val == "isim" || val == "name" || val == "adi" || val == "ad" ||
+                        (val.Contains("dernek") && (val.Contains("adi") || val.Contains("ismi") || val.Contains("resmi"))) ||
+                        (val.Contains("kurum") && (val.Contains("ismi") || val.Contains("adi"))) ||
+                        val.Contains("resmi ad") || val.Contains("resmi adi") || val.Contains("association name"))
+                    {
+                        if (row[k] != null)
+                        {
+                            return row[k]?.ToString()?.Trim();
+                        }
+                    }
+                }
+            }
+
             foreach (var key in possibleKeys)
             {
-                var matchedKey = row.Keys.FirstOrDefault(k => string.Equals(k.Trim(), key, StringComparison.OrdinalIgnoreCase));
-                if (matchedKey != null && row[matchedKey] != null)
+                var normKey = key.Trim().ToLowerInvariant().Replace("ı", "i").Replace("ğ", "g").Replace("ü", "u").Replace("ş", "s").Replace("ö", "o").Replace("ç", "c");
+                foreach (var k in row.Keys)
                 {
-                    return row[matchedKey]?.ToString()?.Trim();
+                    var normK = k.Trim().ToLowerInvariant().Replace("ı", "i").Replace("ğ", "g").Replace("ü", "u").Replace("ş", "s").Replace("ö", "o").Replace("ç", "c");
+                    if (normK == normKey || normK.Contains(normKey))
+                    {
+                        if (row[k] != null)
+                        {
+                            return row[k]?.ToString()?.Trim();
+                        }
+                    }
                 }
             }
             return null;

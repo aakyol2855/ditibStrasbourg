@@ -4,7 +4,8 @@ namespace DitibStasbourg.Models.ViewModels
 {
     public class DashboardStatsViewModel
     {
-        public int TotalAssociations { get; set; }
+        public int TotalAssociations { get; set; }  // Dernek count only
+        public int TotalCami { get; set; }           // Cami count only
         public int TotalPersonnel { get; set; }
         public int TotalAssignments { get; set; }
         

@@ -47,5 +47,8 @@ namespace DitibStasbourg.Models
 
         // Navigation
         public ICollection<GorevlendirmeNot>? GorevlendirmeNotlari { get; set; }
+
+        [Display(Name = "Silindi mi?")]
+        public bool IsDeleted { get; set; } = false;
     }
 }

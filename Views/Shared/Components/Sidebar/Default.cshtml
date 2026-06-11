@@ -1,8 +1,8 @@
 @model DitibStasbourg.Models.Navigation.SidebarViewModel
 @inject Microsoft.Extensions.Configuration.IConfiguration Configuration
 @{
-    var currentCtrl = ViewBag.CurrentController as string ?? "";
-    var currentAct = ViewBag.CurrentAction as string ?? "";
+    var currentCtrl = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    var currentAct = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
 }
 
 <div id="sidebar-wrapper" style="display: flex; flex-direction: column; height: 100vh;">

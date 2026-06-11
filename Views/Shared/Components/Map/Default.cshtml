@@ -119,8 +119,8 @@
 
 <script>
     (function () {
-        // Data injected from MVC backend
-        const markersData = @Html.Raw(Json.Serialize(Model.Markers));
+        // Asynchronously loaded markers data
+        let markersData = [];
 
         // Department Metadata Config
         const DEPARTMENTS_INFO = {
@@ -153,10 +153,78 @@
         document.addEventListener("DOMContentLoaded", function () {
             initMap();
             loadDepartments();
-            renderMarkersAndList();
-            populateRoutingDropdowns();
             setupEventListeners();
+            
+            // Asynchronous database markers ingestion
+            fetch('/Dashboard/GetMapMarkers')
+                .then(res => res.json())
+                .then(data => {
+                    markersData = data || [];
+                    renderMarkersAndList();
+                    populateRoutingDropdowns();
+                })
+                .catch(err => {
+                    console.error("Map markers load error:", err);
+                    renderMarkersAndList(); // renders empty state if failed
+                });
         });
+
+        // Helper to extract department code from city name (client-side)
+        function getDepartmentCode(city) {
+            if (!city) return "";
+            const c = city.toLowerCase();
+            if (c.includes("strasbourg") || c.includes("barr") || c.includes("bischwiller") || c.includes("huttenheim") || c.includes("benfeld") || c.includes("bischheim")) return "67";
+            if (c.includes("mulhouse") || c.includes("colmar") || c.includes("altkirch")) return "68";
+            if (c.includes("besançon")) return "25";
+            if (c.includes("epinal") || c.includes("bruyères") || c.includes("châtenois") || c.includes("vosges")) return "88";
+            if (c.includes("bar-le-duc") || c.includes("meuse")) return "55";
+            if (c.includes("bitche") || c.includes("boulay") || c.includes("bouzonville") || c.includes("creutzwald") || c.includes("moselle")) return "57";
+            return "";
+        }
+
+        // Client-side rate-limited geocoding helper
+        const geocodeCache = new Map();
+        let geocodeQueue = [];
+        let isProcessingQueue = false;
+
+        async function processGeocodeQueue() {
+            if (isProcessingQueue || geocodeQueue.length === 0) return;
+            isProcessingQueue = true;
+
+            const task = geocodeQueue.shift();
+            try {
+                const query = task.query;
+                if (geocodeCache.has(query)) {
+                    task.resolve(geocodeCache.get(query));
+                } else {
+                    await new Promise(r => setTimeout(r, 1000));
+                    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`;
+                    const res = await fetch(url, { headers: { 'User-Agent': 'DitibStasbourgApp/1.0' } });
+                    const data = await res.json();
+                    if (data && data.length > 0) {
+                        const coords = [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+                        geocodeCache.set(query, coords);
+                        task.resolve(coords);
+                    } else {
+                        geocodeCache.set(query, null);
+                        task.resolve(null);
+                    }
+                }
+            } catch (err) {
+                console.error("Client geocode error", err);
+                task.resolve(null);
+            } finally {
+                isProcessingQueue = false;
+                setTimeout(processGeocodeQueue, 100);
+            }
+        }
+
+        function queueGeocode(query) {
+            return new Promise((resolve) => {
+                geocodeQueue.push({ query, resolve });
+                processGeocodeQueue();
+            });
+        }
 
         // Map Initialization
         function initMap() {
@@ -249,11 +317,11 @@
             // Filter data
             const filteredData = markersData.filter(item => {
                 const matchesSearch = !state.filters.searchQuery || 
-                    item.name.toLowerCase().includes(state.filters.searchQuery) ||
-                    item.city.toLowerCase().includes(state.filters.searchQuery) ||
-                    item.address.toLowerCase().includes(state.filters.searchQuery);
+                    (item.isim && item.isim.toLowerCase().includes(state.filters.searchQuery)) ||
+                    (item.sehir && item.sehir.toLowerCase().includes(state.filters.searchQuery));
 
-                const matchesDept = !state.filters.departmentCode || item.departmentCode === state.filters.departmentCode;
+                const deptCode = getDepartmentCode(item.sehir);
+                const matchesDept = !state.filters.departmentCode || deptCode === state.filters.departmentCode;
 
                 return matchesSearch && matchesDept;
             });
@@ -269,7 +337,69 @@
             }
 
             // Draw filtered markers
-            filteredData.forEach(item => {
+            filteredData.forEach(async item => {
+                const deptCode = getDepartmentCode(item.sehir);
+
+                // Render Sidebar list item
+                const card = document.createElement("div");
+                card.className = "map-assoc-item" + (state.activeMarkerId === item.id ? " active" : "");
+                card.setAttribute("data-id", item.id);
+                card.innerHTML = `
+                    <div class="map-assoc-item-info">
+                        <h6>${item.isim}</h6>
+                        <p><i class="fa-solid fa-location-dot"></i> ${item.sehir || "Belirtilmemiş"} ${deptCode ? `(${deptCode})` : ""}</p>
+                    </div>
+                    <span class="map-assoc-item-badge"><i class="fa-solid fa-user-tie"></i> Detay</span>
+                `;
+
+                card.addEventListener("click", function () {
+                    selectAssociation(item.id, true);
+                });
+
+                listContainer.appendChild(card);
+
+                // Check and resolve coordinates
+                let lat = item.latitude;
+                let lon = item.longitude;
+
+                if (!lat || !lon) {
+                    let query = item.adres;
+                    if (query) {
+                        if (!query.toLowerCase().includes("france")) {
+                            query += ", France";
+                        }
+                    } else if (item.sehir) {
+                        query = `${item.sehir}, France`;
+                    }
+
+                    if (query) {
+                        const coords = await queueGeocode(query);
+                        if (coords) {
+                            lat = coords[0];
+                            lon = coords[1];
+                            item.latitude = lat;
+                            item.longitude = lon;
+                        }
+                    }
+                }
+
+                if (!lat || !lon) {
+                    if (item.sehir) {
+                        const cityQuery = `${item.sehir}, France`;
+                        const coords = await queueGeocode(cityQuery);
+                        if (coords) {
+                            lat = coords[0];
+                            lon = coords[1];
+                            item.latitude = lat;
+                            item.longitude = lon;
+                        }
+                    }
+                }
+
+                if (!lat || !lon) {
+                    return; // Skip drawing marker if it cannot be resolved
+                }
+
                 const customIcon = L.divIcon({
                     className: 'address-marker' + (state.activeMarkerId === item.id ? ' address-marker-active' : ''),
                     iconSize: [16, 16],
@@ -278,27 +408,23 @@
                 });
 
                 // Marker instance
-                const marker = L.marker([item.latitude, item.longitude], { icon: customIcon });
+                const marker = L.marker([lat, lon], { icon: customIcon });
 
                 // Popup Details
                 const popupContent = `
                     <div class="custom-popup">
-                        <h5>${item.name}</h5>
-                        <div class="popup-row">
-                            <i class="fa-solid fa-city"></i>
-                            <span>${item.city} (Dept: ${item.departmentCode})</span>
+                        <h5 class="fw-bold mb-2 text-primary">${item.isim}</h5>
+                        <div class="popup-row mb-1">
+                            <i class="fa-solid fa-city me-2 text-muted"></i>
+                            <span>Şehir: <strong>${item.sehir || "Belirtilmemiş"}</strong></span>
                         </div>
-                        <div class="popup-row">
-                            <i class="fa-solid fa-map-location-dot"></i>
-                            <span class="small">${item.address}</span>
-                        </div>
-                        <div class="popup-row">
-                            <i class="fa-solid fa-users"></i>
-                            <span class="popup-badge">Aktif Personel: ${item.staffCount}</span>
+                        <div class="popup-row mb-3">
+                            <i class="fa-solid fa-user-tie me-2 text-muted"></i>
+                            <span>Başkan Adı: <strong>${item.dernekBaskaniAd || "Belirtilmemiş"}</strong></span>
                         </div>
                         <div class="mt-2 text-end">
-                            <a href="/DernekIslemleri/Details/${item.id}" class="btn btn-primary btn-sm px-2 py-1 text-white" style="font-size: 0.75rem;">
-                                <i class="fa-solid fa-circle-info"></i> Detay Git
+                            <a href="/DernekIslemleri/Details/${item.id}" class="btn btn-primary btn-sm w-100 text-white" style="font-size: 0.75rem;">
+                                <i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Dernek İşlemlerine Git
                             </a>
                         </div>
                     </div>
@@ -306,7 +432,7 @@
                 marker.bindPopup(popupContent);
 
                 // Permanent tooltip label
-                marker.bindTooltip(item.name.replace("DITIB ", ""), {
+                marker.bindTooltip(item.isim.replace("DITIB ", ""), {
                     permanent: false,
                     className: 'addr-permanent-tooltip',
                     direction: 'top',
@@ -319,29 +445,11 @@
 
                 marker.addTo(state.map);
                 state.markers[item.id] = marker;
-
-                // Render Sidebar list item
-                const card = document.createElement("div");
-                card.className = "map-assoc-item" + (state.activeMarkerId === item.id ? " active" : "");
-                card.setAttribute("data-id", item.id);
-                card.innerHTML = `
-                    <div class="map-assoc-item-info">
-                        <h6>${item.name}</h6>
-                        <p><i class="fa-solid fa-location-dot"></i> ${item.city} (${item.departmentCode})</p>
-                    </div>
-                    <span class="map-assoc-item-badge"><i class="fa-solid fa-user-tie"></i> ${item.staffCount}</span>
-                `;
-
-                card.addEventListener("click", function () {
-                    selectAssociation(item.id, true);
-                });
-
-                listContainer.appendChild(card);
             });
         }
 
         // Selection Trigger
-        function selectAssociation(id, zoomTo) {
+        function selectAssociation(id, fromSidebarClick) {
             state.activeMarkerId = id;
 
             // Highlight active sidebar card
@@ -370,9 +478,8 @@
             const dataItem = markersData.find(d => d.id == id);
 
             if (marker && dataItem) {
-                if (zoomTo) {
-                    state.map.setView([dataItem.latitude, dataItem.longitude], 12);
-                }
+                // Smooth Fly-To Interactivity: Center and zoom to the targeted association
+                state.map.flyTo([dataItem.latitude, dataItem.longitude], 14, { animate: true });
                 marker.openPopup();
             }
         }
@@ -383,18 +490,22 @@
             const endSelect = document.getElementById("route-end");
             if (!startSelect || !endSelect) return;
 
+            // Clear existing options
+            startSelect.innerHTML = '<option value="">Seçiniz...</option>';
+            endSelect.innerHTML = '<option value="">Seçiniz...</option>';
+
             // Sort alphabetically by name
-            const sortedMarkers = [...markersData].sort((a, b) => a.name.localeCompare(b.name));
+            const sortedMarkers = [...markersData].sort((a, b) => (a.isim || "").localeCompare(b.isim || ""));
 
             sortedMarkers.forEach(item => {
                 const opt1 = document.createElement("option");
                 opt1.value = item.id;
-                opt1.textContent = item.name;
+                opt1.textContent = item.isim;
                 startSelect.appendChild(opt1);
 
                 const opt2 = document.createElement("option");
                 opt2.value = item.id;
-                opt2.textContent = item.name;
+                opt2.textContent = item.isim;
                 endSelect.appendChild(opt2);
             });
         }

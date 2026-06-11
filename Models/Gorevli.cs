@@ -166,6 +166,9 @@ namespace DitibStasbourg.Models
         
         [Display(Name = "Eski Durum (Deprecated)")]
         public GorevliDurum Durum { get; set; } = GorevliDurum.Notr;
+
+        [Display(Name = "Silindi mi?")]
+        public bool IsDeleted { get; set; } = false;
     }
 
     public enum GorevliDurum

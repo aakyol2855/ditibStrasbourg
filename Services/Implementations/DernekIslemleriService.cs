@@ -11,11 +11,13 @@ namespace DitibStasbourg.Services.Implementations
     {
         private readonly ApplicationDbContext _context;
         private readonly IMemoryCache _cache;
+        private readonly IGeocodingService _geocodingService;
 
-        public DernekIslemleriService(ApplicationDbContext context, IMemoryCache cache)
+        public DernekIslemleriService(ApplicationDbContext context, IMemoryCache cache, IGeocodingService geocodingService)
         {
             _context = context;
             _cache   = cache;
+            _geocodingService = geocodingService;
         }
 
         public IQueryable<Kurum> GetFilteredQueryable(string? search = null, string? sehir = null, string? bolge = null)
@@ -26,9 +28,13 @@ namespace DitibStasbourg.Services.Implementations
                 .Include(k => k.UstKurum)
                 .AsQueryable();
 
-            if (!string.IsNullOrEmpty(search) && search.Length >= 3)
+            if (!string.IsNullOrWhiteSpace(search))
             {
-                query = query.Where(k => k.Isim.Contains(search) || (k.Adres != null && k.Adres.Contains(search)));
+                query = query.Where(k => k.Isim.Contains(search) 
+                    || (k.Adres != null && k.Adres.Contains(search))
+                    || (k.DernekBaskaniAd != null && k.DernekBaskaniAd.Contains(search))
+                    || (k.Sehir != null && k.Sehir.Contains(search))
+                    || (k.Bolge != null && k.Bolge.Contains(search)));
             }
 
             if (!string.IsNullOrEmpty(sehir)) query = query.Where(k => k.Sehir == sehir);
@@ -40,7 +46,7 @@ namespace DitibStasbourg.Services.Implementations
         public async Task<List<Kurum>> GetActiveDerneklerAsync()
         {
             return await _context.Kurum
-                .Where(k => (int)k.Tip == 1 && k.AktifMi == true) // 1 = Dernek
+                .Where(k => k.Tip == KurumTip.Dernek && k.AktifMi == true)
                 .Include(k => k.UstKurum)
                 .OrderBy(k => k.Isim)
                 .AsNoTracking()
@@ -74,6 +80,10 @@ namespace DitibStasbourg.Services.Implementations
             return await _context.Kurum
                 .Include(k => k.UstKurum)
                 .Include(k => k.DernekUyeleri)
+                .Include(k => k.Gorevlendirmeler)
+                    .ThenInclude(g => g.Gorevli)
+                .Include(k => k.Gorevlendirmeler)
+                    .ThenInclude(g => g.GorevlendirmeNotlari)
                 .FirstOrDefaultAsync(k => k.Id == id);
         }
 
@@ -86,18 +96,31 @@ namespace DitibStasbourg.Services.Implementations
 
             dernek.Tip    = KurumTip.Dernek;
             dernek.AktifMi = true;
+
+            // Resolve coordinates if null
+            if (!dernek.Latitude.HasValue || !dernek.Longitude.HasValue)
+            {
+                var coords = await _geocodingService.GeocodeAddressAsync(dernek.Adres, dernek.Sehir);
+                if (coords.Latitude.HasValue && coords.Longitude.HasValue)
+                {
+                    dernek.Latitude = coords.Latitude;
+                    dernek.Longitude = coords.Longitude;
+                }
+            }
+
             _context.Add(dernek);
             await _context.SaveChangesAsync();
             return dernek;
         }
 
-        public async Task UpdateBaskanAsync(int id, string ad, string iletisim)
+        public async Task UpdateBaskanAsync(int id, string ad, string iletisim, string? baskanMail)
         {
             var dernek = await _context.Kurum.FindAsync(id);
             if (dernek != null)
             {
                 dernek.DernekBaskaniAd = ad;
                 dernek.DernekBaskaniIletisim = iletisim;
+                dernek.BaskanMail = baskanMail;
                 _context.Update(dernek);
                 await _context.SaveChangesAsync();
             }
@@ -146,7 +169,8 @@ namespace DitibStasbourg.Services.Implementations
         }
 
         public async Task<bool> UpdateDernekAsync(int id, string isim, string? sehir, string? adres, 
-            string? kurulusKanunu, string? baskonsoloslukBolgesi, string? bolge, string? crmUyelikFormDurumu, int? ustKurumId)
+            string? kurulusKanunu, string? baskonsoloslukBolgesi, string? bolge, string? crmUyelikFormDurumu, int? ustKurumId,
+            string? iletisimNumarasi, string? maili, double? latitude, double? longitude)
         {
             var dernek = await _context.Kurum.FindAsync(id);
             if (dernek == null) return false;
@@ -159,6 +183,28 @@ namespace DitibStasbourg.Services.Implementations
             dernek.Bolge = bolge;
             dernek.CrmUyelikFormDurumu = crmUyelikFormDurumu;
             dernek.UstKurumId = ustKurumId;
+            dernek.IletisimNumarasi = iletisimNumarasi;
+            dernek.Maili = maili;
+
+            if (latitude.HasValue && longitude.HasValue)
+            {
+                dernek.Latitude = latitude;
+                dernek.Longitude = longitude;
+            }
+            else
+            {
+                var coords = await _geocodingService.GeocodeAddressAsync(adres, sehir);
+                if (coords.Latitude.HasValue && coords.Longitude.HasValue)
+                {
+                    dernek.Latitude = coords.Latitude;
+                    dernek.Longitude = coords.Longitude;
+                }
+                else
+                {
+                    dernek.Latitude = null;
+                    dernek.Longitude = null;
+                }
+            }
 
             _context.Update(dernek);
             await _context.SaveChangesAsync();
@@ -171,9 +217,16 @@ namespace DitibStasbourg.Services.Implementations
             if (dernek == null) return false;
 
             dernek.AktifMi = false;
+            dernek.IsDeleted = true;
             _context.Update(dernek);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<PaginatedList<Kurum>> GetPaginatedDerneklerAsync(string? search, string? sehir, string? bolge, int pageIndex, int pageSize)
+        {
+            var query = GetFilteredQueryable(search, sehir, bolge);
+            return await PaginatedList<Kurum>.CreateAsync(query, pageIndex, pageSize);
         }
     }
 }

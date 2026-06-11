@@ -16,12 +16,29 @@
                     Üyeler <span class="badge bg-secondary">@(Model.DernekUyeleri?.Count ?? 0)</span>
                 </button>
             </li>
+            <li class="nav-item">
+                <button class="nav-link" id="assignments-tab-@Model.Id" data-bs-toggle="tab" data-bs-target="#assignments-@Model.Id" type="button">
+                    Görevliler ve Görev Geçmişi <span class="badge bg-secondary">@(Model.Gorevlendirmeler?.Count ?? 0)</span>
+                </button>
+            </li>
         </ul>
 
         <div class="tab-content" id="tabContent-@Model.Id">
             
-                
-                <div class="d-flex justify-content-end mb-2">
+            <!-- Genel Bilgiler Tab Pane -->
+            <div class="tab-pane fade show active" id="info-@Model.Id" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex gap-2">
+                        <a href="/DernekIslemleri/ExportSingleToExcel/@Model.Id" class="btn btn-sm btn-success">
+                            <i class="bi bi-file-earmark-excel me-1"></i> Excel İndir
+                        </a>
+                        <a href="/DernekIslemleri/Details/@Model.Id" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-eye me-1"></i> Detaylı Görünüm
+                        </a>
+                        <a href="/DernekIslemleri/Edit/@Model.Id" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-pencil me-1"></i> Düzenle
+                        </a>
+                    </div>
                     <form asp-action="Delete" asp-controller="DernekIslemleri" method="post" style="display:inline;" onsubmit="event.preventDefault(); if(confirm('@Model.Isim adlı derneği silmek istediğinizden emin misiniz?')) this.submit();">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="id" value="@Model.Id" />
@@ -34,116 +51,109 @@
                 <div class="accordion" id="accordion-@Model.Id">
                     
                     <!-- Dernek Temel Bilgileri -->
-                    <div class="accordion-item">
+                    <div class="accordion-item border-0 shadow-xs mb-2 rounded">
                         <h2 class="accordion-header" id="heading-dernek-@Model.Id">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-dernek-@Model.Id" aria-expanded="true">
-                                <i class="fas fa-building me-2"></i> Dernek Temel Bilgileri
+                            <button class="accordion-button bg-light text-dark fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-dernek-@Model.Id" aria-expanded="true">
+                                <i class="fas fa-building me-2 text-primary"></i> Dernek Temel Bilgileri
                             </button>
                         </h2>
                         <div id="collapse-dernek-@Model.Id" class="accordion-collapse collapse show" data-bs-parent="#accordion-@Model.Id">
-                            <div class="accordion-body">
-                                <form id="dernek-form-@Model.Id" onsubmit="event.preventDefault(); submitUpdateDernek(this, @Model.Id);">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@Model.Id" />
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label">Dernek Adı</label>
-                                            <input type="text" name="isim" class="form-control" value="@Model.Isim" required />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Şehir</label>
-                                            <input type="text" name="sehir" class="form-control" value="@Model.Sehir" />
-                                        </div>
-                                        <div class="col-md-12">
-                                            <label class="form-label">Adres</label>
-                                            <textarea name="adres" class="form-control" rows="2">@Model.Adres</textarea>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Kuruluş Kanunu</label>
-                                            <input type="text" name="kurulusKanunu" class="form-control" value="@Model.KurulusKanunu" />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Başkonsolosluk Bölgesi</label>
-                                            <input type="text" name="baskonsoloslukBolgesi" class="form-control" value="@Model.BaskonsoloslukBolgesi" />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Bölge</label>
-                                            <input type="text" name="bolge" class="form-control" value="@Model.Bolge" />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">CRM Üyelik Form Durumu</label>
-                                            <input type="text" name="crmUyelikFormDurumu" class="form-control" value="@Model.CrmUyelikFormDurumu" />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Bağlı Olduğu Kurum</label>
-                                            <select asp-for="UstKurumId" class="form-select" asp-items="@(new SelectList(ViewBag.KurumTurleri, "Id", "Ad"))">
-                                                <option value="">Seçiniz</option>
-                                            </select>
-                                            <span asp-validation-for="UstKurumId" class="text-danger"></span>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <button type="submit" class="btn btn-success">
-                                                <i class="fas fa-save"></i> Temel Bilgileri Güncelle
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
+                            <div class="accordion-body bg-white">
+                                <dl class="row mb-0 g-2">
+                                    <dt class="col-sm-3 text-muted small">Dernek Adı</dt>
+                                    <dd class="col-sm-9 fw-bold">@Model.Isim</dd>
+
+                                    <dt class="col-sm-3 text-muted small">Şehir</dt>
+                                    <dd class="col-sm-9">@(Model.Sehir ?? "-")</dd>
+
+                                    <dt class="col-sm-3 text-muted small">Adres</dt>
+                                    <dd class="col-sm-9">@(Model.Adres ?? "-")</dd>
+
+                                    <dt class="col-sm-3 text-muted small">Kuruluş Kanunu</dt>
+                                    <dd class="col-sm-9">@(Model.KurulusKanunu ?? "-")</dd>
+
+                                    <dt class="col-sm-3 text-muted small">Başkonsolosluk Bölgesi</dt>
+                                    <dd class="col-sm-9">@(Model.BaskonsoloslukBolgesi ?? "-")</dd>
+
+                                    <dt class="col-sm-3 text-muted small">Bölge</dt>
+                                    <dd class="col-sm-9">@(Model.Bolge ?? "-")</dd>
+
+                                    <dt class="col-sm-3 text-muted small">CRM Üyelik Form Durumu</dt>
+                                    <dd class="col-sm-9">
+                                        @if (!string.IsNullOrEmpty(Model.CrmUyelikFormDurumu))
+                                        {
+                                            <span class="badge bg-info text-dark">@Model.CrmUyelikFormDurumu</span>
+                                        }
+                                        else
+                                        {
+                                            <span>-</span>
+                                        }
+                                    </dd>
+
+                                    <dt class="col-sm-3 text-muted small">Bağlı Olduğu Üst Kurum</dt>
+                                    <dd class="col-sm-9">@(Model.UstKurum?.Ad ?? "Bağımsız")</dd>
+
+                                    <dt class="col-sm-3 text-muted small">İletişim Numarası</dt>
+                                    <dd class="col-sm-9">@(Model.IletisimNumarasi ?? "-")</dd>
+
+                                    <dt class="col-sm-3 text-muted small">Dernek E-posta</dt>
+                                    <dd class="col-sm-9">@(Model.Maili ?? "-")</dd>
+
+                                    <dt class="col-sm-3 text-muted small">Coğrafi Konum (Enlem / Boylam)</dt>
+                                    <dd class="col-sm-9">
+                                        @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+                                        {
+                                            <span>@Model.Latitude.Value / @Model.Longitude.Value</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted fst-italic small">Belirtilmemiş</span>
+                                        }
+                                    </dd>
+                                </dl>
                             </div>
                         </div>
                     </div>
 
                     <!-- Başkan Bilgileri -->
-                    <div class="accordion-item">
+                    <div class="accordion-item border-0 shadow-xs mb-2 rounded">
                         <h2 class="accordion-header" id="heading-baskan-@Model.Id">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-baskan-@Model.Id">
-                                <i class="fas fa-user-tie me-2"></i> Dernek Başkanı
+                            <button class="accordion-button collapsed bg-light text-dark fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-baskan-@Model.Id">
+                                <i class="fas fa-user-tie me-2 text-info"></i> Dernek Başkanı
                             </button>
                         </h2>
                         <div id="collapse-baskan-@Model.Id" class="accordion-collapse collapse" data-bs-parent="#accordion-@Model.Id">
-                            <div class="accordion-body">
-                                <form id="baskan-form-@Model.Id" onsubmit="event.preventDefault(); submitUpdateForm(this, @Model.Id, 'Başkan bilgileri');">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@Model.Id" />
-                                    <div class="mb-2">
-                                        <label class="form-label">Ad Soyad</label>
-                                        <input type="text" name="ad" class="form-control" value="@Model.DernekBaskaniAd" />
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">İletişim</label>
-                                        <input type="text" name="iletisim" class="form-control" value="@Model.DernekBaskaniIletisim" />
-                                    </div>
-                                    <button type="submit" class="btn btn-success w-100">
-                                        <i class="fas fa-save"></i> Güncelle
-                                    </button>
-                                </form>
+                            <div class="accordion-body bg-white">
+                                <dl class="row mb-0 g-2">
+                                    <dt class="col-sm-3 text-muted small">Ad Soyad</dt>
+                                    <dd class="col-sm-9 fw-bold">@(Model.DernekBaskaniAd ?? "-")</dd>
+
+                                    <dt class="col-sm-3 text-muted small">İletişim</dt>
+                                    <dd class="col-sm-9">@(Model.DernekBaskaniIletisim ?? "-")</dd>
+
+                                    <dt class="col-sm-3 text-muted small">Başkan E-posta</dt>
+                                    <dd class="col-sm-9">@(Model.BaskanMail ?? "-")</dd>
+                                </dl>
                             </div>
                         </div>
                     </div>
 
                     <!-- Din Görevlisi Bilgileri -->
-                    <div class="accordion-item">
+                    <div class="accordion-item border-0 shadow-xs mb-2 rounded">
                         <h2 class="accordion-header" id="heading-din-@Model.Id">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-din-@Model.Id">
-                                <i class="fas fa-user me-2"></i> Din Görevlisi
+                            <button class="accordion-button collapsed bg-light text-dark fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-din-@Model.Id">
+                                <i class="fas fa-user me-2 text-success"></i> Din Görevlisi
                             </button>
                         </h2>
                         <div id="collapse-din-@Model.Id" class="accordion-collapse collapse" data-bs-parent="#accordion-@Model.Id">
-                            <div class="accordion-body">
-                                <form id="dingorevlisi-form-@Model.Id" onsubmit="event.preventDefault(); submitUpdateForm(this, @Model.Id, 'Din görevlisi bilgileri');">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@Model.Id" />
-                                    <div class="mb-2">
-                                        <label class="form-label">Ad Soyad</label>
-                                        <input type="text" name="ad" class="form-control" value="@Model.DinGorevlisiAd" />
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">İletişim</label>
-                                        <input type="text" name="iletisim" class="form-control" value="@Model.DinGorevlisiIletisim" />
-                                    </div>
-                                    <button type="submit" class="btn btn-success w-100">
-                                        <i class="fas fa-save"></i> Güncelle
-                                    </button>
-                                </form>
+                            <div class="accordion-body bg-white">
+                                <dl class="row mb-0 g-2">
+                                    <dt class="col-sm-3 text-muted small">Ad Soyad</dt>
+                                    <dd class="col-sm-9 fw-bold">@(Model.DinGorevlisiAd ?? "-")</dd>
+
+                                    <dt class="col-sm-3 text-muted small">İletişim</dt>
+                                    <dd class="col-sm-9">@(Model.DinGorevlisiIletisim ?? "-")</dd>
+                                </dl>
                             </div>
                         </div>
                     </div>
@@ -153,7 +163,7 @@
             <!-- Members Tab -->
             <div class="tab-pane fade" id="members-@Model.Id" role="tabpanel">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6>Üye Listesi @(Model.DernekUyeleri.Any() ? $"({Model.DernekUyeleri.Sum(u => u.AileUyeSayisi)} Aile Ferdi)" : "")</h6>
+                    <h6>Üye Listesi @(Model.DernekUyeleri != null && Model.DernekUyeleri.Any() ? $"({Model.DernekUyeleri.Sum(u => u.AileUyeSayisi)} Aile Ferdi)" : "")</h6>
                     <button class="btn btn-sm btn-primary" onclick="toggleAddMember(@Model.Id)"><i class="fas fa-plus"></i> Üye Ekle</button>
                 </div>
 
@@ -241,6 +251,73 @@
                     </table>
                 </div>
             </div>
+
+            <!-- Görevliler ve Görev Geçmişi Tab Pane -->
+            <div class="tab-pane fade" id="assignments-@Model.Id" role="tabpanel">
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table class="table table-sm table-striped align-middle">
+                        <thead>
+                            <tr>
+                                <th>Görevli Adı Soyadı</th>
+                                <th>Başlangıç Tarihi</th>
+                                <th>Bitiş Tarihi</th>
+                                <th>Görev / İdari Notları</th>
+                                <th style="width: 100px;" class="text-end">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Gorevlendirmeler != null && Model.Gorevlendirmeler.Any())
+                            {
+                                foreach (var gv in Model.Gorevlendirmeler.OrderByDescending(g => g.Tarih))
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="fw-bold text-dark">@(gv.Gorevli != null ? $"{gv.Gorevli.Ad} {gv.Gorevli.Soyad}" : "Belirtilmemiş")</span>
+                                        </td>
+                                        <td>@gv.Tarih.ToString("dd.MM.yyyy")</td>
+                                        <td>
+                                            @if (gv.BitisTarihi.HasValue)
+                                            {
+                                                @gv.BitisTarihi.Value.ToString("dd.MM.yyyy")
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-success">Görev Devam Ediyor</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (gv.GorevlendirmeNotlari != null && gv.GorevlendirmeNotlari.Any())
+                                            {
+                                                <ul class="list-unstyled mb-0 small text-muted">
+                                                    @foreach (var not in gv.GorevlendirmeNotlari.OrderByDescending(n => n.Tarih))
+                                                    {
+                                                        <li>• @not.NotIcerik <span class="text-black-50">(@not.Tarih.ToString("dd.MM.yyyy"))</span></li>
+                                                    }
+                                                </ul>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted fst-italic small">-</span>
+                                            }
+                                        </td>
+                                        <td class="text-end">
+                                            <a href="/Gorevli/Details/@gv.GorevliId" class="btn btn-xs btn-primary text-nowrap">
+                                                <i class="bi bi-box-arrow-up-right me-1"></i>Detaya Git
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-3">Bu derneğe atanmış görevli geçmişi bulunmuyor.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
-
+</div>

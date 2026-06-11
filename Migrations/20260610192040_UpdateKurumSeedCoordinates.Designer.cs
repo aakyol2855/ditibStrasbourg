@@ -4,6 +4,7 @@ using DitibStasbourg.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DitibStasbourg.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260610192040_UpdateKurumSeedCoordinates")]
+    partial class UpdateKurumSeedCoordinates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -126,9 +129,6 @@ namespace DitibStasbourg.Migrations
                     b.Property<int>("GorevliId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<int>("KurumId")
                         .HasColumnType("int");
 
@@ -162,7 +162,6 @@ namespace DitibStasbourg.Migrations
                         {
                             Id = 1,
                             GorevliId = 1,
-                            IsDeleted = false,
                             KurumId = 1,
                             Tarih = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -170,7 +169,6 @@ namespace DitibStasbourg.Migrations
                         {
                             Id = 2,
                             GorevliId = 2,
-                            IsDeleted = false,
                             KurumId = 2,
                             Tarih = new DateTime(2023, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -178,7 +176,6 @@ namespace DitibStasbourg.Migrations
                         {
                             Id = 3,
                             GorevliId = 3,
-                            IsDeleted = false,
                             KurumId = 3,
                             Tarih = new DateTime(2023, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
@@ -288,9 +285,6 @@ namespace DitibStasbourg.Migrations
                     b.Property<DateTime?>("IlkGoreveBaslamaTarihi")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Kademe")
                         .HasColumnType("nvarchar(max)");
 
@@ -356,7 +350,6 @@ namespace DitibStasbourg.Migrations
                             Ad = "Ahmet",
                             Durum = 0,
                             Email = "ahmet.yilmaz@example.com",
-                            IsDeleted = false,
                             Soyad = "Yılmaz"
                         },
                         new
@@ -365,7 +358,6 @@ namespace DitibStasbourg.Migrations
                             Ad = "Mehmet",
                             Durum = 0,
                             Email = "mehmet.demir@example.com",
-                            IsDeleted = false,
                             Soyad = "Demir"
                         },
                         new
@@ -374,7 +366,6 @@ namespace DitibStasbourg.Migrations
                             Ad = "Ayşe",
                             Durum = 0,
                             Email = "ayse.kaya@example.com",
-                            IsDeleted = false,
                             Soyad = "Kaya"
                         });
                 });
@@ -574,9 +565,6 @@ namespace DitibStasbourg.Migrations
                     b.Property<string>("IletisimNumarasi")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Isim")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -617,7 +605,6 @@ namespace DitibStasbourg.Migrations
                             Id = 1,
                             Adres = "12 Rue de la Musau",
                             AktifMi = true,
-                            IsDeleted = false,
                             Isim = "Strasbourg Yunus Emre Camii",
                             Latitude = 48.566099999999999,
                             Longitude = 7.7786,
@@ -629,7 +616,6 @@ namespace DitibStasbourg.Migrations
                             Id = 2,
                             Adres = "3 Rue des Écoles",
                             AktifMi = true,
-                            IsDeleted = false,
                             Isim = "Bischheim Fatih Camii",
                             Latitude = 48.6143,
                             Longitude = 7.7491000000000003,
@@ -641,7 +627,6 @@ namespace DitibStasbourg.Migrations
                             Id = 3,
                             Adres = "5 Place Kléber",
                             AktifMi = true,
-                            IsDeleted = false,
                             Isim = "Strasbourg Türk Kültür Derneği",
                             Latitude = 48.582999999999998,
                             Longitude = 7.7477999999999998,

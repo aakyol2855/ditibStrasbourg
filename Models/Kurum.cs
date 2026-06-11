@@ -74,10 +74,31 @@ namespace DitibStasbourg.Models
         [ExportColumn("Din Görevlisi İletişim", Order = 13, IncludeInQuickExport = false)]
         public string? DinGorevlisiIletisim { get; set; }
 
+        [Display(Name = "İletişim Numarası")]
+        [ExportColumn("İletişim Numarası", Order = 14)]
+        public string? IletisimNumarasi { get; set; }
+
+        [Display(Name = "Maili")]
+        [ExportColumn("Maili", Order = 15)]
+        public string? Maili { get; set; }
+
+        [Display(Name = "Başkan Mail")]
+        [ExportColumn("Başkan Mail", Order = 16)]
+        public string? BaskanMail { get; set; }
+
+        [Display(Name = "Enlem (Latitude)")]
+        public double? Latitude { get; set; }
+
+        [Display(Name = "Boylam (Longitude)")]
+        public double? Longitude { get; set; }
+
         // Navigation property for assignments
         public ICollection<Gorevlendirme> Gorevlendirmeler { get; set; } = new List<Gorevlendirme>();
         
         // Navigation for Members
         public ICollection<DernekUye> DernekUyeleri { get; set; } = new List<DernekUye>();
+
+        [Display(Name = "Silindi mi?")]
+        public bool IsDeleted { get; set; } = false;
     }
 }

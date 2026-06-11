@@ -53,6 +53,11 @@ public class ApplicationDbContext : IdentityDbContext
     {
         base.OnModelCreating(builder);
 
+        // Global Soft-Delete Query Filters
+        builder.Entity<Kurum>().HasQueryFilter(k => !k.IsDeleted);
+        builder.Entity<Gorevli>().HasQueryFilter(g => !g.IsDeleted);
+        builder.Entity<Gorevlendirme>().HasQueryFilter(gv => !gv.IsDeleted);
+
         // Configure Lookups
         builder.Entity<LookupType>()
             .HasIndex(lt => lt.Code)
@@ -80,9 +85,9 @@ public class ApplicationDbContext : IdentityDbContext
 
         // Seed Institutions
         builder.Entity<Kurum>().HasData(
-            new Kurum { Id = 1, Isim = "Strasbourg Yunus Emre Camii", Adres = "12 Rue de la Musau", Tip = KurumTip.Cami },
-            new Kurum { Id = 2, Isim = "Bischheim Fatih Camii", Adres = "3 Rue des Écoles", Tip = KurumTip.Cami },
-            new Kurum { Id = 3, Isim = "Strasbourg Türk Kültür Derneği", Adres = "5 Place Kléber", Tip = KurumTip.Dernek }
+            new Kurum { Id = 1, Isim = "Strasbourg Yunus Emre Camii", Adres = "12 Rue de la Musau", Sehir = "Strasbourg", Tip = KurumTip.Cami, Latitude = 48.5661, Longitude = 7.7786 },
+            new Kurum { Id = 2, Isim = "Bischheim Fatih Camii", Adres = "3 Rue des Écoles", Sehir = "Bischheim", Tip = KurumTip.Cami, Latitude = 48.6143, Longitude = 7.7491 },
+            new Kurum { Id = 3, Isim = "Strasbourg Türk Kültür Derneği", Adres = "5 Place Kléber", Sehir = "Strasbourg", Tip = KurumTip.Dernek, Latitude = 48.5830, Longitude = 7.7478 }
         );
 
         // Seed Assignments

@@ -75,5 +75,8 @@ namespace DitibStasbourg.Models.ViewModels
         public string? SortOrder { get; set; }
         public int? PageNumber { get; set; }
         public int? PageSize { get; set; }
+        
+        // Selection-based export support
+        public List<int>? SelectedIds { get; set; }
     }
 }

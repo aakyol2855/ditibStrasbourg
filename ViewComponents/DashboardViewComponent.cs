@@ -24,32 +24,36 @@ namespace DitibStasbourg.ViewComponents
             var model = new DashboardStatsViewModel
             {
                 TotalAssociations = await _context.Kurum.CountAsync(k => k.Tip == Models.KurumTip.Dernek),
-                TotalPersonnel = await _context.Gorevli.CountAsync(),
-                TotalAssignments = await _context.Gorevlendirme.CountAsync(),
-                Preferences = await _prefService.GetPreferencesAsync(userId)
+                TotalCami         = await _context.Kurum.CountAsync(k => k.Tip == Models.KurumTip.Cami),
+                TotalPersonnel    = await _context.Gorevli.CountAsync(),
+                TotalAssignments  = await _context.Gorevlendirme.CountAsync(),
+                Preferences       = await _prefService.GetPreferencesAsync(userId)
             };
 
-            // Region Stats
-            model.RegionStats = await _context.Kurum
+            // ── Region Stats: real gorevlendirme count per region (no approximation) ──
+            var regionRaw = await _context.Kurum
                 .Where(k => !string.IsNullOrEmpty(k.Bolge))
-                .GroupBy(k => k.Bolge)
-                .Select(g => new RegionStat
-                {
-                    RegionName = g.Key!,
-                    AssociationCount = g.Count(),
-                    // This is an approximation for demo: summing some personnel? 
-                    // Actually, let's just count unique staff mentioned in these associations
-                    PersonnelCount = g.Count() * 2 // Simplified for demo
-                })
+                .Select(k => new { k.Bolge, AssignmentCount = k.Gorevlendirmeler.Count() })
                 .ToListAsync();
 
-            // Kurban Summary
+            model.RegionStats = regionRaw
+                .GroupBy(r => r.Bolge!)
+                .Select(g => new RegionStat
+                {
+                    RegionName       = g.Key,
+                    AssociationCount = g.Count(),
+                    PersonnelCount   = g.Sum(r => r.AssignmentCount) // live active assignment count
+                })
+                .OrderByDescending(r => r.PersonnelCount)
+                .ToList();
+
+            // ── Kurban Summary ──
             var kurbanlar = await _context.Kurbanliklar.ToListAsync();
             model.KurbanSummary = new KurbanSummary
             {
                 TotalAnimals = kurbanlar.Count,
-                TotalShares = kurbanlar.Sum(k => k.TotalShares),
-                TakenShares = kurbanlar.Sum(k => k.TotalShares - k.RemainingShares)
+                TotalShares  = kurbanlar.Sum(k => k.TotalShares),
+                TakenShares  = kurbanlar.Sum(k => k.TotalShares - k.RemainingShares)
             };
 
             return View(model);

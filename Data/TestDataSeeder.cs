@@ -22,11 +22,18 @@ namespace DitibStasbourg.Data
 
         private static async Task ClearExistingDataAsync(ApplicationDbContext context)
         {
-            // Clear in correct order (respecting foreign keys)
-            context.DernekUyeleri.RemoveRange(context.DernekUyeleri);
-            context.Gorevlendirme.RemoveRange(context.Gorevlendirme);
-            context.Gorevli.RemoveRange(context.Gorevli);
-            context.Kurum.RemoveRange(context.Kurum);
+            // Clear in correct order (respecting foreign keys) ignoring global filters
+            var uyeler = await context.DernekUyeleri.IgnoreQueryFilters().ToListAsync();
+            context.DernekUyeleri.RemoveRange(uyeler);
+
+            var gorevlendirmeler = await context.Gorevlendirme.IgnoreQueryFilters().ToListAsync();
+            context.Gorevlendirme.RemoveRange(gorevlendirmeler);
+
+            var gorevliler = await context.Gorevli.IgnoreQueryFilters().ToListAsync();
+            context.Gorevli.RemoveRange(gorevliler);
+
+            var kurumlar = await context.Kurum.IgnoreQueryFilters().ToListAsync();
+            context.Kurum.RemoveRange(kurumlar);
             
             await context.SaveChangesAsync();
         }

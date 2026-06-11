@@ -27,6 +27,8 @@ builder.Services.AddScoped(typeof(DitibStasbourg.Services.Base.IBaseService<>), 
 builder.Services.AddScoped<IGorevliService, GorevliService>();
 builder.Services.AddScoped<IGorevlendirmeService, GorevlendirmeService>();
 builder.Services.AddScoped<IUserManagementService, UserManagementService>();
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<IGeocodingService, GeocodingService>();
 builder.Services.AddScoped<IDernekIslemleriService, DernekIslemleriService>();
 builder.Services.AddScoped<IHelpService, HelpService>();
 builder.Services.AddScoped<IFileStorageService, FileStorageService>();
@@ -52,12 +54,25 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+// ── Session lifetime: 2-hour sliding window (auto-renews while staff is active) ──
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Account/Login";
     options.LogoutPath = "/Account/Logout";
     options.AccessDeniedPath = "/Account/AccessDenied";
+    options.ExpireTimeSpan = TimeSpan.FromHours(2);
+    options.SlidingExpiration = true; // Resets the 2-hour window on every authenticated request
 });
+
+// ── Security stamp: verify on every request so password resets take effect immediately ──
+// Default is 30 minutes — TimeSpan.Zero forces validation on every single HTTP request cycle.
+// When a mismatch is detected (e.g. password reset), Identity automatically signs the user
+// out and redirects to /Account/Login without any additional code required.
+builder.Services.Configure<SecurityStampValidatorOptions>(options =>
+{
+    options.ValidationInterval = TimeSpan.Zero;
+});
+
 
 builder.Services.AddControllersWithViews(options =>
 {
@@ -103,6 +118,10 @@ else
 app.UseHttpsRedirection();
 app.UseRouting();
 
+// ── Audit forced sign-outs caused by security stamp invalidation ──
+app.UseMiddleware<SecurityStampAuditMiddleware>();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();

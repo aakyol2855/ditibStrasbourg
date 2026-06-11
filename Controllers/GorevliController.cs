@@ -131,6 +131,25 @@ namespace DitibStasbourg.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> BulkDelete([FromBody] List<int> ids)
+        {
+            if (ids == null || !ids.Any())
+            {
+                return Json(new { success = false, message = "Hiçbir görevli seçilmedi." });
+            }
+
+            int deletedCount = 0;
+            foreach (var id in ids)
+            {
+                await _gorevliService.DeleteAsync(id);
+                deletedCount++;
+            }
+
+            return Json(new { success = true, count = deletedCount });
+        }
+
         public async Task<IActionResult> ExportToExcel(GorevliFilterViewModel filter)
         {
             var content = await _gorevliService.ExportToExcelAsync(filter);
@@ -138,7 +157,6 @@ namespace DitibStasbourg.Controllers
             return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
-        [HttpGet]
         public async Task<IActionResult> CustomExport(GorevliFilterViewModel filter, List<string> columns)
         {
             if (columns == null || !columns.Any())

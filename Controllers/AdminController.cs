@@ -7,10 +7,10 @@ using DitibStasbourg.Models.ViewModels;
 using DitibStasbourg.Services.Interfaces;
 using DitibStasbourg.Services.Implementations;
 using System.Diagnostics;
-// System.Net.Http — removed (unused import)
 using System.Threading.Tasks;
 using System.IO;
 using ClosedXML.Excel;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace DitibStasbourg.Controllers
 {
@@ -22,19 +22,22 @@ namespace DitibStasbourg.Controllers
         private readonly IConfiguration _configuration;
         private readonly IDataMaintenanceService _maintenanceService;
         private readonly ImportProgressTracker _progressTracker;
+        private readonly IMemoryCache _cache;
 
         public AdminController(
             ApplicationDbContext context, 
             ISystemAuditLogService auditLogService, 
             IConfiguration configuration,
             IDataMaintenanceService maintenanceService,
-            ImportProgressTracker progressTracker)
+            ImportProgressTracker progressTracker,
+            IMemoryCache cache)
         {
             _context = context;
             _auditLogService = auditLogService;
             _configuration = configuration;
             _maintenanceService = maintenanceService;
             _progressTracker = progressTracker;
+            _cache = cache;
         }
 
         /// <summary>
@@ -68,7 +71,7 @@ namespace DitibStasbourg.Controllers
         public async Task<IActionResult> PurgeTestData()
         {
             var username = User.Identity?.Name ?? "System_Daemon";
-            await TestDataInitializer.PurgeMockDataAsync(_context);
+            await TestDataInitializer.PurgeMockDataAsync(_context, _cache);
             await _auditLogService.LogAsync(
                 "Warning",
                 username,
@@ -217,6 +220,11 @@ namespace DitibStasbourg.Controllers
 
                     await transaction.CommitAsync();
 
+                    if (_cache is MemoryCache concreteCache)
+                    {
+                        concreteCache.Clear();
+                    }
+
                     await _auditLogService.LogAsync(
                         "Warning",
                         username,
@@ -257,6 +265,11 @@ namespace DitibStasbourg.Controllers
         public async Task<IActionResult> PurgeDuplicates(string module)
         {
             var count = await _maintenanceService.PurgeDuplicateEntriesAsync(module);
+
+            if (_cache is MemoryCache concreteCache)
+            {
+                concreteCache.Clear();
+            }
 
             var username = User.Identity?.Name ?? "System_Deamon";
             await _auditLogService.LogAsync(

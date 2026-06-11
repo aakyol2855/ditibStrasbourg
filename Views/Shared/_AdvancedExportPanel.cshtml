@@ -19,18 +19,23 @@
 
 <style type="text/css">
     .@(pid) {
-        background: rgba(255,255,255,0.07);
-        backdrop-filter: blur(18px) saturate(1.6);
-        -webkit-backdrop-filter: blur(18px) saturate(1.6);
-        border: 1px solid rgba(255,255,255,0.15);
-        border-radius: 1.25rem;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.18);
-        padding: 1.4rem 1.75rem 1.6rem;
-        margin-bottom: 1.5rem;
-        transition: box-shadow 0.3s ease;
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        background: rgba(15, 23, 42, 0.95) !important; /* Premium dark slate glassmorphism */
+        backdrop-filter: blur(18px) saturate(1.6) !important;
+        -webkit-backdrop-filter: blur(18px) saturate(1.6) !important;
+        border: 1px solid rgba(255,255,255,0.18) !important;
+        border-radius: 1.25rem !important;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.18) !important;
+        padding: 1.4rem 1.75rem 1.6rem !important;
+        margin-bottom: 1.5rem !important;
+        transition: box-shadow 0.3s ease !important;
+        position: relative !important;
+        z-index: 9999 !important;
     }
     .@(pid):hover {
-        box-shadow: 0 14px 40px rgba(30,58,95,0.35), inset 0 1px 0 rgba(255,255,255,0.22);
+        box-shadow: 0 14px 40px rgba(15,23,42,0.5), inset 0 1px 0 rgba(255,255,255,0.22) !important;
     }
     .@(pid) .ep-header {
         display: flex; align-items: center; gap: 0.6rem;
@@ -42,16 +47,24 @@
     .@(pid) .ep-header h6 {
         font-size: 0.78rem; font-weight: 700;
         letter-spacing: 0.08em; text-transform: uppercase;
-        color: rgba(255,255,255,0.85); margin: 0; flex: 1;
+        color: rgba(255,255,255,0.95) !important; margin: 0; flex: 1;
     }
     .@(pid) .ep-chevron {
-        color: rgba(255,255,255,0.5);
+        color: rgba(255,255,255,0.6) !important;
         transition: transform 0.25s ease;
         font-size: 0.75rem;
     }
     .@(pid).ep-closed .ep-chevron { transform: rotate(-90deg); }
-    .@(pid) .ep-body { display: block; }
-    .@(pid).ep-closed .ep-body { display: none; }
+    .@(pid) .ep-body { 
+        display: block !important; 
+        opacity: 1 !important; 
+        visibility: visible !important;
+    }
+    .@(pid).ep-closed .ep-body { 
+        display: none !important; 
+        opacity: 0 !important; 
+        visibility: hidden !important;
+    }
     .@(pid) .ep-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));

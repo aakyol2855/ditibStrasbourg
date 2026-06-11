@@ -16,7 +16,6 @@
 @{
     var controller = ViewContext.RouteData.Values["controller"]?.ToString();
     var action = ViewContext.RouteData.Values["action"]?.ToString();
-    string ActiveClass(string c) => controller == c ? "active" : "";
     bool isAdminRoute = controller == "Tanimlamalar" || controller == "LookupAdmin" || controller == "UserManagement" || controller == "RoleTemplate";
     bool isDernekGorevliOpen = controller == "Gorevli" || controller == "Gorevlendirme" || controller == "DernekIslemleri";
 

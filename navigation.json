@@ -27,6 +27,13 @@
       "Controller": "Kurban",
       "Action": "Index",
       "RequiredClaim": "Kurban-Index"
+    },
+    {
+      "Title": "Yardım & Destek",
+      "Icon": "bi bi-question-circle",
+      "Controller": "Help",
+      "Action": "Index",
+      "RequiredClaim": ""
     }
   ],
   "AdminMenu": [

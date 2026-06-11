@@ -1,68 +1,210 @@
-@model IEnumerable<DitibStasbourg.Models.Kurum>
+@model PaginatedList<DitibStasbourg.Models.Kurum>
 
 @{
     ViewData["Title"] = "Dernek İşlemleri";
 }
 
-<div class="container-fluid">
+<style type="text/css">
+    .contextual-action-bar-container {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translate(-50%, 120px);
+        z-index: 1050;
+        background: rgba(15, 23, 42, 0.95);
+        backdrop-filter: blur(12px) saturate(1.5);
+        -webkit-backdrop-filter: blur(12px) saturate(1.5);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        border-radius: 50px;
+        padding: 10px 24px;
+        opacity: 0;
+        visibility: hidden;
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s, visibility 0.3s;
+    }
+    .contextual-action-bar-container.show {
+        transform: translate(-50%, 0);
+        opacity: 1;
+        visibility: visible;
+    }
+    .h-divider {
+        width: 1px;
+        height: 24px;
+        background: rgba(255, 255, 255, 0.15);
+    }
+    .hover-up {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .hover-up:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1) !important;
+    }
+</style>
+
+<div class="container-fluid py-3">
     <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold text-dark mb-0">Dernekler & Kurumlar</h2>
-    <div class="d-flex gap-2">
-        <a asp-action="Import" class="btn btn-outline-success">
-            <i class="bi bi-file-earmark-excel me-2"></i>Toplu İçe Aktar
-        </a>
-        <a asp-action="Create" class="btn btn-primary">
-            <i class="bi bi-plus-lg me-2"></i>Yeni Dernek Ekle
-        </a>
-    </div>
-</div>
+        <div>
+            <h2 class="fw-bold text-dark mb-0">Dernekler &amp; Kurumlar</h2>
+            <p class="text-muted mb-0 small">Sisteme kayıtlı tüm aktif dernek, cami ve bağlı kurumlarımızın yönetim merkezi.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="Import" class="btn btn-outline-success">
+                <i class="bi bi-file-earmark-excel me-2"></i>Toplu İçe Aktar
+            </a>
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-2"></i>Yeni Dernek Ekle
+            </a>
+        </div>
     </div>
 
-    <div class="card shadow-sm">
-        <div class="card-body">
+    <!-- Universal Search & Consolidated Filtering Panel -->
+    <div class="card shadow-sm mb-4 border-0" style="background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(226, 232, 240, 0.8); border-radius: 1rem; backdrop-filter: blur(10px);">
+        <div class="card-body py-3">
+            <form method="get" id="filterForm" class="row g-2 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label text-muted small fw-bold mb-1">Arama Terimi</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                        <input type="text" name="search" id="table-instant-search" class="form-control border-start-0" placeholder="İsim, adres, başkan, şehir, bölge..." value="@ViewBag.CurrentSearch" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-muted small fw-bold mb-1">Şehir</label>
+                    <select name="sehir" class="form-select">
+                        <option value="">Tüm Şehirler</option>
+                        @if (ViewBag.Sehirler != null)
+                        {
+                            foreach (var sehir in (List<string>)ViewBag.Sehirler)
+                            {
+                                <option value="@sehir" selected="@(ViewBag.CurrentSehir == sehir)">@sehir</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label text-muted small fw-bold mb-1">Bölge</label>
+                    <input type="text" name="bolge" class="form-control" placeholder="Bölge..." value="@ViewBag.CurrentBolge" />
+                </div>
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-100"><i class="bi bi-funnel"></i> Filtrele</button>
+                    <a href="/DernekIslemleri" class="btn btn-outline-secondary" title="Filtreleri Temizle"><i class="bi bi-arrow-counterclockwise"></i></a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Advanced Column Select Export Panel (Accordion-style for drawer layout toggle) -->
+    <div class="mb-4" id="exportPanelWrapper">
+        @await Html.PartialAsync("_AdvancedExportPanel", "Dernek")
+    </div>
+
+    <!-- Main Wide Datatable Grid -->
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover align-middle" id="dernekTable">
-                    <thead class="table-light">
+                <table class="table table-hover align-middle mb-0" id="dernekTable">
+                    <thead class="table-light border-bottom">
                         <tr>
-                            <th>Dernek Adı</th>
-                            <th>Başkonsolosluk Bölgesi</th>
-                            <th>Bölge</th>
-                            <th>Şehir</th>
-                            <th>Bağlı Kurum</th>
+                            <th style="width: 50px; text-align: center; vertical-align: middle;">
+                                <input type="checkbox" id="selectAllDernek" class="form-check-input" style="cursor: pointer;" />
+                            </th>
+                            <th style="min-width: 250px;">Resmi Ad / Dernek Adı</th>
+                            <th>Şehir &amp; Bölge</th>
+                            <th>Dernek Başkanı</th>
+                            <th>Dernek İletişim</th>
                             <th>CRM Form Durumu</th>
-                            <th>İşlemler</th>
+                            <th style="width: 160px; text-align: right;">İşlemler</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in Model)
+                        @if (Model.Any())
                         {
-                            <tr>
-                                <td class="fw-bold">@item.Isim</td>
-                                <td>@item.BaskonsoloslukBolgesi</td>
-                                <td>@item.Bolge</td>
-                                <td>@item.Sehir</td>
-                                <td>@item.UstKurum?.Ad</td>
-                                <td>
-                                    @if (!string.IsNullOrEmpty(item.CrmUyelikFormDurumu))
-                                    {
-                                        <span class="badge bg-info text-dark">@item.CrmUyelikFormDurumu</span>
-                                    }
-                                </td>
-                                <td>
-                                    <button class="btn btn-sm btn-primary" type="button" onclick="toggleDetails(@item.Id)">
-                                        <i class="fas fa-chevron-down"></i> Detay / İşlemler
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr id="details-row-@item.Id" style="display: none;">
-                                <td colspan="7" class="p-0">
-                                    <div id="details-content-@item.Id" class="p-3 bg-light border-bottom">
-                                        <div class="text-center">
-                                            <div class="spinner-border text-primary" role="status">
-                                                <span class="visually-hidden">Yükleniyor...</span>
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td style="text-align: center; vertical-align: middle;">
+                                        <input type="checkbox" class="dernek-select form-check-input" data-id="@item.Id" style="cursor: pointer;" />
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold text-dark d-block">@item.Isim</span>
+                                        <small class="text-muted">@(item.UstKurum?.Ad ?? "Bağımsız Kurum")</small>
+                                    </td>
+                                    <td>
+                                        <span class="d-block">@item.Sehir</span>
+                                        <small class="text-muted">@item.Bolge</small>
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(item.DernekBaskaniAd))
+                                        {
+                                            <span class="fw-bold d-block text-secondary">@item.DernekBaskaniAd</span>
+                                            <span class="small d-block text-muted">@item.DernekBaskaniIletisim</span>
+                                            @if (!string.IsNullOrEmpty(item.BaskanMail))
+                                            {
+                                                <small class="text-muted d-block">@item.BaskanMail</small>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted fst-italic small">Belirtilmemiş</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(item.IletisimNumarasi) || !string.IsNullOrEmpty(item.Maili))
+                                        {
+                                            @if (!string.IsNullOrEmpty(item.IletisimNumarasi))
+                                            {
+                                                <span class="d-block small"><i class="bi bi-telephone text-muted me-1"></i>@item.IletisimNumarasi</span>
+                                            }
+                                            @if (!string.IsNullOrEmpty(item.Maili))
+                                            {
+                                                <small class="text-muted d-block"><i class="bi bi-envelope text-muted me-1"></i>@item.Maili</small>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted fst-italic small">-</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(item.CrmUyelikFormDurumu))
+                                        {
+                                            <span class="badge bg-info text-dark rounded-pill px-3 py-1">@item.CrmUyelikFormDurumu</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small">-</span>
+                                        }
+                                    </td>
+                                    <td class="text-end py-3">
+                                        <div class="d-inline-flex gap-1">
+                                            <button class="btn btn-sm btn-outline-primary" type="button" onclick="toggleDetails(@item.Id)">
+                                                <i class="bi bi-chevron-down me-1"></i>Detay
+                                            </button>
+                                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary" title="Düzenle">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr id="details-row-@item.Id" style="display: none;">
+                                    <td colspan="7" class="p-0">
+                                        <div id="details-content-@item.Id" class="p-3 bg-light border-bottom">
+                                            <div class="text-center">
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="visually-hidden">Yükleniyor...</span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center py-5 text-muted">
+                                    <i class="bi bi-folder-x fs-1"></i>
+                                    <p class="mt-2 mb-0">Hiçbir dernek kaydı bulunamadı.</p>
                                 </td>
                             </tr>
                         }
@@ -71,18 +213,279 @@
             </div>
         </div>
     </div>
+
+    <!-- Server-Side Pagination Controls -->
+    @if (Model.Any())
+    {
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 gap-3">
+            <div class="text-muted small">
+                Toplam <strong>@Model.TotalCount</strong> kayıt arasından <strong>@(((Model.PageIndex - 1) * Model.Count) + 1) - @(Math.Min(Model.PageIndex * Model.Count, Model.TotalCount))</strong> arası gösteriliyor.
+            </div>
+            
+            <div class="d-flex align-items-center gap-3">
+                <label class="text-muted small mb-0 text-nowrap">Her Sayfada:</label>
+                <select class="form-select form-select-sm w-auto" onchange="changePageSize(this.value)">
+                    <option value="10" selected="@(ViewBag.PageSize == 10)">10</option>
+                    <option value="20" selected="@(ViewBag.PageSize == 20)">20</option>
+                    <option value="50" selected="@(ViewBag.PageSize == 50)">50</option>
+                    <option value="100" selected="@(ViewBag.PageSize == 100)">100</option>
+                </select>
+                
+                <nav aria-label="Sayfalama">
+                    <ul class="pagination mb-0">
+                        <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                            <a class="page-link" href="?search=@ViewBag.CurrentSearch&sehir=@ViewBag.CurrentSehir&bolge=@ViewBag.CurrentBolge&pageNumber=@(Model.PageIndex - 1)&pageSize=@ViewBag.PageSize" aria-label="Önceki">
+                                <span aria-hidden="true">&laquo; Önceki</span>
+                            </a>
+                        </li>
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(Model.PageIndex == i ? "active" : "")">
+                                <a class="page-link" href="?search=@ViewBag.CurrentSearch&sehir=@ViewBag.CurrentSehir&bolge=@ViewBag.CurrentBolge&pageNumber=@i&pageSize=@ViewBag.PageSize">@i</a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                            <a class="page-link" href="?search=@ViewBag.CurrentSearch&sehir=@ViewBag.CurrentSehir&bolge=@ViewBag.CurrentBolge&pageNumber=@(Model.PageIndex + 1)&pageSize=@ViewBag.PageSize" aria-label="Sonraki">
+                                <span aria-hidden="true">Sonraki &raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- FLOATING CONTEXTUAL ACTION BAR -->
+<div id="contextual-action-bar" class="contextual-action-bar-container">
+    <div class="d-flex align-items-center gap-3">
+        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fs-7 fw-bold" id="selected-badge">0 Dernek Seçildi</span>
+        
+        <div class="h-divider"></div>
+        
+        <button type="button" class="btn btn-sm btn-success rounded-pill px-3" onclick="triggerBulkExcelQuick()">
+            <i class="bi bi-lightning-fill me-1"></i>Hızlı Excel
+        </button>
+        
+        <button type="button" class="btn btn-sm btn-outline-light rounded-pill px-3" onclick="toggleExportPanelFromFloatingBar()">
+            <i class="bi bi-gear-fill me-1"></i>Sütun Seç &amp; İndir
+        </button>
+        
+        <button type="button" class="btn btn-sm btn-danger rounded-pill px-3" onclick="triggerBulkDelete()">
+            <i class="bi bi-trash-fill me-1"></i>Seçilenleri Güvenli Sil
+        </button>
+        
+        <button type="button" class="btn btn-sm btn-link text-white text-decoration-none ms-2" onclick="clearAllSelections()">
+            Sıfırla
+        </button>
+    </div>
 </div>
 
 @section Scripts {
     <script>
+        // Checkbox state tracker with robust sessionStorage persistence
+        (function() {
+            window.selectedEntityIds = [];
+
+            // Read state on load
+            try {
+                var stored = sessionStorage.getItem('selectedDernekIds');
+                if (stored) {
+                    window.selectedEntityIds = JSON.parse(stored);
+                }
+            } catch (e) {
+                console.error('Failed to parse selectedDernekIds from sessionStorage:', e);
+            }
+
+            function syncCheckboxesUI() {
+                var rowCheckboxes = document.querySelectorAll('.dernek-select');
+                var allChecked = rowCheckboxes.length > 0;
+                var noneChecked = true;
+
+                rowCheckboxes.forEach(function(cb) {
+                    var id = parseInt(cb.getAttribute('data-id'));
+                    var isChecked = window.selectedEntityIds.includes(id);
+                    cb.checked = isChecked;
+                    if (isChecked) {
+                        noneChecked = false;
+                    } else {
+                        allChecked = false;
+                    }
+                });
+
+                var selectAll = document.getElementById('selectAllDernek');
+                if (selectAll) {
+                    selectAll.checked = allChecked && rowCheckboxes.length > 0;
+                    selectAll.indeterminate = (!allChecked && !noneChecked);
+                }
+
+                // Update contextual action bar
+                var bar = document.getElementById('contextual-action-bar');
+                var badge = document.getElementById('selected-badge');
+                if (bar) {
+                    if (window.selectedEntityIds.length > 0) {
+                        bar.classList.add('show');
+                        if (badge) {
+                            badge.textContent = window.selectedEntityIds.length + ' Dernek Seçildi';
+                        }
+                    } else {
+                        bar.classList.remove('show');
+                    }
+                }
+
+                // Update Advanced Export Panel if registered
+                if (typeof window.epUpdateRowBadge === 'function') {
+                    window.epUpdateRowBadge();
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                syncCheckboxesUI();
+
+                var selectAll = document.getElementById('selectAllDernek');
+                var rowCheckboxes = document.querySelectorAll('.dernek-select');
+
+                if (selectAll) {
+                    selectAll.addEventListener('change', function() {
+                        var checked = selectAll.checked;
+                        rowCheckboxes.forEach(function(cb) {
+                            var id = parseInt(cb.getAttribute('data-id'));
+                            cb.checked = checked;
+                            if (checked) {
+                                if (!window.selectedEntityIds.includes(id)) {
+                                    window.selectedEntityIds.push(id);
+                                }
+                            } else {
+                                var idx = window.selectedEntityIds.indexOf(id);
+                                if (idx > -1) {
+                                    window.selectedEntityIds.splice(idx, 1);
+                                }
+                            }
+                        });
+                        sessionStorage.setItem('selectedDernekIds', JSON.stringify(window.selectedEntityIds));
+                        syncCheckboxesUI();
+                    });
+                }
+
+                rowCheckboxes.forEach(function(cb) {
+                    cb.addEventListener('change', function() {
+                        var id = parseInt(cb.getAttribute('data-id'));
+                        if (cb.checked) {
+                            if (!window.selectedEntityIds.includes(id)) {
+                                window.selectedEntityIds.push(id);
+                            }
+                        } else {
+                            var idx = window.selectedEntityIds.indexOf(id);
+                            if (idx > -1) {
+                                window.selectedEntityIds.splice(idx, 1);
+                            }
+                        }
+                        sessionStorage.setItem('selectedDernekIds', JSON.stringify(window.selectedEntityIds));
+                        syncCheckboxesUI();
+                    });
+                });
+            });
+
+            // Expose sync function globally
+            window.syncCheckboxesUI = syncCheckboxesUI;
+        })();
+
+        function changePageSize(size) {
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set('pageSize', size);
+            urlParams.set('pageNumber', 1);
+            window.location.search = urlParams.toString();
+        }
+
+        // ── Instant search: debounce 400ms then auto-submit the filter form ──
+        (function() {
+            document.addEventListener('DOMContentLoaded', function() {
+                var searchInput = document.getElementById('table-instant-search');
+                if (!searchInput) return;
+
+                var debounceTimer = null;
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(function() {
+                        var form = document.getElementById('filterForm');
+                        if (form) {
+                            // Reset to page 1 on new search
+                            var pageInput = form.querySelector('input[name="pageNumber"]');
+                            if (!pageInput) {
+                                pageInput = document.createElement('input');
+                                pageInput.type = 'hidden';
+                                pageInput.name = 'pageNumber';
+                                form.appendChild(pageInput);
+                            }
+                            pageInput.value = '1';
+                            form.submit();
+                        }
+                    }, 400);
+                });
+            });
+        })();
+
+        function clearAllSelections() {
+            window.selectedEntityIds = [];
+            sessionStorage.setItem('selectedDernekIds', JSON.stringify([]));
+            if (typeof window.syncCheckboxesUI === 'function') {
+                window.syncCheckboxesUI();
+            }
+        }
+
+        function toggleExportPanelFromFloatingBar() {
+            var panel = document.querySelector('.ep-dernek');
+            if (panel && panel.classList.contains('ep-closed')) {
+                window.epToggle('ep-dernek');
+            }
+            panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function triggerBulkExcelQuick() {
+            if (typeof window.epQuickExport === 'function') {
+                window.epQuickExport('Dernek', 'ep-dernek');
+            }
+        }
+
+        function triggerBulkDelete() {
+            var ids = window.selectedEntityIds || [];
+            if (ids.length === 0) return;
+            if (!confirm(ids.length + ' adet seçilen derneği sistemden silmek istediğinize emin misiniz?')) return;
+
+            var token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+            
+            fetch('/DernekIslemleri/BulkDelete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token
+                },
+                body: JSON.stringify(ids)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✓ ' + data.count + ' dernek silindi!');
+                    clearAllSelections();
+                    location.reload();
+                } else {
+                    alert('✗ Hata: ' + (data.message || 'Silme işlemi gerçekleştirilemedi.'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('✗ Sunucu bağlantısı başarısız.');
+            });
+        }
+
+        // Details view toggling via AJAX
         function toggleDetails(id) {
             var row = document.getElementById('details-row-' + id);
             var contentDiv = document.getElementById('details-content-' + id);
             
             if (row.style.display === 'none') {
                 row.style.display = 'table-row';
-                // Load content via AJAX if empty
-                 if (contentDiv.innerHTML.trim().length < 200 || contentDiv.querySelector('.spinner-border')) {
+                if (contentDiv.innerHTML.trim().length < 200 || contentDiv.querySelector('.spinner-border')) {
                     fetch('/DernekIslemleri/GetDetay/' + id)
                         .then(response => response.text())
                         .then(html => {
@@ -94,10 +497,9 @@
             }
         }
         
-        // Reload partial after updates
         function reloadDetails(id) {
-             var contentDiv = document.getElementById('details-content-' + id);
-             fetch('/DernekIslemleri/GetDetay/' + id)
+            var contentDiv = document.getElementById('details-content-' + id);
+            fetch('/DernekIslemleri/GetDetay/' + id)
                 .then(response => response.text())
                 .then(html => {
                     contentDiv.innerHTML = html;
@@ -111,8 +513,6 @@
 
         function submitUpdateForm(formElement, dernekId, sectionName) {
             var formData = new FormData(formElement);
-            
-            // Determine action based on form ID - use getAttribute to safely get string
             var formId = formElement.getAttribute('id') || '';
             var action = formId.includes('baskan') 
                 ? '/DernekIslemleri/UpdateBaskan'
@@ -166,7 +566,6 @@
         }
         
         function toggleEditMember(uyeId) {
-            // Hide display spans, show input fields
             document.getElementById('display-adsoyad-' + uyeId).style.display = 'none';
             document.getElementById('display-iletisim-' + uyeId).style.display = 'none';
             document.getElementById('display-ailesayisi-' + uyeId).style.display = 'none';
@@ -174,14 +573,12 @@
             document.getElementById('edit-iletisim-' + uyeId).style.display = 'inline-block';
             document.getElementById('edit-ailesayisi-' + uyeId).style.display = 'inline-block';
             
-            // Toggle buttons
             document.getElementById('btn-edit-' + uyeId).style.display = 'none';
             document.getElementById('btn-save-' + uyeId).style.display = 'inline-block';
             document.getElementById('btn-cancel-' + uyeId).style.display = 'inline-block';
         }
         
         function cancelEditMember(uyeId) {
-            // Show display spans, hide input fields
             document.getElementById('display-adsoyad-' + uyeId).style.display = 'inline';
             document.getElementById('display-iletisim-' + uyeId).style.display = 'inline';
             document.getElementById('display-ailesayisi-' + uyeId).style.display = 'inline';
@@ -189,7 +586,6 @@
             document.getElementById('edit-iletisim-' + uyeId).style.display = 'none';
             document.getElementById('edit-ailesayisi-' + uyeId).style.display = 'none';
             
-            // Toggle buttons
             document.getElementById('btn-edit-' + uyeId).style.display = 'inline-block';
             document.getElementById('btn-save-' + uyeId).style.display = 'none';
             document.getElementById('btn-cancel-' + uyeId).style.display = 'none';
@@ -207,7 +603,6 @@
             formData.append('aileUyeSayisi', aileSayisi);
             formData.append('kurumId', dernekId);
             
-            // Get antiforgery token
             var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
             formData.append('__RequestVerificationToken', token);
             

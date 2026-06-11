@@ -4,6 +4,7 @@
         <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <NoWarn>$(NoWarn);CS8618;CS8602;CS8604;CS8600;CS8603;CS8625;CS1998;CS8619</NoWarn>
         <UserSecretsId>aspnet-DitibStasbourg-1d13fdee-d28c-4ae4-bad9-2d3577689686</UserSecretsId>
     </PropertyGroup>
 

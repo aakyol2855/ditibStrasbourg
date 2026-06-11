@@ -71,6 +71,9 @@ namespace DitibStasbourg.Services.Implementations
             if (filter.StaffIds != null && filter.StaffIds.Any())
                 query = query.Where(s => filter.StaffIds.Contains(s.Id));
 
+            if (filter.SelectedIds != null && filter.SelectedIds.Any())
+                query = query.Where(s => filter.SelectedIds.Contains(s.Id));
+
             if (filter.GorevliDurumIds != null && filter.GorevliDurumIds.Any())
                 query = query.Where(s => s.GorevliDurumId.HasValue && filter.GorevliDurumIds.Contains(s.GorevliDurumId.Value));
 
@@ -288,13 +291,32 @@ namespace DitibStasbourg.Services.Implementations
                         columnMap[headerValue] = col;
                     }
 
+                    // Check if required headers exist: "ad" or "soyad"
+                    bool hasAd = columnMap.Keys.Any(k => k == "ad" || k == "adı" || k == "isim" || k == "name" || k == "first name" || k.Contains("ad") || k.Contains("adı") || k.Contains("isim") || k.Contains("name"));
+                    bool hasSoyad = columnMap.Keys.Any(k => k == "soyad" || k == "soyadı" || k == "surname" || k == "last name" || k.Contains("soyad") || k.Contains("soyadı") || k.Contains("surname"));
+
+                    if (!hasAd || !hasSoyad)
+                    {
+                        throw new ArgumentException("Yüklenen Excel dosyasında zorunlu 'Ad' veya 'Soyad' sütunları bulunamadı. Lütfen sütun başlıklarını kontrol ediniz.");
+                    }
+
                     string? GetCellValue(IXLRow row, params string[] possibleNames)
                     {
                         foreach (var name in possibleNames)
                         {
-                            if (columnMap.TryGetValue(name.ToLower(), out int colIndex))
+                            var nameLower = name.ToLower();
+                            if (columnMap.TryGetValue(nameLower, out int colIndex))
                             {
                                 return row.Cell(colIndex).GetString().Trim();
+                            }
+                        }
+                        foreach (var name in possibleNames)
+                        {
+                            var nameLower = name.ToLower();
+                            var matchedKey = columnMap.Keys.FirstOrDefault(k => k.Contains(nameLower));
+                            if (matchedKey != null)
+                            {
+                                return row.Cell(columnMap[matchedKey]).GetString().Trim();
                             }
                         }
                         return null;
@@ -304,9 +326,20 @@ namespace DitibStasbourg.Services.Implementations
                     {
                         foreach (var name in possibleNames)
                         {
-                            if (columnMap.TryGetValue(name.ToLower(), out int colIndex))
+                            var nameLower = name.ToLower();
+                            if (columnMap.TryGetValue(nameLower, out int colIndex))
                             {
                                 var cell = row.Cell(colIndex);
+                                if (cell.TryGetValue(out DateTime date)) return date;
+                            }
+                        }
+                        foreach (var name in possibleNames)
+                        {
+                            var nameLower = name.ToLower();
+                            var matchedKey = columnMap.Keys.FirstOrDefault(k => k.Contains(nameLower));
+                            if (matchedKey != null)
+                            {
+                                var cell = row.Cell(columnMap[matchedKey]);
                                 if (cell.TryGetValue(out DateTime date)) return date;
                             }
                         }
@@ -337,12 +370,62 @@ namespace DitibStasbourg.Services.Implementations
                                 continue;
                             }
 
+                            var tc = GetCellValue(row, "tc", "tc kimlik no", "tckimlikno", "tc no");
+                            var email = GetCellValue(row, "email", "e-posta", "eposta", "e-mail");
+
+                            // Explicit database lookup constraint
+                            bool existsInDb = false;
+                            string duplicateDetail = "";
+
+                            if (!string.IsNullOrEmpty(tc))
+                            {
+                                existsInDb = await _context.Gorevli.AnyAsync(g => g.TCKimlikNo == tc);
+                                if (existsInDb)
+                                {
+                                    duplicateDetail = $"TC Kimlik Numarası ({tc}) zaten veritabanında mevcut.";
+                                }
+                            }
+                            else
+                            {
+                                if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(cep))
+                                {
+                                    existsInDb = await _context.Gorevli.AnyAsync(g => g.Email == email || g.CepTelefonu == cep);
+                                    if (existsInDb)
+                                    {
+                                        duplicateDetail = $"E-posta ({email}) veya Cep Telefonu ({cep}) zaten veritabanında mevcut.";
+                                    }
+                                }
+                                else if (!string.IsNullOrEmpty(email))
+                                {
+                                    existsInDb = await _context.Gorevli.AnyAsync(g => g.Email == email);
+                                    if (existsInDb)
+                                    {
+                                        duplicateDetail = $"E-posta ({email}) zaten veritabanında mevcut.";
+                                    }
+                                }
+                                else if (!string.IsNullOrEmpty(cep))
+                                {
+                                    existsInDb = await _context.Gorevli.AnyAsync(g => g.CepTelefonu == cep);
+                                    if (existsInDb)
+                                    {
+                                        duplicateDetail = $"Cep Telefonu ({cep}) zaten veritabanında mevcut.";
+                                    }
+                                }
+                            }
+
+                            if (existsInDb)
+                            {
+                                errors.Add($"Satır {row.RowNumber()}: Mükerrer kayıt engellendi ({ad} {soyad}). Detay: {duplicateDetail}");
+                                errorCount++;
+                                continue;
+                            }
+
                             var gorevli = new Gorevli
                             {
                                 Ad = ad,
                                 Soyad = soyad,
-                                Email = GetCellValue(row, "email", "e-posta", "eposta", "e-mail"),
-                                TCKimlikNo = GetCellValue(row, "tc", "tc kimlik no", "tckimlikno", "tc no"),
+                                Email = email,
+                                TCKimlikNo = tc,
                                 Cinsiyet = GetCellValue(row, "cinsiyet", "gender", "sex")?.ToUpper().Substring(0, 1),
                                 CepTelefonu = cep,
                                 EvTelefonu = GetCellValue(row, "ev telefonu", "ev tel", "home phone"),
@@ -355,7 +438,8 @@ namespace DitibStasbourg.Services.Implementations
                                 DiyanetGirisTarihi = GetDateValue(row, "diyanet giriş", "diyanet tarihi"),
                                 EmeklilikTarihi = GetDateValue(row, "emeklilik tarihi", "emeklilik", "retirement date"),
                                 MezuniyetOkul = GetCellValue(row, "mezuniyet okul", "okul", "school"),
-                                MezuniyetBolum = GetCellValue(row, "mezuniyet bölüm", "bölüm", "department")
+                                MezuniyetBolum = GetCellValue(row, "mezuniyet bölüm", "bölüm", "department"),
+                                IsDeleted = false
                             };
 
                             _context.Gorevli.Add(gorevli);
@@ -374,6 +458,59 @@ namespace DitibStasbourg.Services.Implementations
             }
 
             return (successCount, errorCount, importResults, errors);
+        }
+
+        public override async Task DeleteAsync(Gorevli entityToDelete)
+        {
+            var gorevliId = entityToDelete.Id;
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    // 1. Delete notes on Gorevlendirmeler
+                    var gorevlendirmeIds = await _context.Gorevlendirme
+                        .Where(g => g.GorevliId == gorevliId)
+                        .Select(g => g.Id)
+                        .ToListAsync();
+
+                    if (gorevlendirmeIds.Any())
+                    {
+                        var gNotlar = await _context.GorevlendirmeNotlari
+                            .Where(gn => gorevlendirmeIds.Contains(gn.GorevlendirmeId))
+                            .ToListAsync();
+                        _context.GorevlendirmeNotlari.RemoveRange(gNotlar);
+
+                        // 2. Delete Gorevlendirmeler
+                        var activeAssignments = await _context.Gorevlendirme
+                            .Where(g => g.GorevliId == gorevliId)
+                            .ToListAsync();
+                        _context.Gorevlendirme.RemoveRange(activeAssignments);
+                    }
+
+                    // 3. Delete GorevGecmisleri where this gorevli is the main personnel or the replacement
+                    var activeHistory = await _context.GorevGecmisleri
+                        .Where(g => g.GorevliId == gorevliId || g.YerineGelenGorevliId == gorevliId)
+                        .ToListAsync();
+                    _context.GorevGecmisleri.RemoveRange(activeHistory);
+
+                    // 4. Delete GorevliNotlari
+                    var notes = await _context.GorevliNotlari
+                        .Where(n => n.GorevliId == gorevliId)
+                        .ToListAsync();
+                    _context.GorevliNotlari.RemoveRange(notes);
+
+                    // 5. Remove the Gorevli entity
+                    dbSet.Remove(entityToDelete);
+
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                }
+                catch (Exception)
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+            }
         }
     }
 }

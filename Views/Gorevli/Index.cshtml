@@ -7,464 +7,710 @@
     var nextDisabled = !Model.HasNextPage ? "disabled" : "";
 }
 
-<style>
-    .accordion-button:not(.collapsed) { background-color: #e7f1ff; }
+<style type="text/css">
+    .contextual-action-bar-container {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translate(-50%, 120px);
+        z-index: 1050;
+        background: rgba(15, 23, 42, 0.95);
+        backdrop-filter: blur(12px) saturate(1.5);
+        -webkit-backdrop-filter: blur(12px) saturate(1.5);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        border-radius: 50px;
+        padding: 10px 24px;
+        opacity: 0;
+        visibility: hidden;
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s, visibility 0.3s;
+    }
+    .contextual-action-bar-container.show {
+        transform: translate(-50%, 0);
+        opacity: 1;
+        visibility: visible;
+    }
+    .h-divider {
+        width: 1px;
+        height: 24px;
+        background: rgba(255, 255, 255, 0.15);
+    }
+    
+    /* Dark slate glassmorphism panel */
+    .glass-panel {
+        background: rgba(15, 23, 42, 0.96) !important;
+        backdrop-filter: blur(20px) saturate(1.7) !important;
+        -webkit-backdrop-filter: blur(20px) saturate(1.7) !important;
+        border: 1px solid rgba(255, 255, 255, 0.14) !important;
+        border-radius: 1.25rem !important;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45) !important;
+        color: #fff !important;
+        padding: 1.6rem 2.2rem !important;
+    }
+    .glass-panel h5 {
+        color: #fff !important;
+    }
+    .glass-panel .form-label {
+        color: rgba(255, 255, 255, 0.8) !important;
+        font-size: 0.76rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+    }
+    .glass-panel .form-control, 
+    .glass-panel .form-select {
+        background-color: rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        color: #fff !important;
+        border-radius: 0.5rem !important;
+    }
+    .glass-panel .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.4) !important;
+    }
+    .glass-panel .form-control:focus, 
+    .glass-panel .form-select:focus {
+        background-color: rgba(255, 255, 255, 0.12) !important;
+        border-color: #3b82f6 !important;
+        color: #fff !important;
+        box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25) !important;
+    }
+    .glass-panel .form-select option {
+        background-color: #0f172a !important;
+        color: #fff !important;
+    }
+    
+    /* Select2 Dark Mode Override */
+    .glass-panel .select2-container--default .select2-selection--multiple {
+        background-color: rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-radius: 0.5rem !important;
+        min-height: 38px;
+    }
+    .glass-panel .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: rgba(255, 255, 255, 0.15) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        color: #fff !important;
+        border-radius: 0.25rem !important;
+        padding: 1px 8px !important;
+        font-size: 0.8rem;
+    }
+    .glass-panel .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: rgba(255, 255, 255, 0.7) !important;
+        margin-right: 5px !important;
+    }
+    .glass-panel .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+        color: #ef4444 !important;
+    }
+    .glass-panel .select2-container--default.select2-container--focus .select2-selection--multiple {
+        border-color: #3b82f6 !important;
+    }
+    .select2-dropdown {
+        background-color: #0f172a !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        color: #fff !important;
+        z-index: 99999 !important;
+    }
+    .select2-container--default .select2-search--inline .select2-search__field {
+        color: #fff !important;
+    }
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: #2563eb !important;
+    }
+    .select2-container--default .select2-results__option[aria-selected=true] {
+        background-color: rgba(255, 255, 255, 0.12) !important;
+    }
+
+    /* Collapsible export section styles */
+    .ep-trigger {
+        cursor: pointer;
+        user-select: none;
+        padding: 1.1rem 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+        margin-top: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .ep-trigger h6 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 0.82rem;
+        letter-spacing: 0.06em;
+        color: rgba(255, 255, 255, 0.95);
+        text-transform: uppercase;
+    }
+    .ep-trigger .ep-chevron-icon {
+        color: rgba(255, 255, 255, 0.6);
+        transition: transform 0.25s ease;
+    }
+    .ep-content {
+        display: none;
+        padding-top: 0.5rem;
+    }
+    .ep-content.show {
+        display: block;
+    }
+    .ep-col-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 0.5rem 1rem;
+        max-height: 200px;
+        overflow-y: auto;
+        padding-right: 0.5rem;
+        margin-bottom: 1.2rem;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    }
+    .ep-col-grid::-webkit-scrollbar {
+        width: 4px;
+    }
+    .ep-col-grid::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 2px;
+    }
+    .ep-checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.35rem 0.6rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 0.4rem;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+    .ep-checkbox-item:hover, .ep-checkbox-item.active {
+        background: rgba(59, 130, 246, 0.2);
+        border-color: rgba(59, 130, 246, 0.4);
+    }
+    .ep-checkbox-item input {
+        accent-color: #3b82f6;
+        cursor: pointer;
+        width: 14px;
+        height: 14px;
+    }
+    .ep-checkbox-item label {
+        font-size: 0.74rem;
+        color: rgba(255, 255, 255, 0.8);
+        cursor: pointer;
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .border-white-10 {
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
 </style>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="fw-bold">Görevliler <help-icon topic-id="1" title="Personel Yönetimi"></help-icon></h1>
-    <div>
-        <button type="button" id="btnExportExcel" class="btn btn-success me-2">
-            <i class="fas fa-file-excel me-2"></i>Excel'e Aktar
-        </button>
-        @if (User.IsInRole("SuperAdmin"))
-        {
-            <a asp-action="Import" class="btn btn-success me-2"><i class="fas fa-file-excel"></i> Excel'den Yükle</a>
-        }
-        <a asp-action="Create" class="btn btn-primary"><i class="fas fa-plus"></i> Yeni Ekle</a>
-    </div>
-</div>
-
-@{
-    var filter = ViewData["Filter"] as DitibStasbourg.Models.ViewModels.GorevliFilterViewModel ?? new DitibStasbourg.Models.ViewModels.GorevliFilterViewModel();
-}
-
-<div class="accordion mb-4" id="filterAccordion">
-    <div class="accordion-item">
-        <h2 class="accordion-header" id="headingFilter">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
-                <i class="fas fa-filter me-2"></i> Gelişmiş Filtreleme
-            </button>
-        </h2>
-        <div id="collapseFilter" class="accordion-collapse collapse @(!string.IsNullOrEmpty(filter.SearchString) || filter.GorevliDurumIds?.Any() == true ? "show" : "")" aria-labelledby="headingFilter" data-bs-parent="#filterAccordion">
-            <div class="accordion-body">
-                <form asp-action="Index" method="get">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label">Arama (İsim, Soyad, E-posta)</label>
-                            <select name="StaffIds" id="staffSearch" class="form-select" multiple="multiple">
-                                <!-- Options will be loaded via AJAX autocomplete -->
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Kurum</label>
-                            <select name="KurumId" class="form-select" asp-items="@(new SelectList(ViewBag.Kurumlar, "Id", "Isim", filter.KurumId))">
-                                <option value="">Tümü</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Şehir</label>
-                            <select name="Sehir" class="form-select" asp-items="@(new SelectList(ViewBag.Sehirler, filter.Sehir))">
-                                <option value="">Tümü</option>
-                            </select>
-                        </div>
-                        
-                         <div class="col-md-3">
-                            <label class="form-label">Sözleşme Tipi</label>
-                            <select name="SozlesmeTipId" class="form-select" asp-items="@(new SelectList(ViewBag.SozlesmeTipleri, "Id", "Ad", filter.SozlesmeTipId))">
-                                <option value="">Tümü</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Cinsiyet</label>
-                            <select name="Cinsiyet" class="form-select">
-                                <option value="">Tümü</option>
-                                <option value="E" selected="@(filter.Cinsiyet == "E")">Erkek</option>
-                                <option value="K" selected="@(filter.Cinsiyet == "K")">Kadın</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Aktiflik</label>
-                            <select name="IsActive" class="form-select">
-                                <option value="">Hepsi</option>
-                                <option value="true" selected="@(filter.IsActive == true)">Aktif Görevde</option>
-                                <option value="false" selected="@(filter.IsActive == false)">Pasif / Görevde Değil</option>
-                            </select>
-                        </div>
-
-                        <!-- Yeni Filtreler -->
-                        <div class="col-md-3">
-                            <label class="form-label">Ünvan</label>
-                            <select name="UnvanIds" class="form-select" multiple asp-items="@(new SelectList(ViewBag.Unvanlar, "Id", "Ad", filter.UnvanIds))">
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Eğitim Durumu</label>
-                            <select name="EgitimDurumuIds" class="form-select" multiple asp-items="@(new SelectList(ViewBag.EgitimDurumlari, "Id", "Ad", filter.EgitimDurumuIds))">
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Hafızlık</label>
-                            <select name="HafizlikDurumuIds" class="form-select" multiple asp-items="@(new SelectList(ViewBag.HafizlikDurumlari, "Id", "Ad", filter.HafizlikDurumuIds))">
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Kadro Türü</label>
-                            <select name="KadroTuruIds" class="form-select" multiple asp-items="@(new SelectList(ViewBag.KadroTurleri, "Id", "Ad", filter.KadroTuruIds))">
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Kan Grubu</label>
-                            <select name="KanGrubuIds" class="form-select" multiple asp-items="@(new SelectList(ViewBag.KanGruplari, "Id", "Ad", filter.KanGrubuIds))">
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                             <label class="form-label">Askerlik Durumu</label>
-                             <select name="AskerlikDurumuIds" class="form-select" multiple asp-items="@(new SelectList(ViewBag.AskerlikDurumlari, "Id", "Ad", filter.AskerlikDurumuIds))">
-                             </select>
-                        </div>
-                        
-                         <div class="col-md-12">
-                            <label class="form-label d-block">Görevli Durumu</label>
-                            <div class="d-flex flex-wrap gap-3">
-                                @if (ViewBag.Durumlar != null)
-                                {
-                                    foreach (var durum in (List<DitibStasbourg.Models.Ref_GorevliDurum>)ViewBag.Durumlar)
-                                    {
-                                        var isChecked = filter.GorevliDurumIds != null && filter.GorevliDurumIds.Contains(durum.Id);
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="GorevliDurumIds" value="@durum.Id" id="status_@durum.Id" @(isChecked ? "checked" : "")>
-                                            <label class="form-check-label badge" style="background-color: @(durum.Renk ?? "gray"); color: white; cursor: pointer;" for="status_@durum.Id">
-                                                @durum.Ad
-                                            </label>
-                                        </div>
-                                    }
-                                }
-                            </div>
-                        </div>
-
-                        <div class="col-md-12 text-end">
-                            <a asp-action="Index" class="btn btn-outline-secondary me-2">Temizle</a>
-                            <button type="submit" class="btn btn-primary">Filtrele</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
+<div class="container-fluid py-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold text-dark mb-0">Görevliler <help-icon topic-id="1" title="Personel Yönetimi"></help-icon></h1>
+            <p class="text-muted mb-0 small">Diyanet ve yerel sözleşmeli personelin görev geçmişi, notları ve aktiflik durumları.</p>
+        </div>
+        <div class="d-flex gap-2">
+            @if (User.IsInRole("SuperAdmin"))
+            {
+                <a asp-action="Import" class="btn btn-outline-success"><i class="bi bi-file-earmark-excel me-2"></i>Excel'den Yükle</a>
+            }
+            <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg me-2"></i>Yeni Görevli Ekle</a>
         </div>
     </div>
-</div>
 
-<div class="accordion mb-4" id="exportAccordionWrapper">
-    @await Html.PartialAsync("_AdvancedExportPanel", "Gorevli")
-</div>
+    @{
+        var filter = ViewData["Filter"] as DitibStasbourg.Models.ViewModels.GorevliFilterViewModel ?? new DitibStasbourg.Models.ViewModels.GorevliFilterViewModel();
+    }
 
-<div class="row mb-2 fw-bold text-muted border-bottom pb-2 d-none d-md-flex">
-    <div class="col-md-3">
-        <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]" class="text-decoration-none text-dark">Ad Soyad <i class="fas fa-sort"></i></a>
-    </div>
-    <div class="col-md-2">
-        <a asp-action="Index" asp-route-sortOrder="@ViewData["StatusSortParm"]" class="text-decoration-none text-dark">Referans Durumu <i class="fas fa-sort"></i></a>
-    </div>
-    <div class="col-md-2">Son Görev</div>
-    <div class="col-md-2">
-        <a asp-action="Index" asp-route-sortOrder="@ViewData["DateSortParm"]" class="text-decoration-none text-dark">Tarihler <i class="fas fa-sort"></i></a>
-    </div>
-    <div class="col-md-1 text-center">Aktif mi?</div>
-    <div class="col-md-2 text-end">İşlemler</div>
-</div>
+    <!-- Single Unified Glassmorphic Query & Export Container -->
+    <div class="glass-panel shadow mb-4">
+        <form asp-action="Index" method="get" id="filterForm">
+            <h5 class="fw-bold mb-3 d-flex align-items-center">
+                <i class="bi bi-funnel-fill text-primary me-2"></i>
+                <span>Gelişmiş Arama, Filtreleme ve Raporlama</span>
+            </h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Görevli Arama (İsim, Soyad, E-posta)</label>
+                    <select name="StaffIds" id="staffSearch" class="form-select" multiple="multiple">
+                        <!-- Options loaded via AJAX -->
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Kurum</label>
+                    <select name="KurumId" class="form-select" asp-items="@(new SelectList(ViewBag.Kurumlar, "Id", "Isim", filter.KurumId))">
+                        <option value="">Tümü</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Şehir</label>
+                    <select name="Sehir" class="form-select" asp-items="@(new SelectList(ViewBag.Sehirler, filter.Sehir))">
+                        <option value="">Tümü</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-3">
+                    <label class="form-label">Sözleşme Tipi</label>
+                    <select name="SozlesmeTipId" class="form-select" asp-items="@(new SelectList(ViewBag.SozlesmeTipleri, "Id", "Ad", filter.SozlesmeTipId))">
+                        <option value="">Tümü</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Cinsiyet</label>
+                    <select name="Cinsiyet" class="form-select">
+                        <option value="">Tümü</option>
+                        <option value="E" selected="@(filter.Cinsiyet == "E")">Erkek</option>
+                        <option value="K" selected="@(filter.Cinsiyet == "K")">Kadın</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Aktiflik</label>
+                    <select name="IsActive" class="form-select">
+                        <option value="">Hepsi</option>
+                        <option value="true" selected="@(filter.IsActive == true)">Aktif Görevde</option>
+                        <option value="false" selected="@(filter.IsActive == false)">Pasif / Görevde Değil</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Ünvan</label>
+                    <select name="UnvanIds" class="form-select" multiple asp-items="@(new SelectList(ViewBag.Unvanlar, "Id", "Ad", filter.UnvanIds))">
+                    </select>
+                </div>
 
-<div class="accordion" id="accordionGorevli">
-    @foreach (var item in Model) {
-        var statusClass = item.Durum switch {
-            GorevliDurum.Yesil => "status-yesil",
-            GorevliDurum.Turuncu => "status-turuncu",
-            GorevliDurum.Kirmizi => "status-kirmizi",
-            _ => "status-notr"
-        };
-        var lastAssignment = item.Gorevlendirmeler.OrderByDescending(g => g.Tarih).FirstOrDefault();
-        var lastPlace = lastAssignment?.Kurum?.Isim ?? "-";
-        
-        var earliestStart = item.Gorevlendirmeler.OrderBy(g => g.Tarih).FirstOrDefault()?.Tarih;
-        var latestEnd = item.Gorevlendirmeler.OrderByDescending(g => g.BitisTarihi).FirstOrDefault()?.BitisTarihi;
-        
-        <div class="accordion-item mb-2 shadow-sm border-0" style="border-left: 5px solid @(item.GorevliDurumBilgisi?.Renk ?? "#6c757d") !important;">
-            <h2 class="accordion-header" id="heading-@item.Id">
-                <button class="accordion-button collapsed py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@item.Id" aria-expanded="false" aria-controls="collapse-@item.Id">
-                    <div class="container-fluid p-0">
-                        <div class="row align-items-center">
-                            <div class="col-md-3 fw-bold">@item.AdSoyad <br/>
-                                <small class="text-muted">@(item.Cinsiyet == "E" ? "Erkek" : item.Cinsiyet == "K" ? "Kadın" : "")</small>
-                                <br />
-                                @if (item.Unvan != null)
-                                {
-                                    <span class="badge bg-light text-dark border">@item.Unvan.Ad</span>
-                                }
-                                @if (item.GorevliNotlari != null && item.GorevliNotlari.Any())
-                                {
-                                    <i class="fas fa-sticky-note text-warning ms-2" title="Not Mevcut"></i>
-                                }
-                            </div>
-                            <div class="col-md-2">
-                                @if (item.GorevliDurumBilgisi != null)
-                                {
-                                    <span class="badge" style="background-color: @(item.GorevliDurumBilgisi.Renk ?? "#6c757d"); color: white;">@item.GorevliDurumBilgisi.Ad</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary">Tanımsız</span>
-                                }
-                                @if (item.SozlesmeTip != null)
-                                {
-                                    <br/><span class="badge bg-info text-dark mt-1">@item.SozlesmeTip.Ad</span>
-                                }
-                            </div>
-                            <div class="col-md-2 small text-muted">@lastPlace</div>
-                            <div class="col-md-2 small text-muted">
-                                @if(earliestStart.HasValue) {
-                                    <div><small>Baş:</small> @earliestStart.Value.ToShortDateString()</div>
-                                } else {
-                                    <div><small>Baş:</small> -</div>
-                                }
-                                @if(latestEnd.HasValue) {
-                                    <div><small>Bit:</small> @latestEnd.Value.ToShortDateString()</div>
-                                }
-                            </div>
-                            <div class="col-md-1 text-center">
-                                @if (item.isActive) {
-                                    <span class="text-success" title="Şu an görevde"><i class="fas fa-check-circle fa-lg"></i></span>
-                                } else {
-                                    <span class="text-danger" title="Görevde değil"><i class="fas fa-times-circle fa-lg"></i></span>
-                                }
-                            </div>
-                        </div>
-                    </div>
-                </button>
-            </h2>
-            <div id="collapse-@item.Id" class="accordion-collapse collapse" aria-labelledby="heading-@item.Id" data-bs-parent="#accordionGorevli">
-                <div class="accordion-body bg-white">
-                    <div class="d-flex justify-content-end mb-3">
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning me-2">Düzenle</a>
-                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info me-2">Detay</a>
-                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Sil</a>
-                    </div>
-                    
-                    <h5 class="border-bottom pb-2">Görev Geçmişi</h5>
-                    @if (item.Gorevlendirmeler.Any())
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-sm table-bordered">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Kurum</th>
-                                        <th>Tarih</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach(var gorev in item.Gorevlendirmeler.OrderByDescending(g => g.Tarih))
-                                    {
-                                        <tr>
-                                            <td>@gorev.Kurum?.Isim</td>
-                                            <td>@gorev.Tarih.ToShortDateString()</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    }
-                    else
-                    {
-                        <p class="text-muted fst-italic">Henüz görevlendirme yok.</p>
-                    }
-                    
-                    <h5 class="border-bottom pb-2 mt-4">Notlar</h5>
-                    @if (item.GorevliNotlari != null && item.GorevliNotlari.Any())
-                    {
-                        <div class="mb-3">
-                            @foreach(var not in item.GorevliNotlari.OrderByDescending(n => n.Tarih))
+                <div class="col-md-3">
+                    <label class="form-label">Eğitim Durumu</label>
+                    <select name="EgitimDurumuIds" class="form-select" multiple asp-items="@(new SelectList(ViewBag.EgitimDurumlari, "Id", "Ad", filter.EgitimDurumuIds))">
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Hafızlık</label>
+                    <select name="HafizlikDurumuIds" class="form-select" multiple asp-items="@(new SelectList(ViewBag.HafizlikDurumlari, "Id", "Ad", filter.HafizlikDurumuIds))">
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Kadro Türü</label>
+                    <select name="KadroTuruIds" class="form-select" multiple asp-items="@(new SelectList(ViewBag.KadroTurleri, "Id", "Ad", filter.KadroTuruIds))">
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Kan Grubu</label>
+                    <select name="KanGrubuIds" class="form-select" multiple asp-items="@(new SelectList(ViewBag.KanGruplari, "Id", "Ad", filter.KanGrubuIds))">
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Askerlik Durumu</label>
+                    <select name="AskerlikDurumuIds" class="form-select" multiple asp-items="@(new SelectList(ViewBag.AskerlikDurumlari, "Id", "Ad", filter.AskerlikDurumuIds))">
+                    </select>
+                </div>
+
+                <div class="col-md-9">
+                    <label class="form-label d-block">Görevli Durumu</label>
+                    <div class="d-flex flex-wrap gap-2 mt-1">
+                        @if (ViewBag.Durumlar != null)
+                        {
+                            foreach (var durum in (List<DitibStasbourg.Models.Ref_GorevliDurum>)ViewBag.Durumlar)
                             {
-                                <div class="alert alert-light border-start border-warning border-3 mb-2">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div class="flex-grow-1">
-                                            <p class="mb-1">@not.NotIcerik</p>
-                                            <small class="text-muted">
-                                                <i class="fas fa-calendar me-1"></i>@not.Tarih.ToString("dd MMM yyyy HH:mm")
-                                            </small>
-                                        </div>
-                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteNote(@not.Id, @item.Id)">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
+                                var isChecked = filter.GorevliDurumIds != null && filter.GorevliDurumIds.Contains(durum.Id);
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="GorevliDurumIds" value="@durum.Id" id="status_@durum.Id" @(isChecked ? "checked" : "")>
+                                    <label class="form-check-label badge rounded-pill px-3 py-1" style="background-color: @(durum.Renk ?? "gray"); color: white; cursor: pointer;" for="status_@durum.Id">
+                                        @durum.Ad
+                                    </label>
                                 </div>
                             }
-                        </div>
-                    }
-                    else
-                    {
-                        <p class="text-muted fst-italic small">Henüz not eklenmemiş.</p>
-                    }
-                    
-                    <form id="note-form-@item.Id" onsubmit="event.preventDefault(); addNote(@item.Id);" class="mb-3">
-                        @Html.AntiForgeryToken()
-                        <div class="input-group">
-                            <textarea id="note-input-@item.Id" name="notIcerik" class="form-control" rows="2" placeholder="Yeni not ekle..." required></textarea>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-plus"></i> Ekle
-                            </button>
-                        </div>
-                    </form>
-                    
-                    <div class="mt-3">
-                        <strong>E-posta:</strong> <a href="mailto:@item.Email">@item.Email</a> <br/>
-                        <strong>Toplam Görev Sayısı:</strong> @item.Gorevlendirmeler.Count
+                        }
                     </div>
                 </div>
             </div>
+
+            <!-- Column Selection Section (Collapsible) -->
+            <div class="ep-trigger" onclick="toggleExportSection()">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-file-earmark-spreadsheet-fill text-success" style="font-size: 1.1rem;"></i>
+                    <h6>📊 Gelişmiş Raporlama &amp; Excel Dışa Aktarım Sütunları</h6>
+                </div>
+                <span class="ep-chevron-icon"><i class="bi bi-chevron-down"></i></span>
+            </div>
+
+            <div class="ep-content" id="exportSectionContent">
+                <p style="font-size: 0.72rem; color: rgba(255, 255, 255, 0.55); margin-bottom: 0.75rem;">
+                    Dışa aktarılacak sütunları seçin veya standart/hızlı dışa aktarımı kullanın.
+                </p>
+
+                <div class="ep-col-grid" id="ep-col-grid">
+                    <div class="text-white-50 small p-2">
+                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                        Sütun şeması yükleniyor...
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <button type="button" class="btn btn-sm btn-outline-light" onclick="toggleAllColumns()">
+                        <i class="bi bi-check2-all me-1"></i> Tümünü Seç / Temizle
+                    </button>
+                    <span class="small text-muted ms-2" id="ep-selected-cols-count">0 sütun seçili</span>
+                    
+                    <div class="ms-auto text-warning small" id="ep-selected-rows-badge" style="display: none;">
+                        <i class="bi bi-filter-circle-fill me-1"></i>
+                        <span id="ep-selected-rows-count">0</span> satır seçili (yalnızca bu satırlar aktarılacak)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="col-md-12 text-end border-top border-white-10 pt-3 mt-4">
+                <a asp-action="Index" class="btn btn-outline-light me-2"><i class="bi bi-arrow-counterclockwise me-1"></i> Filtreleri Temizle</a>
+                <button type="submit" class="btn btn-primary me-2"><i class="bi bi-funnel-fill me-1"></i> Sorgula &amp; Listele</button>
+                
+                <button type="button" class="btn btn-success me-2" onclick="submitQuickExport()">
+                    <i class="bi bi-lightning-fill me-1"></i> Hızlı Excel Dışa Aktar
+                </button>
+                <button type="button" class="btn btn-info" onclick="submitCustomExport()">
+                    <i class="bi bi-file-earmark-excel-fill me-1"></i> Seçili Sütunları İndir
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Table Grid Header -->
+    <div class="row mb-2 fw-bold text-muted border-bottom pb-2 d-none d-md-flex align-items-center">
+        <div class="col-md-1 text-center" style="width: 50px;">
+            <input type="checkbox" id="selectAllGorevli" class="form-check-input" style="cursor: pointer;" />
         </div>
-    }
+        <div class="col-md-3">
+            <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]" class="text-decoration-none text-dark">Ad Soyad <i class="fas fa-sort"></i></a>
+        </div>
+        <div class="col-md-2">
+            <a asp-action="Index" asp-route-sortOrder="@ViewData["StatusSortParm"]" class="text-decoration-none text-dark">Referans Durumu <i class="fas fa-sort"></i></a>
+        </div>
+        <div class="col-md-2">Son Görev</div>
+        <div class="col-md-2">
+            <a asp-action="Index" asp-route-sortOrder="@ViewData["DateSortParm"]" class="text-decoration-none text-dark">Tarihler <i class="fas fa-sort"></i></a>
+        </div>
+        <div class="col-md-1 text-center">Aktif mi?</div>
+        <div class="col-md-1 text-end" style="flex-grow: 1;">İşlemler</div>
+    </div>
+
+    <div class="accordion" id="accordionGorevli">
+        @foreach (var item in Model) {
+            var lastAssignment = item.Gorevlendirmeler.OrderByDescending(g => g.Tarih).FirstOrDefault();
+            var lastPlace = lastAssignment?.Kurum?.Isim ?? "-";
+            
+            var earliestStart = item.Gorevlendirmeler.OrderBy(g => g.Tarih).FirstOrDefault()?.Tarih;
+            var latestEnd = item.Gorevlendirmeler.OrderByDescending(g => g.BitisTarihi).FirstOrDefault()?.BitisTarihi;
+            
+            <div class="accordion-item mb-2 shadow-sm border-0" style="border-left: 5px solid @(item.GorevliDurumBilgisi?.Renk ?? "#6c757d") !important; border-radius: 0.5rem; overflow: hidden;">
+                <h2 class="accordion-header" id="heading-@item.Id">
+                    <div class="d-flex align-items-center bg-white">
+                        <div class="px-3 text-center" style="width: 50px; flex-shrink: 0;">
+                            <input type="checkbox" class="gorevli-select form-check-input" data-id="@item.Id" style="cursor: pointer;" />
+                        </div>
+                        <button class="accordion-button collapsed py-3 flex-grow-1" style="background: transparent !important; box-shadow: none;" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@item.Id" aria-expanded="false" aria-controls="collapse-@item.Id">
+                            <div class="container-fluid p-0">
+                                <div class="row align-items-center">
+                                    <div class="col-md-3 fw-bold">@item.AdSoyad <br/>
+                                        <small class="text-muted">@(item.Cinsiyet == "E" ? "Erkek" : item.Cinsiyet == "K" ? "Kadın" : "")</small>
+                                        <br />
+                                        @if (item.Unvan != null)
+                                        {
+                                            <span class="badge bg-light text-dark border">@item.Unvan.Ad</span>
+                                        }
+                                        @if (item.GorevliNotlari != null && item.GorevliNotlari.Any())
+                                        {
+                                            <i class="fas fa-sticky-note text-warning ms-2" title="Not Mevcut"></i>
+                                        }
+                                    </div>
+                                    <div class="col-md-2">
+                                        @if (item.GorevliDurumBilgisi != null)
+                                        {
+                                            <span class="badge" style="background-color: @(item.GorevliDurumBilgisi.Renk ?? "#6c757d"); color: white;">@item.GorevliDurumBilgisi.Ad</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Tanımsız</span>
+                                        }
+                                        @if (item.SozlesmeTip != null)
+                                        {
+                                            <br/><span class="badge bg-info text-dark mt-1">@item.SozlesmeTip.Ad</span>
+                                        }
+                                    </div>
+                                    <div class="col-md-2 small text-muted">@lastPlace</div>
+                                    <div class="col-md-2 small text-muted">
+                                        @if(earliestStart.HasValue) {
+                                            <div><small>Baş:</small> @earliestStart.Value.ToShortDateString()</div>
+                                        } else {
+                                            <div><small>Baş:</small> -</div>
+                                        }
+                                        @if(latestEnd.HasValue) {
+                                            <div><small>Bit:</small> @latestEnd.Value.ToShortDateString()</div>
+                                        }
+                                    </div>
+                                    <div class="col-md-1 text-center">
+                                        @if (item.isActive) {
+                                            <span class="text-success" title="Şu an görevde"><i class="fas fa-check-circle fa-lg"></i></span>
+                                        } else {
+                                            <span class="text-danger" title="Görevde değil"><i class="fas fa-times-circle fa-lg"></i></span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                </h2>
+                <div id="collapse-@item.Id" class="accordion-collapse collapse" aria-labelledby="heading-@item.Id" data-bs-parent="#accordionGorevli">
+                    <div class="accordion-body bg-white border-top">
+                        <div class="d-flex justify-content-end mb-3">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning me-2">Düzenle</a>
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info me-2">Detay</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Sil</a>
+                        </div>
+                        
+                        <h5 class="border-bottom pb-2">Görev Geçmişi</h5>
+                        @if (item.Gorevlendirmeler.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered text-dark">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Kurum</th>
+                                            <th>Tarih</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach(var gorev in item.Gorevlendirmeler.OrderByDescending(g => g.Tarih))
+                                        {
+                                            <tr>
+                                                <td>@gorev.Kurum?.Isim</td>
+                                                <td>@gorev.Tarih.ToShortDateString()</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted fst-italic">Henüz görevlendirme yok.</p>
+                        }
+                        
+                        <h5 class="border-bottom pb-2 mt-4">Notlar</h5>
+                        @if (item.GorevliNotlari != null && item.GorevliNotlari.Any())
+                        {
+                            <div class="mb-3">
+                                @foreach(var not in item.GorevliNotlari.OrderByDescending(n => n.Tarih))
+                                {
+                                    <div class="alert alert-light border-start border-warning border-3 mb-2">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div class="flex-grow-1 text-dark">
+                                                <p class="mb-1">@not.NotIcerik</p>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-calendar me-1"></i>@not.Tarih.ToString("dd MMM yyyy HH:mm")
+                                                </small>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteNote(@not.Id, @item.Id)">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted fst-italic small">Henüz not eklenmemiş.</p>
+                        }
+                        
+                        <form id="note-form-@item.Id" onsubmit="event.preventDefault(); addNote(@item.Id);" class="mb-3">
+                            @Html.AntiForgeryToken()
+                            <div class="input-group">
+                                <textarea id="note-input-@item.Id" name="notIcerik" class="form-control" rows="2" placeholder="Yeni not ekle..." required></textarea>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Ekle
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <div class="mt-3 text-dark">
+                            <strong>E-posta:</strong> <a href="mailto:@item.Email">@item.Email</a> <br/>
+                            <strong>Toplam Görev Sayısı:</strong> @item.Gorevlendirmeler.Count
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Pagination & Page Size Control -->
+    <div class="d-flex justify-content-between mt-4 align-items-center">
+        <div class="d-flex align-items-center">
+            <label class="me-2 text-muted small mb-0 text-nowrap">Her Sayfada:</label>
+            <select name="PageSize" class="form-select form-select-sm w-auto me-4" onchange="changePageSize(this.value)">
+                <option value="10" selected="@(filter.PageSize == 10)">10</option>
+                <option value="20" selected="@(filter.PageSize == 20 || filter.PageSize == null)">20</option>
+                <option value="50" selected="@(filter.PageSize == 50)">50</option>
+                <option value="100" selected="@(filter.PageSize == 100)">100</option>
+            </select>
+
+            <nav aria-label="Page navigation">
+              <ul class="pagination mb-0">
+                <li class="page-item @prevDisabled">
+                    <button class="page-link" onclick="changePage(@(Model.PageIndex - 1))">Geri</button>
+                </li>
+                <li class="page-item disabled"><span class="page-link">Sayfa @Model.PageIndex / @Model.TotalPages</span></li>
+                <li class="page-item @nextDisabled">
+                    <button class="page-link" onclick="changePage(@(Model.PageIndex + 1))">İleri</button>
+                </li>
+              </ul>
+            </nav>
+        </div>
+    </div>
 </div>
 
-<div class="d-flex justify-content-between mt-4">
-    @{
-        var routeData = new Dictionary<string, string>
-        {
-            { "sortOrder", ViewData["CurrentSort"]?.ToString() ?? "" },
-            { "SearchString", filter.SearchString ?? "" },
-            { "Sehir", filter.Sehir ?? "" },
-            { "Cinsiyet", filter.Cinsiyet ?? "" },
-            { "SozlesmeTipId", filter.SozlesmeTipId?.ToString() ?? "" },
-            { "KurumId", filter.KurumId?.ToString() ?? "" },
-            { "IsActive", filter.IsActive?.ToString() ?? "" }
-        };
+<!-- FLOATING CONTEXTUAL ACTION BAR -->
+<div id="contextual-action-bar" class="contextual-action-bar-container">
+    <div class="d-flex align-items-center gap-3">
+        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fs-7 fw-bold" id="selected-badge">0 Görevli Seçildi</span>
         
-        // Handling list valid for GorevliDurumIds is tricky in Dictionary<string, string>. 
-        // ASP.NET Core expects repeats for lists. 
-        // We will construct the previous/next links manually or use a form-based pagination if strictly needed.
-        // For now, simpler implementation:
-    }
-    <!-- Simplified Pagination for Filtered Results -->
-    <!-- Ideally, use a TagHelper or JS to submit form with page number -->
-    
-    <div class="d-flex align-items-center">
-        <label class="me-2 text-muted small">Her sayfada:</label>
-        <select name="PageSize" class="form-select form-select-sm w-auto me-4" onchange="changePage(1)">
-            <option value="10" selected="@(filter.PageSize == 10)">10</option>
-            <option value="20" selected="@(filter.PageSize == 20 || filter.PageSize == null)">20</option>
-            <option value="50" selected="@(filter.PageSize == 50)">50</option>
-            <option value="100" selected="@(filter.PageSize == 100)">100</option>
-        </select>
-
-        <nav aria-label="Page navigation">
-          <ul class="pagination mb-0">
-            <li class="page-item @prevDisabled">
-                <button class="page-link" onclick="changePage(@(Model.PageIndex - 1))">Previous</button>
-            </li>
-            <li class="page-item disabled"><span class="page-link">Sayfa @Model.PageIndex / @Model.TotalPages</span></li>
-            <li class="page-item @nextDisabled">
-                <button class="page-link" onclick="changePage(@(Model.PageIndex + 1))">Next</button>
-            </li>
-          </ul>
-        </nav>
+        <div class="h-divider"></div>
+        
+        <button type="button" class="btn btn-sm btn-success rounded-pill px-3" onclick="triggerBulkExcelQuick()">
+            <i class="bi bi-lightning-fill me-1"></i>Hızlı Excel
+        </button>
+        
+        <button type="button" class="btn btn-sm btn-outline-light rounded-pill px-3" onclick="toggleExportPanelFromFloatingBar()">
+            <i class="bi bi-gear-fill me-1"></i>Sütun Seç &amp; İndir
+        </button>
+        
+        <button type="button" class="btn btn-sm btn-danger rounded-pill px-3" onclick="triggerBulkDelete()">
+            <i class="bi bi-trash-fill me-1"></i>Seçilenleri Güvenli Sil
+        </button>
+        
+        <button type="button" class="btn btn-sm btn-link text-white text-decoration-none ms-2" onclick="clearAllSelections()">
+            Sıfırla
+        </button>
     </div>
-    
-    <script>
-        // Handle Excel export button
-        document.getElementById('btnExportExcel').addEventListener('click', function() {
-            var form = document.querySelector('#collapseFilter form');
-            if (form) {
-                // Create a temporary form to submit to ExportToExcel action
-                var exportForm = document.createElement('form');
-                exportForm.method = 'GET';
-                exportForm.action = '@Url.Action("ExportToExcel", "Gorevli")';
-                
-                console.log('=== Excel Export Debug ===');
-                
-                // Clone all input fields from the filter form
-                var inputs = form.querySelectorAll('input');
-                inputs.forEach(function(input) {
-                    if (input.name) {
-                        // Handle checkboxes
-                        if (input.type === 'checkbox') {
-                            if (input.checked) {
-                                console.log('Checkbox:', input.name, '=', input.value);
-                                var clonedInput = document.createElement('input');
-                                clonedInput.type = 'hidden';
-                                clonedInput.name = input.name;
-                                clonedInput.value = input.value;
-                                exportForm.appendChild(clonedInput);
-                            }
-                        }
-                        // Handle regular inputs
-                        else if (input.value) {
-                            console.log('Input:', input.name, '=', input.value);
-                            var clonedInput = document.createElement('input');
-                            clonedInput.type = 'hidden';
-                            clonedInput.name = input.name;
-                            clonedInput.value = input.value;
-                            exportForm.appendChild(clonedInput);
-                        }
-                    }
-                });
-                
-                // Handle select elements (including multiselect)
-                var selects = form.querySelectorAll('select');
-                selects.forEach(function(select) {
-                    if (select.name) {
-                        // For multiselect, get all selected options
-                        if (select.multiple) {
-                            Array.from(select.selectedOptions).forEach(function(option, index) {
-                                if (option.value) {
-                                    console.log('Multiselect:', select.name, '[' + index + '] =', option.value);
-                                    var clonedInput = document.createElement('input');
-                                    clonedInput.type = 'hidden';
-                                    // Use array syntax for ASP.NET Core model binding
-                                    clonedInput.name = select.name + '[' + index + ']';
-                                    clonedInput.value = option.value;
-                                    exportForm.appendChild(clonedInput);
-                                }
-                            });
-                        }
-                        // For single select
-                        else if (select.value) {
-                            console.log('Select:', select.name, '=', select.value);
-                            var clonedInput = document.createElement('input');
-                            clonedInput.type = 'hidden';
-                            clonedInput.name = select.name;
-                            clonedInput.value = select.value;
-                            exportForm.appendChild(clonedInput);
-                        }
-                    }
-                });
-                
-                console.log('=== End Debug ===');
-                
-                document.body.appendChild(exportForm);
-                exportForm.submit();
-                document.body.removeChild(exportForm);
-            } else {
-                // No filters, export all
-                console.log('No filter form found, exporting all');
-                window.location.href = '@Url.Action("ExportToExcel", "Gorevli")';
-            }
+</div>
+
+<script>
+    function submitQuickExport() {
+        var form = document.getElementById('filterForm');
+        if (!form) return;
+        
+        var originalAction = form.action;
+        var originalMethod = form.method;
+        form.action = '@Url.Action("ExportToExcel", "Gorevli")';
+        form.method = 'POST';
+        
+        var tempElements = [];
+        
+        var selectedIds = window.selectedEntityIds || [];
+        selectedIds.forEach(function(id) {
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'SelectedIds';
+            input.value = id;
+            form.appendChild(input);
+            tempElements.push(input);
         });
-    
-        function changePage(pageNum) {
-            // Find the filter form
-            var form = document.querySelector('#collapseFilter form');
-            if (form) {
-                // Create a hidden input for page number
-                var pageInput = document.createElement('input');
-                pageInput.type = 'hidden';
-                pageInput.name = 'PageNumber';
-                pageInput.value = pageNum;
-                form.appendChild(pageInput);
-                
-                // Ensure PageSize is included
-                var pageSizeSelect = document.querySelector('select[name="PageSize"]');
-                if (pageSizeSelect) {
-                    var pageSizeInput = document.createElement('input');
-                    pageSizeInput.type = 'hidden';
-                    pageSizeInput.name = 'PageSize';
-                    pageSizeInput.value = pageSizeSelect.value;
-                    form.appendChild(pageSizeInput);
-                }
-                
-                form.submit();
-            } else {
-                 // Fallback if form not found (should not happen)
-                 window.location.href = '?PageNumber=' + pageNum;
-            }
+        
+        form.submit();
+        
+        form.action = originalAction;
+        form.method = originalMethod;
+        tempElements.forEach(function(el) {
+            form.removeChild(el);
+        });
+    }
+
+    function submitCustomExport() {
+        var checkedColumns = document.querySelectorAll('#ep-col-grid input:checked');
+        if (checkedColumns.length === 0) {
+            alert('Lütfen en az bir sütun seçin.');
+            return;
         }
-    
+        
+        var form = document.getElementById('filterForm');
+        if (!form) return;
+        
+        var originalAction = form.action;
+        var originalMethod = form.method;
+        form.action = '@Url.Action("CustomExport", "Gorevli")';
+        form.method = 'POST';
+        
+        var tempElements = [];
+        
+        var selectedIds = window.selectedEntityIds || [];
+        selectedIds.forEach(function(id) {
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'SelectedIds';
+            input.value = id;
+            form.appendChild(input);
+            tempElements.push(input);
+        });
+        
+        checkedColumns.forEach(function(box) {
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'columns';
+            input.value = box.value;
+            form.appendChild(input);
+            tempElements.push(input);
+        });
+        
+        form.submit();
+        
+        form.action = originalAction;
+        form.method = originalMethod;
+        tempElements.forEach(function(el) {
+            form.removeChild(el);
+        });
+    }
+
+    function changePage(pageNum) {
+        var form = document.getElementById('filterForm');
+        if (form) {
+            var pageInput = document.createElement('input');
+            pageInput.type = 'hidden';
+            pageInput.name = 'PageNumber';
+            pageInput.value = pageNum;
+            form.appendChild(pageInput);
+            
+            var pageSizeSelect = document.querySelector('select[name="PageSize"]');
+            if (pageSizeSelect) {
+                var pageSizeInput = document.createElement('input');
+                pageSizeInput.type = 'hidden';
+                pageSizeInput.name = 'PageSize';
+                pageSizeInput.value = pageSizeSelect.value;
+                form.appendChild(pageSizeInput);
+            }
+            
+            form.submit();
+        } else {
+             window.location.href = '?PageNumber=' + pageNum;
+        }
+    }
+
+    function changePageSize(size) {
+        var form = document.getElementById('filterForm');
+        if (form) {
+            var pageSizeInput = document.createElement('input');
+            pageSizeInput.type = 'hidden';
+            pageSizeInput.name = 'PageSize';
+            pageSizeInput.value = size;
+            form.appendChild(pageSizeInput);
+
+            var pageInput = document.createElement('input');
+            pageInput.type = 'hidden';
+            pageInput.name = 'PageNumber';
+            pageInput.value = 1;
+            form.appendChild(pageInput);
+
+            form.submit();
+        } else {
+            window.location.href = '?PageSize=' + size + '&PageNumber=1';
+        }
+    }
+
     // Note Management Functions
     function addNote(gorevliId) {
         const form = document.getElementById(`note-form-${gorevliId}`);
@@ -480,7 +726,7 @@
         .then(data => {
             if (data.success) {
                 textarea.value = '';
-                location.reload(); // Reload to show new note
+                location.reload();
             } else {
                 alert('Not eklenirken hata oluştu: ' + (data.message || 'Bilinmeyen hata'));
             }
@@ -505,7 +751,7 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                location.reload(); // Reload to remove note
+                location.reload();
             } else {
                 alert('Not silinirken hata oluştu: ' + (data.message || 'Bilinmeyen hata'));
             }
@@ -516,7 +762,6 @@
         });
     }
 </script>
-</div>
 
 @section Scripts {
     <!-- Select2 CSS -->
@@ -525,6 +770,77 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
+        var colsLoaded = false;
+        
+        function toggleExportSection() {
+            var content = document.getElementById('exportSectionContent');
+            var chevron = document.querySelector('.ep-trigger .ep-chevron-icon i');
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                chevron.className = 'bi bi-chevron-down';
+            } else {
+                content.classList.add('show');
+                chevron.className = 'bi bi-chevron-up';
+                if (!colsLoaded) {
+                    fetchColumns();
+                }
+            }
+        }
+        
+        function fetchColumns() {
+            var grid = document.getElementById('ep-col-grid');
+            fetch('/Export/Columns?module=Gorevli')
+                .then(r => r.json())
+                .then(cols => {
+                    grid.innerHTML = '';
+                    cols.forEach(col => {
+                        var wrap = document.createElement('div');
+                        wrap.className = 'ep-checkbox-item' + (col.includeInQuickExport ? ' active' : '');
+                        
+                        var cb = document.createElement('input');
+                        cb.type = 'checkbox';
+                        cb.id = 'ep-col-' + col.propertyName;
+                        cb.value = col.propertyName;
+                        cb.checked = col.includeInQuickExport;
+                        cb.addEventListener('change', function() {
+                            wrap.classList.toggle('active', cb.checked);
+                            updateSelectedColumnsCount();
+                        });
+                        
+                        var lbl = document.createElement('label');
+                        lbl.htmlFor = cb.id;
+                        lbl.textContent = col.displayName;
+                        lbl.title = col.displayName;
+                        
+                        wrap.appendChild(cb);
+                        wrap.appendChild(lbl);
+                        grid.appendChild(wrap);
+                    });
+                    colsLoaded = true;
+                    updateSelectedColumnsCount();
+                })
+                .catch(err => {
+                    grid.innerHTML = '<div class="text-danger small"><i class="bi bi-exclamation-triangle-fill me-1"></i>Sütunlar yüklenemedi.</div>';
+                });
+        }
+        
+        function updateSelectedColumnsCount() {
+            var count = document.querySelectorAll('#ep-col-grid input:checked').length;
+            document.getElementById('ep-selected-cols-count').textContent = count + ' sütun seçili';
+        }
+        
+        function toggleAllColumns() {
+            var boxes = document.querySelectorAll('#ep-col-grid input[type="checkbox"]');
+            var allChecked = true;
+            boxes.forEach(b => { if (!b.checked) allChecked = false; });
+            boxes.forEach(b => {
+                b.checked = !allChecked;
+                var wrap = b.closest('.ep-checkbox-item');
+                if (wrap) wrap.classList.toggle('active', !allChecked);
+            });
+            updateSelectedColumnsCount();
+        }
+
         $(document).ready(function() {
             // Initialize Select2 for staff search with AJAX
             $('#staffSearch').select2({
@@ -534,7 +850,7 @@
                     delay: 250,
                     data: function (params) {
                         return {
-                            term: params.term // search term
+                            term: params.term
                         };
                     },
                     processResults: function (data) {
@@ -545,10 +861,191 @@
                     cache: true
                 },
                 placeholder: 'İsim, soyad veya e-posta ile arayın...',
-                minimumInputLength: 3, // Optimization: Min 3 chars
+                minimumInputLength: 3,
                 allowClear: true,
                 width: '100%'
             });
+
+            // Restore Selected staff search options if present in filter model
+            @if (filter.StaffIds != null && filter.StaffIds.Any())
+            {
+                foreach (var id in filter.StaffIds)
+                {
+                    <text>
+                    // Add existing selected staff options
+                    fetch('/Gorevli/GetGorevliName?id=' + @id)
+                        .then(r => r.json())
+                        .then(data => {
+                            var option = new Option(data.text, data.id, true, true);
+                            $('#staffSearch').append(option).trigger('change');
+                        });
+                    </text>
+                }
+            }
         });
+
+        // Checkbox state tracker with robust sessionStorage persistence
+        (function() {
+            window.selectedEntityIds = [];
+
+            try {
+                var stored = sessionStorage.getItem('selectedGorevliIds');
+                if (stored) {
+                    window.selectedEntityIds = JSON.parse(stored);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+
+            function syncCheckboxesUI() {
+                var rowCheckboxes = document.querySelectorAll('.gorevli-select');
+                var allChecked = rowCheckboxes.length > 0;
+                var noneChecked = true;
+
+                rowCheckboxes.forEach(function(cb) {
+                    var id = parseInt(cb.getAttribute('data-id'));
+                    var isChecked = window.selectedEntityIds.includes(id);
+                    cb.checked = isChecked;
+                    if (isChecked) {
+                        noneChecked = false;
+                    } else {
+                        allChecked = false;
+                    }
+                });
+
+                var selectAll = document.getElementById('selectAllGorevli');
+                if (selectAll) {
+                    selectAll.checked = allChecked && rowCheckboxes.length > 0;
+                    selectAll.indeterminate = (!allChecked && !noneChecked);
+                }
+
+                var bar = document.getElementById('contextual-action-bar');
+                var badge = document.getElementById('selected-badge');
+                if (bar) {
+                    if (window.selectedEntityIds.length > 0) {
+                        bar.classList.add('show');
+                        if (badge) {
+                            badge.textContent = window.selectedEntityIds.length + ' Görevli Seçildi';
+                        }
+                    } else {
+                        bar.classList.remove('show');
+                    }
+                }
+
+                // Update rows badge in the export section
+                var rowsBadge = document.getElementById('ep-selected-rows-badge');
+                var rowsCount = document.getElementById('ep-selected-rows-count');
+                if (rowsBadge && rowsCount) {
+                    if (window.selectedEntityIds.length > 0) {
+                        rowsBadge.style.display = 'inline-flex';
+                        rowsCount.textContent = window.selectedEntityIds.length;
+                    } else {
+                        rowsBadge.style.display = 'none';
+                    }
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                syncCheckboxesUI();
+
+                var selectAll = document.getElementById('selectAllGorevli');
+                var rowCheckboxes = document.querySelectorAll('.gorevli-select');
+
+                if (selectAll) {
+                    selectAll.addEventListener('change', function() {
+                        var checked = selectAll.checked;
+                        rowCheckboxes.forEach(function(cb) {
+                            var id = parseInt(cb.getAttribute('data-id'));
+                            cb.checked = checked;
+                            if (checked) {
+                                if (!window.selectedEntityIds.includes(id)) {
+                                    window.selectedEntityIds.push(id);
+                                }
+                            } else {
+                                var idx = window.selectedEntityIds.indexOf(id);
+                                if (idx > -1) {
+                                    window.selectedEntityIds.splice(idx, 1);
+                                }
+                            }
+                        });
+                        sessionStorage.setItem('selectedGorevliIds', JSON.stringify(window.selectedEntityIds));
+                        syncCheckboxesUI();
+                    });
+                }
+
+                rowCheckboxes.forEach(function(cb) {
+                    cb.addEventListener('change', function() {
+                        var id = parseInt(cb.getAttribute('data-id'));
+                        if (cb.checked) {
+                            if (!window.selectedEntityIds.includes(id)) {
+                                window.selectedEntityIds.push(id);
+                            }
+                        } else {
+                            var idx = window.selectedEntityIds.indexOf(id);
+                            if (idx > -1) {
+                                window.selectedEntityIds.splice(idx, 1);
+                            }
+                        }
+                        sessionStorage.setItem('selectedGorevliIds', JSON.stringify(window.selectedEntityIds));
+                        syncCheckboxesUI();
+                    });
+                });
+            });
+
+            window.syncCheckboxesUI = syncCheckboxesUI;
+        })();
+
+        function clearAllSelections() {
+            window.selectedEntityIds = [];
+            sessionStorage.setItem('selectedGorevliIds', JSON.stringify([]));
+            if (typeof window.syncCheckboxesUI === 'function') {
+                window.syncCheckboxesUI();
+            }
+        }
+
+        function toggleExportPanelFromFloatingBar() {
+            var content = document.getElementById('exportSectionContent');
+            if (content) {
+                if (!content.classList.contains('show')) {
+                    toggleExportSection();
+                }
+                content.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        function triggerBulkExcelQuick() {
+            submitQuickExport();
+        }
+
+        function triggerBulkDelete() {
+            var ids = window.selectedEntityIds || [];
+            if (ids.length === 0) return;
+            if (!confirm(ids.length + ' adet seçilen görevliyi sistemden silmek istediğinize emin misiniz?')) return;
+
+            var token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+            
+            fetch('/Gorevli/BulkDelete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token
+                },
+                body: JSON.stringify(ids)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✓ ' + data.count + ' görevli silindi!');
+                    clearAllSelections();
+                    location.reload();
+                } else {
+                    alert('✗ Hata: ' + (data.message || 'Silme işlemi gerçekleştirilemedi.'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('✗ Sunucu bağlantısı başarısız.');
+            });
+        }
     </script>
 }
