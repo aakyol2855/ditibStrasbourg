@@ -280,20 +280,80 @@ namespace DitibStasbourg.Services.Implementations
                 using (var workbook = new XLWorkbook(stream))
                 {
                     var worksheet = workbook.Worksheet(1);
-                    var rows = worksheet.RowsUsed().Skip(1); 
+                    int headerRowIndex = -1;
+                    IXLRow? headerRow = null;
 
-                    var headerRow = worksheet.Row(1);
+                    string NormalizeHeader(string val)
+                    {
+                        if (string.IsNullOrEmpty(val)) return string.Empty;
+                        return val.Trim()
+                                  .Replace("\u00A0", " ") // Replace non-breaking spaces
+                                  .Replace("\r", " ")
+                                  .Replace("\n", " ")     // Remove line breaks inside cells
+                                  .ToLowerInvariant()
+                                  .Replace("ı", "i")
+                                  .Replace("ğ", "g")
+                                  .Replace("ü", "u")
+                                  .Replace("ş", "s")
+                                  .Replace("ö", "o")
+                                  .Replace("ç", "c");
+                    }
+
+                    for (int r = 1; r <= Math.Min(worksheet.LastRowUsed()?.RowNumber() ?? 0, 15); r++)
+                    {
+                        var row = worksheet.Row(r);
+                        if (row.LastCellUsed() == null) continue;
+                        
+                        int score = 0;
+                        for (int c = 1; c <= row.LastCellUsed().Address.ColumnNumber; c++)
+                        {
+                            var cellValue = NormalizeHeader(row.Cell(c).GetString());
+                            if (string.IsNullOrEmpty(cellValue)) continue;
+
+                            if (cellValue == "ad" || cellValue == "adi" || cellValue == "isim" || cellValue == "name" || cellValue == "first name")
+                                score += 3;
+                            if (cellValue == "soyad" || cellValue == "soyadi" || cellValue == "surname" || cellValue == "last name")
+                                score += 3;
+                            if (cellValue.Contains("telefon") || cellValue.Contains("phone") || cellValue == "tel" || cellValue == "cep")
+                                score += 2;
+                            if (cellValue.Contains("tc") || cellValue.Contains("tckn") || cellValue.Contains("kimlik"))
+                                score += 2;
+                            if (cellValue.Contains("adres") || cellValue.Contains("address"))
+                                score += 2;
+                            if (cellValue.Contains("sira") || cellValue == "no" || cellValue == "sn" || cellValue == "s.n." || cellValue == "s.no")
+                                score += 1;
+                        }
+
+                        if (score >= 4)
+                        {
+                            headerRowIndex = r;
+                            headerRow = row;
+                            break;
+                        }
+                    }
+
+                    if (headerRowIndex == -1 || headerRow == null)
+                    {
+                        headerRowIndex = 1;
+                        headerRow = worksheet.Row(1);
+                    }
+
+                    var rows = worksheet.RowsUsed().Where(r => r.RowNumber() > headerRowIndex);
                     var columnMap = new Dictionary<string, int>();
                     
                     for (int col = 1; col <= headerRow.LastCellUsed().Address.ColumnNumber; col++)
                     {
-                        var headerValue = headerRow.Cell(col).GetString().Trim().ToLower();
-                        columnMap[headerValue] = col;
+                        var rawHeader = headerRow.Cell(col).GetString();
+                        var normalizedHeader = NormalizeHeader(rawHeader);
+                        if (!string.IsNullOrEmpty(normalizedHeader))
+                        {
+                            columnMap[normalizedHeader] = col;
+                        }
                     }
 
                     // Check if required headers exist: "ad" or "soyad"
-                    bool hasAd = columnMap.Keys.Any(k => k == "ad" || k == "adı" || k == "isim" || k == "name" || k == "first name" || k.Contains("ad") || k.Contains("adı") || k.Contains("isim") || k.Contains("name"));
-                    bool hasSoyad = columnMap.Keys.Any(k => k == "soyad" || k == "soyadı" || k == "surname" || k == "last name" || k.Contains("soyad") || k.Contains("soyadı") || k.Contains("surname"));
+                    bool hasAd = columnMap.Keys.Any(k => k == "ad" || k == "adi" || k == "isim" || k == "name" || k == "first name" || k.Contains("ad") || k.Contains("adi") || k.Contains("isim") || k.Contains("name"));
+                    bool hasSoyad = columnMap.Keys.Any(k => k == "soyad" || k == "soyadi" || k == "surname" || k == "last name" || k.Contains("soyad") || k.Contains("soyadi") || k.Contains("surname"));
 
                     if (!hasAd || !hasSoyad)
                     {
@@ -304,16 +364,16 @@ namespace DitibStasbourg.Services.Implementations
                     {
                         foreach (var name in possibleNames)
                         {
-                            var nameLower = name.ToLower();
-                            if (columnMap.TryGetValue(nameLower, out int colIndex))
+                            var nameNorm = NormalizeHeader(name);
+                            if (columnMap.TryGetValue(nameNorm, out int colIndex))
                             {
                                 return row.Cell(colIndex).GetString().Trim();
                             }
                         }
                         foreach (var name in possibleNames)
                         {
-                            var nameLower = name.ToLower();
-                            var matchedKey = columnMap.Keys.FirstOrDefault(k => k.Contains(nameLower));
+                            var nameNorm = NormalizeHeader(name);
+                            var matchedKey = columnMap.Keys.FirstOrDefault(k => k.Contains(nameNorm));
                             if (matchedKey != null)
                             {
                                 return row.Cell(columnMap[matchedKey]).GetString().Trim();
@@ -326,8 +386,8 @@ namespace DitibStasbourg.Services.Implementations
                     {
                         foreach (var name in possibleNames)
                         {
-                            var nameLower = name.ToLower();
-                            if (columnMap.TryGetValue(nameLower, out int colIndex))
+                            var nameNorm = NormalizeHeader(name);
+                            if (columnMap.TryGetValue(nameNorm, out int colIndex))
                             {
                                 var cell = row.Cell(colIndex);
                                 if (cell.TryGetValue(out DateTime date)) return date;
@@ -335,8 +395,8 @@ namespace DitibStasbourg.Services.Implementations
                         }
                         foreach (var name in possibleNames)
                         {
-                            var nameLower = name.ToLower();
-                            var matchedKey = columnMap.Keys.FirstOrDefault(k => k.Contains(nameLower));
+                            var nameNorm = NormalizeHeader(name);
+                            var matchedKey = columnMap.Keys.FirstOrDefault(k => k.Contains(nameNorm));
                             if (matchedKey != null)
                             {
                                 var cell = row.Cell(columnMap[matchedKey]);

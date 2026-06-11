@@ -42,24 +42,57 @@ namespace DitibStasbourg.Services.Implementations
                 int headerRowIndex = -1;
                 IXLRow? headerRow = null;
 
-                for (int r = 1; r <= Math.Min(worksheet.LastRowUsed()?.RowNumber() ?? 0, 10); r++)
+                string NormalizeHeader(string val)
+                {
+                    if (string.IsNullOrEmpty(val)) return string.Empty;
+                    return val.Trim()
+                              .Replace("\u00A0", " ") // Replace non-breaking spaces
+                              .Replace("\r", " ")
+                              .Replace("\n", " ")     // Remove line breaks inside cells
+                              .ToLowerInvariant()
+                              .Replace("ı", "i")
+                              .Replace("ğ", "g")
+                              .Replace("ü", "u")
+                              .Replace("ş", "s")
+                              .Replace("ö", "o")
+                              .Replace("ç", "c");
+                }
+
+                for (int r = 1; r <= Math.Min(worksheet.LastRowUsed()?.RowNumber() ?? 0, 15); r++)
                 {
                     var row = worksheet.Row(r);
                     if (row.LastCellUsed() == null) continue;
                     
-                    bool hasHeader = false;
+                    int score = 0;
                     for (int c = 1; c <= row.LastCellUsed().Address.ColumnNumber; c++)
                     {
-                        var cellValue = row.Cell(c).GetString().Trim();
-                        if (cellValue.Contains("dernek", StringComparison.OrdinalIgnoreCase) || 
-                            cellValue.Contains("resmi", StringComparison.OrdinalIgnoreCase) ||
-                            cellValue.Contains("kurum", StringComparison.OrdinalIgnoreCase))
+                        var cellValue = NormalizeHeader(row.Cell(c).GetString());
+                        if (string.IsNullOrEmpty(cellValue)) continue;
+
+                        if (cellValue.Contains("dernek") || cellValue.Contains("kurum") || cellValue.Contains("association"))
                         {
-                            hasHeader = true;
-                            break;
+                            if (cellValue.Contains("ad") || cellValue.Contains("isim") || cellValue.Contains("name") || cellValue.Contains("resmi"))
+                                score += 3; // High confidence indicator
                         }
+                        else if (cellValue == "ad" || cellValue == "ad soyad" || cellValue == "isim" || cellValue == "name")
+                        {
+                            score += 2;
+                        }
+                        
+                        if (cellValue.Contains("sehir") || cellValue.Contains("city") || cellValue == "il")
+                            score += 2;
+                        if (cellValue.Contains("adres") || cellValue.Contains("address"))
+                            score += 2;
+                        if (cellValue.Contains("telefon") || cellValue.Contains("phone") || cellValue == "tel" || cellValue.Contains("iletisim") || cellValue.Contains("contact"))
+                            score += 2;
+                        if (cellValue.Contains("baskan") || cellValue.Contains("president"))
+                            score += 2;
+                        if (cellValue.Contains("sira") || cellValue == "no" || cellValue == "sn" || cellValue == "s.n." || cellValue == "s.no")
+                            score += 1;
                     }
-                    if (hasHeader)
+
+                    // A valid header row should have at least 4 score points (e.g. "Dernek Adı" [3] + "Şehir" [2] = 5)
+                    if (score >= 4)
                     {
                         headerRowIndex = r;
                         headerRow = row;
@@ -76,17 +109,18 @@ namespace DitibStasbourg.Services.Implementations
                 
                 for (int col = 1; col <= headerRow.LastCellUsed().Address.ColumnNumber; col++)
                 {
-                    var headerValue = headerRow.Cell(col).GetString().Trim().ToLower();
-                    if (!string.IsNullOrEmpty(headerValue))
+                    var rawHeader = headerRow.Cell(col).GetString();
+                    var normalizedHeader = NormalizeHeader(rawHeader);
+                    if (!string.IsNullOrEmpty(normalizedHeader))
                     {
-                        columnMap[headerValue] = col;
+                        columnMap[normalizedHeader] = col;
                     }
                 }
 
-                bool IsAssociationNameHeader(string header)
+                bool IsAssociationNameHeader(string normalizedHeader)
                 {
-                    if (string.IsNullOrWhiteSpace(header)) return false;
-                    var val = header.Trim().ToLowerInvariant().Replace("ı", "i").Replace("ğ", "g").Replace("ü", "u").Replace("ş", "s").Replace("ö", "o").Replace("ç", "c");
+                    if (string.IsNullOrWhiteSpace(normalizedHeader)) return false;
+                    var val = normalizedHeader;
                     
                     if (val.Contains("sira no") || val.Contains("s.n.") || val == "no" || val == "s.no")
                         return false;
@@ -121,24 +155,19 @@ namespace DitibStasbourg.Services.Implementations
 
                     foreach (var kw in keywords)
                     {
-                        var kwLower = kw.Trim().ToLowerInvariant().Replace("ı", "i").Replace("ğ", "g").Replace("ü", "u").Replace("ş", "s").Replace("ö", "o").Replace("ç", "c");
-                        foreach (var entry in columnMap)
+                        var kwNorm = NormalizeHeader(kw);
+                        if (columnMap.TryGetValue(kwNorm, out int index))
                         {
-                            var keyLower = entry.Key.Trim().ToLowerInvariant().Replace("ı", "i").Replace("ğ", "g").Replace("ü", "u").Replace("ş", "s").Replace("ö", "o").Replace("ç", "c");
-                            if (keyLower == kwLower)
-                            {
-                                return entry.Value;
-                            }
+                            return index;
                         }
                     }
                     
                     foreach (var kw in keywords)
                     {
-                        var kwLower = kw.Trim().ToLowerInvariant().Replace("ı", "i").Replace("ğ", "g").Replace("ü", "u").Replace("ş", "s").Replace("ö", "o").Replace("ç", "c");
+                        var kwNorm = NormalizeHeader(kw);
                         foreach (var entry in columnMap)
                         {
-                            var keyLower = entry.Key.Trim().ToLowerInvariant().Replace("ı", "i").Replace("ğ", "g").Replace("ü", "u").Replace("ş", "s").Replace("ö", "o").Replace("ç", "c");
-                            if (keyLower.Contains(kwLower))
+                            if (entry.Key.Contains(kwNorm))
                             {
                                 return entry.Value;
                             }
