@@ -221,13 +221,18 @@
         var filter = ViewData["Filter"] as DitibStasbourg.Models.ViewModels.GorevliFilterViewModel ?? new DitibStasbourg.Models.ViewModels.GorevliFilterViewModel();
     }
 
-    <!-- Single Unified Glassmorphic Query & Export Container -->
-    <div class="glass-panel shadow mb-4">
-        <form asp-action="Index" method="get" id="filterForm">
-            <h5 class="fw-bold mb-3 d-flex align-items-center">
-                <i class="bi bi-funnel-fill text-primary me-2"></i>
-                <span>Gelişmiş Arama, Filtreleme ve Raporlama</span>
-            </h5>
+    <!-- Collapsible Filter Accordion -->
+    <div class="accordion mb-4" id="gorevliFilterAccordion">
+        <div class="accordion-item border-0 rounded-4 overflow-hidden">
+            <h2 class="accordion-header" id="filterPanelHeading">
+                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#filterPanelCollapse" aria-expanded="false" aria-controls="filterPanelCollapse" style="background: rgba(15, 23, 42, 0.96); color: #fff; border-radius: 1.25rem;">
+                    <i class="bi bi-funnel-fill text-primary me-2"></i>
+                    Gelişmiş Arama, Filtreleme ve Raporlama
+                </button>
+            </h2>
+            <div id="filterPanelCollapse" class="accordion-collapse collapse" aria-labelledby="filterPanelHeading" data-bs-parent="#gorevliFilterAccordion">
+                <div class="glass-panel shadow" style="border-top-left-radius: 0 !important; border-top-right-radius: 0 !important;">
+    <form asp-action="Index" method="get" id="filterForm">
             <div class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label">Görevli Arama (İsim, Soyad, E-posta)</label>
@@ -369,6 +374,9 @@
                 </button>
             </div>
         </form>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Table Grid Header -->
@@ -386,7 +394,9 @@
         <div class="col-md-2">
             <a asp-action="Index" asp-route-sortOrder="@ViewData["DateSortParm"]" class="text-decoration-none text-dark">Tarihler <i class="fas fa-sort"></i></a>
         </div>
-        <div class="col-md-1 text-center">Aktif mi?</div>
+        <div class="col-md-1 text-center">
+            <a asp-action="Index" asp-route-sortOrder="@ViewData["ActiveSortParm"]" class="text-decoration-none text-dark">Aktif mi? <i class="fas fa-sort"></i></a>
+        </div>
         <div class="col-md-1 text-end" style="flex-grow: 1;">İşlemler</div>
     </div>
 

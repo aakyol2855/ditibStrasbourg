@@ -134,6 +134,8 @@ $(document).ready(function () {
             btn.prop('disabled', true);
             btn.html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Lütfen Bekleyin...');
         }
+    });
+
     // 6. Automatic Table Responsiveness
     // Wrap any table that isn't already in a table-responsive div
     $('table.table').each(function() {

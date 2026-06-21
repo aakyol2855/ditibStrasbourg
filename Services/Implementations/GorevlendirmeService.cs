@@ -130,7 +130,8 @@ namespace DitibStasbourg.Services.Implementations
             var not = await _context.GorevlendirmeNotlari.FindAsync(noteId);
             if (not != null)
             {
-                _context.GorevlendirmeNotlari.Remove(not);
+                not.IsDeleted = true;
+                _context.Entry(not).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
             }
         }

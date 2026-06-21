@@ -147,7 +147,12 @@ namespace DitibStasbourg.Services.Implementations
                 case "name_desc": return query.OrderByDescending(s => s.Ad);
                 case "Status": return query.OrderBy(s => s.GorevliDurumBilgisi != null ? s.GorevliDurumBilgisi.Sira : 999);
                 case "status_desc": return query.OrderByDescending(s => s.GorevliDurumBilgisi != null ? s.GorevliDurumBilgisi.Sira : 999);
-                default: return query.OrderBy(s => s.Ad);
+                case "Active": return query.OrderByDescending(s => s.Gorevlendirmeler.Any(g => g.Tarih <= DateTime.Now && (g.BitisTarihi == null || g.BitisTarihi >= DateTime.Now))).ThenBy(s => s.Ad);
+                case "active_desc": return query.OrderBy(s => s.Gorevlendirmeler.Any(g => g.Tarih <= DateTime.Now && (g.BitisTarihi == null || g.BitisTarihi >= DateTime.Now))).ThenBy(s => s.Ad);
+                case "name_asc": return query.OrderBy(s => s.Ad);
+                default:
+                    // Default: active personnel first, then alphabetical
+                    return query.OrderByDescending(s => s.Gorevlendirmeler.Any(g => g.Tarih <= DateTime.Now && (g.BitisTarihi == null || g.BitisTarihi >= DateTime.Now))).ThenBy(s => s.Ad);
             }
         }
 
@@ -200,7 +205,8 @@ namespace DitibStasbourg.Services.Implementations
             var not = await _context.GorevliNotlari.FindAsync(noteId);
             if (not != null)
             {
-                _context.GorevliNotlari.Remove(not);
+                not.IsDeleted = true;
+                _context.Entry(not).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
             }
         }
@@ -527,40 +533,39 @@ namespace DitibStasbourg.Services.Implementations
             {
                 try
                 {
-                    // 1. Delete notes on Gorevlendirmeler
-                    var gorevlendirmeIds = await _context.Gorevlendirme
+                    // 1. Soft-delete Gorevlendirmeler and GorevlendirmeNotlari
+                    var activeAssignments = await _context.Gorevlendirme
                         .Where(g => g.GorevliId == gorevliId)
-                        .Select(g => g.Id)
                         .ToListAsync();
 
-                    if (gorevlendirmeIds.Any())
+                    foreach (var g in activeAssignments)
                     {
-                        var gNotlar = await _context.GorevlendirmeNotlari
-                            .Where(gn => gorevlendirmeIds.Contains(gn.GorevlendirmeId))
-                            .ToListAsync();
-                        _context.GorevlendirmeNotlari.RemoveRange(gNotlar);
+                        g.IsDeleted = true;
+                        _context.Entry(g).State = EntityState.Modified;
 
-                        // 2. Delete Gorevlendirmeler
-                        var activeAssignments = await _context.Gorevlendirme
-                            .Where(g => g.GorevliId == gorevliId)
+                        var gNotlar = await _context.GorevlendirmeNotlari
+                            .Where(gn => gn.GorevlendirmeId == g.Id)
                             .ToListAsync();
-                        _context.Gorevlendirme.RemoveRange(activeAssignments);
+                        foreach (var gn in gNotlar)
+                        {
+                            gn.IsDeleted = true;
+                            _context.Entry(gn).State = EntityState.Modified;
+                        }
                     }
 
-                    // 3. Delete GorevGecmisleri where this gorevli is the main personnel or the replacement
-                    var activeHistory = await _context.GorevGecmisleri
-                        .Where(g => g.GorevliId == gorevliId || g.YerineGelenGorevliId == gorevliId)
-                        .ToListAsync();
-                    _context.GorevGecmisleri.RemoveRange(activeHistory);
-
-                    // 4. Delete GorevliNotlari
+                    // 2. Soft-delete GorevliNotlari
                     var notes = await _context.GorevliNotlari
                         .Where(n => n.GorevliId == gorevliId)
                         .ToListAsync();
-                    _context.GorevliNotlari.RemoveRange(notes);
+                    foreach (var n in notes)
+                    {
+                        n.IsDeleted = true;
+                        _context.Entry(n).State = EntityState.Modified;
+                    }
 
-                    // 5. Remove the Gorevli entity
-                    dbSet.Remove(entityToDelete);
+                    // 3. Soft-delete Gorevli
+                    entityToDelete.IsDeleted = true;
+                    _context.Entry(entityToDelete).State = EntityState.Modified;
 
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();

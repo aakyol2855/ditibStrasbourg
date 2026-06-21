@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DitibStasbourg.Models
 {
-    public class Gorevlendirme
+    public class Gorevlendirme : ISoftDeletable
     {
         public int Id { get; set; }
 
@@ -50,5 +50,7 @@ namespace DitibStasbourg.Models
 
         [Display(Name = "Silindi mi?")]
         public bool IsDeleted { get; set; } = false;
+
+        public DateTime? DeletedAt { get; set; }
     }
 }

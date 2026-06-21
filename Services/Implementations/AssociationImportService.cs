@@ -240,6 +240,15 @@ namespace DitibStasbourg.Services.Implementations
                             lon = coords.Longitude;
                         }
 
+                        var cemaatStr = GetValueByKeywords(row, "cemaat sayısı", "cemaat sayisi", "cemaat", "congregation", "members count", "member count", "member size");
+                        int? cemaatCount = null;
+                        if (!string.IsNullOrEmpty(cemaatStr) && int.TryParse(cemaatStr, out int cVal))
+                        {
+                            cemaatCount = cVal;
+                        }
+
+                        var frenchRegName = GetValueByKeywords(row, "resmi fransızca adı", "resmi fransizca adi", "fransızca adı", "fransizca adi", "prefecture name", "french name", "nom officiel", "official french name");
+
                         var dernek = new Kurum
                         {
                             Isim = isim,
@@ -256,7 +265,9 @@ namespace DitibStasbourg.Services.Implementations
                             AktifMi = true,
                             IsDeleted = false,
                             Latitude = lat,
-                            Longitude = lon
+                            Longitude = lon,
+                            CemaatCount = cemaatCount,
+                            FrenchRegistrationName = string.IsNullOrWhiteSpace(frenchRegName) ? null : frenchRegName
                         };
 
                         _context.Kurum.Add(dernek);

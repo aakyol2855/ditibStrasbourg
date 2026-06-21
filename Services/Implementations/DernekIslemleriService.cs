@@ -4,6 +4,7 @@ using DitibStasbourg.Models;
 using DitibStasbourg.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DitibStasbourg.Services.Implementations
 {
@@ -12,12 +13,14 @@ namespace DitibStasbourg.Services.Implementations
         private readonly ApplicationDbContext _context;
         private readonly IMemoryCache _cache;
         private readonly IGeocodingService _geocodingService;
+        private readonly IServiceProvider _serviceProvider;
 
-        public DernekIslemleriService(ApplicationDbContext context, IMemoryCache cache, IGeocodingService geocodingService)
+        public DernekIslemleriService(ApplicationDbContext context, IMemoryCache cache, IGeocodingService geocodingService, IServiceProvider serviceProvider)
         {
             _context = context;
             _cache   = cache;
             _geocodingService = geocodingService;
+            _serviceProvider = serviceProvider;
         }
 
         public IQueryable<Kurum> GetFilteredQueryable(string? search = null, string? sehir = null, string? bolge = null)
@@ -80,11 +83,48 @@ namespace DitibStasbourg.Services.Implementations
             return await _context.Kurum
                 .Include(k => k.UstKurum)
                 .Include(k => k.DernekUyeleri)
+                .Include(k => k.YonetimKuruluUyeleri)
+                    .ThenInclude(y => y.YonetimRol)
                 .Include(k => k.Gorevlendirmeler)
                     .ThenInclude(g => g.Gorevli)
                 .Include(k => k.Gorevlendirmeler)
                     .ThenInclude(g => g.GorevlendirmeNotlari)
                 .FirstOrDefaultAsync(k => k.Id == id);
+        }
+
+        private void StartBackgroundGeocoding(int dernekId, string? adres, string? sehir)
+        {
+            if (string.IsNullOrWhiteSpace(adres) && string.IsNullOrWhiteSpace(sehir)) return;
+
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await Task.Delay(1000);
+
+                    using (var scope = _serviceProvider.CreateScope())
+                    {
+                        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                        var geocoder = scope.ServiceProvider.GetRequiredService<IGeocodingService>();
+
+                        var coords = await geocoder.GeocodeAddressAsync(adres, sehir);
+                        if (coords.Latitude.HasValue && coords.Longitude.HasValue)
+                        {
+                            var dernek = await dbContext.Kurum.FindAsync(dernekId);
+                            if (dernek != null)
+                            {
+                                dernek.Latitude = coords.Latitude;
+                                dernek.Longitude = coords.Longitude;
+                                await dbContext.SaveChangesAsync();
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+                    // Fail silently
+                }
+            });
         }
 
         public async Task<Kurum> CreateDernekAsync(Kurum dernek)
@@ -97,19 +137,22 @@ namespace DitibStasbourg.Services.Implementations
             dernek.Tip    = KurumTip.Dernek;
             dernek.AktifMi = true;
 
-            // Resolve coordinates if null
-            if (!dernek.Latitude.HasValue || !dernek.Longitude.HasValue)
+            if (dernek.YonetimKuruluUyeleri != null)
             {
-                var coords = await _geocodingService.GeocodeAddressAsync(dernek.Adres, dernek.Sehir);
-                if (coords.Latitude.HasValue && coords.Longitude.HasValue)
+                foreach (var member in dernek.YonetimKuruluUyeleri)
                 {
-                    dernek.Latitude = coords.Latitude;
-                    dernek.Longitude = coords.Longitude;
+                    member.IsDeleted = false;
                 }
             }
 
             _context.Add(dernek);
             await _context.SaveChangesAsync();
+
+            if (!dernek.Latitude.HasValue || !dernek.Longitude.HasValue)
+            {
+                StartBackgroundGeocoding(dernek.Id, dernek.Adres, dernek.Sehir);
+            }
+
             return dernek;
         }
 
@@ -170,7 +213,7 @@ namespace DitibStasbourg.Services.Implementations
 
         public async Task<bool> UpdateDernekAsync(int id, string isim, string? sehir, string? adres, 
             string? kurulusKanunu, string? baskonsoloslukBolgesi, string? bolge, string? crmUyelikFormDurumu, int? ustKurumId,
-            string? iletisimNumarasi, string? maili, double? latitude, double? longitude)
+            string? iletisimNumarasi, string? maili, double? latitude, double? longitude, int? cemaatCount, string? frenchRegistrationName, List<KurumYonetimKuruluUyesi>? yonetimKurulu)
         {
             var dernek = await _context.Kurum.FindAsync(id);
             if (dernek == null) return false;
@@ -185,6 +228,8 @@ namespace DitibStasbourg.Services.Implementations
             dernek.UstKurumId = ustKurumId;
             dernek.IletisimNumarasi = iletisimNumarasi;
             dernek.Maili = maili;
+            dernek.CemaatCount = cemaatCount;
+            dernek.FrenchRegistrationName = frenchRegistrationName;
 
             if (latitude.HasValue && longitude.HasValue)
             {
@@ -193,16 +238,46 @@ namespace DitibStasbourg.Services.Implementations
             }
             else
             {
-                var coords = await _geocodingService.GeocodeAddressAsync(adres, sehir);
-                if (coords.Latitude.HasValue && coords.Longitude.HasValue)
+                StartBackgroundGeocoding(dernek.Id, dernek.Adres, dernek.Sehir);
+            }
+
+            // Sync Board Members
+            var existingMembers = await _context.KurumYonetimKuruluUyeleri
+                .Where(m => m.KurumId == id && !m.IsDeleted)
+                .ToListAsync();
+
+            if (yonetimKurulu == null)
+            {
+                yonetimKurulu = new List<KurumYonetimKuruluUyesi>();
+            }
+
+            foreach (var existing in existingMembers)
+            {
+                if (!yonetimKurulu.Any(n => n.Id == existing.Id))
                 {
-                    dernek.Latitude = coords.Latitude;
-                    dernek.Longitude = coords.Longitude;
+                    existing.IsDeleted = true;
+                    _context.Entry(existing).State = EntityState.Modified;
+                }
+            }
+
+            foreach (var member in yonetimKurulu)
+            {
+                if (member.Id > 0)
+                {
+                    var existing = existingMembers.FirstOrDefault(e => e.Id == member.Id);
+                    if (existing != null)
+                    {
+                        existing.FullName = member.FullName;
+                        existing.ContactPhone = member.ContactPhone;
+                        existing.YonetimRolId = member.YonetimRolId;
+                        _context.Entry(existing).State = EntityState.Modified;
+                    }
                 }
                 else
                 {
-                    dernek.Latitude = null;
-                    dernek.Longitude = null;
+                    member.KurumId = id;
+                    member.IsDeleted = false;
+                    _context.KurumYonetimKuruluUyeleri.Add(member);
                 }
             }
 
@@ -227,6 +302,15 @@ namespace DitibStasbourg.Services.Implementations
         {
             var query = GetFilteredQueryable(search, sehir, bolge);
             return await PaginatedList<Kurum>.CreateAsync(query, pageIndex, pageSize);
+        }
+
+        public async Task<List<Ref_YonetimRol>> GetYonetimRolleriAsync()
+        {
+            return await _context.Ref_YonetimRols
+                .Where(x => !x.IsDeleted)
+                .OrderBy(r => r.Ad)
+                .AsNoTracking()
+                .ToListAsync();
         }
     }
 }

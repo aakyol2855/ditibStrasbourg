@@ -153,9 +153,21 @@ namespace DitibStasbourg.Services.Base
                 {
                     dbSet.Attach(entityToDelete);
                 }
-                dbSet.Remove(entityToDelete);
+
+                var isDeletedProp = typeof(TEntity).GetProperty("IsDeleted");
+                if (isDeletedProp != null && isDeletedProp.PropertyType == typeof(bool) && isDeletedProp.CanWrite)
+                {
+                    isDeletedProp.SetValue(entityToDelete, true);
+                    _context.Entry(entityToDelete).State = EntityState.Modified;
+                    _logger.LogInformation("Soft-deleted {EntityType}", typeof(TEntity).Name);
+                }
+                else
+                {
+                    dbSet.Remove(entityToDelete);
+                    _logger.LogInformation("Hard-deleted {EntityType} (No IsDeleted property)", typeof(TEntity).Name);
+                }
+
                 await _context.SaveChangesAsync();
-                _logger.LogInformation("Deleted {EntityType}", typeof(TEntity).Name);
             }
             catch (Exception ex)
             {

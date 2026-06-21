@@ -128,6 +128,9 @@ namespace DitibStasbourg.Services.Implementations
             existing.Phone           = hissedar.Phone;
             existing.PaymentStatus   = hissedar.PaymentStatus;
             existing.IsVekaletTaken  = hissedar.IsVekaletTaken;
+            existing.PaymentMethod   = hissedar.PaymentMethod;
+            existing.TotalPaid       = hissedar.TotalPaid;
+            existing.RemainingBalance = hissedar.RemainingBalance;
 
             _context.Update(existing);
             await _context.SaveChangesAsync();

@@ -181,6 +181,14 @@ public static class DbSeeder
             }
         }
         await context.SaveChangesAsync();
+
+        // Seed AppSettings
+        var settingExists = await context.AppSettings.AnyAsync(s => s.Key == "SoftDeleteRetentionDays");
+        if (!settingExists)
+        {
+            context.AppSettings.Add(new AppSetting { Key = "SoftDeleteRetentionDays", Value = "30" });
+            await context.SaveChangesAsync();
+        }
         
         // Seed Gorevli Data
         if (!context.Gorevli.Any(g => g.Id > 3)) 

@@ -5,8 +5,11 @@ using DitibStasbourg.Data;
 using DitibStasbourg.Models.Security;
 using DitibStasbourg.Models.ViewModels;
 
+using Microsoft.AspNetCore.Authorization;
+
 namespace DitibStasbourg.Controllers
 {
+    [Authorize(Roles = "SuperAdmin")]
     public class RoleTemplateController : Controller
     {
         private readonly ApplicationDbContext _context;

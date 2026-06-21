@@ -7,6 +7,7 @@ using DitibStasbourg.Models.Security;
 
 namespace DitibStasbourg.Controllers
 {
+    [Authorize(Roles = "SuperAdmin")]
     public class UserManagementController : Controller
     {
         private readonly IUserManagementService _userService;

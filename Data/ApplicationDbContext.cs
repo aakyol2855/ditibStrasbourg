@@ -3,21 +3,32 @@ using Microsoft.EntityFrameworkCore;
 using DitibStasbourg.Models;
 using DitibStasbourg.Models.Dashboard;
 using DitibStasbourg.Models.Security;
+using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DitibStasbourg.Data;
 
 public class ApplicationDbContext : IdentityDbContext
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+    private readonly IHttpContextAccessor? _httpContextAccessor;
+
+    public ApplicationDbContext(
+        DbContextOptions<ApplicationDbContext> options,
+        IHttpContextAccessor? httpContextAccessor = null)
         : base(options)
     {
+        _httpContextAccessor = httpContextAccessor;
     }
 
+    public DbSet<DatabaseAuditLogs> DatabaseAuditLogs { get; set; }
+    public DbSet<AppSetting> AppSettings { get; set; }
     public DbSet<Gorevli> Gorevli { get; set; }
     public DbSet<Kurum> Kurum { get; set; }
     public DbSet<Gorevlendirme> Gorevlendirme { get; set; }
-    
-    // New Entities
+    public DbSet<KurumFinansalDonem> KurumFinansalDonemler { get; set; }
     public DbSet<Ref_GorevliDurum> Ref_GorevliDurums { get; set; }
     public DbSet<Ref_SozlesmeTip> Ref_SozlesmeTips { get; set; }
     public DbSet<Ref_KurumTuru> Ref_KurumTurus { get; set; }
@@ -48,6 +59,8 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<Hissedar> Hissedarlar { get; set; }
     public DbSet<DashboardPreference> DashboardPreferences { get; set; }
     public DbSet<SystemAuditLog> SystemAuditLogs { get; set; }
+    public DbSet<Ref_YonetimRol> Ref_YonetimRols { get; set; }
+    public DbSet<KurumYonetimKuruluUyesi> KurumYonetimKuruluUyeleri { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -57,6 +70,10 @@ public class ApplicationDbContext : IdentityDbContext
         builder.Entity<Kurum>().HasQueryFilter(k => !k.IsDeleted);
         builder.Entity<Gorevli>().HasQueryFilter(g => !g.IsDeleted);
         builder.Entity<Gorevlendirme>().HasQueryFilter(gv => !gv.IsDeleted);
+        builder.Entity<Ref_YonetimRol>().HasQueryFilter(r => !r.IsDeleted);
+        builder.Entity<KurumYonetimKuruluUyesi>().HasQueryFilter(m => !m.IsDeleted);
+        builder.Entity<GorevliNot>().HasQueryFilter(n => !n.IsDeleted);
+        builder.Entity<GorevlendirmeNot>().HasQueryFilter(n => !n.IsDeleted);
 
         // Configure Lookups
         builder.Entity<LookupType>()
@@ -138,5 +155,188 @@ public class ApplicationDbContext : IdentityDbContext
         builder.Entity<Gorevlendirme>()
             .HasIndex(g => new { g.Tarih, g.BitisTarihi, g.KurumId, g.GorevliId })
             .HasDatabaseName("IX_Gorevlendirme_Filters");
+
+        builder.Entity<KurumYonetimKuruluUyesi>()
+            .HasOne(m => m.Kurum)
+            .WithMany(k => k.YonetimKuruluUyeleri)
+            .HasForeignKey(m => m.KurumId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<KurumYonetimKuruluUyesi>()
+            .HasOne(m => m.YonetimRol)
+            .WithMany()
+            .HasForeignKey(m => m.YonetimRolId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<Ref_YonetimRol>().HasData(
+            new Ref_YonetimRol { Id = 1, Ad = "Başkan", IsDeleted = false },
+            new Ref_YonetimRol { Id = 2, Ad = "Sekreter", IsDeleted = false },
+            new Ref_YonetimRol { Id = 3, Ad = "Muhasip", IsDeleted = false },
+            new Ref_YonetimRol { Id = 4, Ad = "Üye", IsDeleted = false }
+        );
+    }
+
+    public override int SaveChanges()
+    {
+        var auditEntries = OnBeforeSaveChanges();
+        var result = base.SaveChanges();
+        OnAfterSaveChangesSync(auditEntries);
+        return result;
+    }
+
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        var auditEntries = OnBeforeSaveChanges();
+        var result = await base.SaveChangesAsync(cancellationToken);
+        await OnAfterSaveChangesAsync(auditEntries);
+        return result;
+    }
+
+    private List<AuditTempEntry> OnBeforeSaveChanges()
+    {
+        ChangeTracker.DetectChanges();
+        var auditEntries = new List<AuditTempEntry>();
+        
+        var username = _httpContextAccessor?.HttpContext?.User?.Identity?.Name ?? "System";
+
+        foreach (var entry in ChangeTracker.Entries())
+        {
+            if (entry.Entity is DatabaseAuditLogs || entry.State == EntityState.Detached || entry.State == EntityState.Unchanged)
+                continue;
+
+            // Automate soft delete DeletedAt timestamp setting
+            if (entry.Entity is ISoftDeletable softDeletable)
+            {
+                if (entry.State == EntityState.Modified)
+                {
+                    var isDeletedProp = entry.Property("IsDeleted");
+                    if (isDeletedProp != null && isDeletedProp.IsModified)
+                    {
+                        if (softDeletable.IsDeleted)
+                        {
+                            softDeletable.DeletedAt = DateTime.UtcNow;
+                        }
+                        else
+                        {
+                            softDeletable.DeletedAt = null;
+                        }
+                    }
+                }
+                else if (entry.State == EntityState.Added && softDeletable.IsDeleted)
+                {
+                    softDeletable.DeletedAt = DateTime.UtcNow;
+                }
+            }
+
+            var auditEntry = new AuditTempEntry
+            {
+                EntityName = entry.Entity.GetType().Name,
+                Username = username,
+                Timestamp = DateTime.UtcNow
+            };
+
+            if (entry.State == EntityState.Added)
+            {
+                auditEntry.Action = "INSERT";
+                var newValues = new Dictionary<string, object?>();
+                foreach (var prop in entry.Properties)
+                {
+                    if (prop.Metadata.IsPrimaryKey()) continue;
+                    newValues[prop.Metadata.Name] = prop.CurrentValue;
+                }
+                auditEntry.NewValues = System.Text.Json.JsonSerializer.Serialize(newValues);
+            }
+            else if (entry.State == EntityState.Deleted)
+            {
+                auditEntry.Action = "DELETE";
+                var oldValues = new Dictionary<string, object?>();
+                foreach (var prop in entry.Properties)
+                {
+                    oldValues[prop.Metadata.Name] = prop.OriginalValue;
+                }
+                auditEntry.OldValues = System.Text.Json.JsonSerializer.Serialize(oldValues);
+            }
+            else if (entry.State == EntityState.Modified)
+            {
+                auditEntry.Action = "UPDATE";
+                var oldValues = new Dictionary<string, object?>();
+                var newValues = new Dictionary<string, object?>();
+
+                foreach (var prop in entry.Properties)
+                {
+                    if (prop.IsModified)
+                    {
+                        oldValues[prop.Metadata.Name] = prop.OriginalValue;
+                        newValues[prop.Metadata.Name] = prop.CurrentValue;
+                    }
+                }
+
+                if (oldValues.Count > 0)
+                {
+                    auditEntry.OldValues = System.Text.Json.JsonSerializer.Serialize(oldValues);
+                    auditEntry.NewValues = System.Text.Json.JsonSerializer.Serialize(newValues);
+                }
+                else
+                {
+                    continue;
+                }
+            }
+
+            auditEntries.Add(auditEntry);
+        }
+
+        return auditEntries;
+    }
+
+    private void OnAfterSaveChangesSync(List<AuditTempEntry> auditEntries)
+    {
+        if (auditEntries == null || auditEntries.Count == 0)
+            return;
+
+        foreach (var entry in auditEntries)
+        {
+            DatabaseAuditLogs.Add(new DatabaseAuditLogs
+            {
+                EntityName = entry.EntityName,
+                Action = entry.Action,
+                Username = entry.Username,
+                Timestamp = entry.Timestamp,
+                OldValues = entry.OldValues,
+                NewValues = entry.NewValues
+            });
+        }
+
+        base.SaveChanges();
+    }
+
+    private async Task OnAfterSaveChangesAsync(List<AuditTempEntry> auditEntries)
+    {
+        if (auditEntries == null || auditEntries.Count == 0)
+            return;
+
+        foreach (var entry in auditEntries)
+        {
+            DatabaseAuditLogs.Add(new DatabaseAuditLogs
+            {
+                EntityName = entry.EntityName,
+                Action = entry.Action,
+                Username = entry.Username,
+                Timestamp = entry.Timestamp,
+                OldValues = entry.OldValues,
+                NewValues = entry.NewValues
+            });
+        }
+
+        await base.SaveChangesAsync();
+    }
+
+    private class AuditTempEntry
+    {
+        public string EntityName { get; set; } = "";
+        public string Action { get; set; } = "";
+        public string Username { get; set; } = "";
+        public DateTime Timestamp { get; set; }
+        public string? OldValues { get; set; }
+        public string? NewValues { get; set; }
     }
 }

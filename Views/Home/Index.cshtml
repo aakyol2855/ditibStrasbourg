@@ -1,113 +1,460 @@
 @model DitibStasbourg.Models.ViewModels.DashboardViewModel
 @{
-    ViewData["Title"] = "Ana Sayfa";
+    ViewData["Title"] = "Executive Information Dashboard";
 }
 
-<!-- Page Header -->
-<div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
-    <div class="d-flex align-items-center gap-3">
-        <div>
-            <h1 class="h3 fw-bold text-dark mb-0">DITIB Strasbourg</h1>
-            <p class="text-muted mb-0">Yönetim Paneli</p>
-        </div>
-        <button class="btn btn-sm btn-outline-secondary rounded-circle p-2" type="button" data-bs-toggle="modal" data-bs-target="#dashboardSettingsModal" title="Panel Ayarları">
-            <i class="bi bi-gear-fill"></i>
-        </button>
-    </div>
-    <div class="d-none d-md-block text-end text-muted small">
-        <i class="bi bi-calendar-event me-1"></i> @DateTime.Now.ToString("dd MMMM yyyy, dddd")
-    </div>
-</div>
-
-<!-- Interactive Command Center (Stats) -->
-@await Component.InvokeAsync("Dashboard")
-
-<!-- Modules Section -->
-<h4 class="mb-4 fw-bold"><i class="bi bi-grid-1x2 me-2 text-primary"></i>Sistem Modülleri</h4>
-<div class="row g-4">
-    <!-- Dernekler Module -->
-    <div class="col-md-6 col-lg-4">
-        <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden module-card transition-all" style="transition: transform 0.2s, box-shadow 0.2s;">
-            <div class="card-body p-4 d-flex flex-column">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div class="bg-primary bg-opacity-10 p-3 rounded-3">
-                        <i class="bi bi-building text-primary fs-3"></i>
-                    </div>
-                </div>
-                <h5 class="card-title fw-bold">Dernek İşlemleri</h5>
-                <p class="card-text text-muted mb-4">Dernek kayıtlarını yönetin, üyeleri, başkan bilgilerini ve bölgesel detayları güncelleyin.</p>
-                <div class="mt-auto d-flex gap-2">
-                    <a asp-controller="DernekIslemleri" asp-action="Index" class="btn btn-primary flex-grow-1">Listele / Git</a>
-                    <a asp-controller="DernekIslemleri" asp-action="Create" class="btn btn-outline-primary" title="Yeni Ekle"><i class="bi bi-plus-lg"></i></a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Görevliler Module -->
-    <div class="col-md-6 col-lg-4">
-        <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden module-card transition-all" style="transition: transform 0.2s, box-shadow 0.2s;">
-            <div class="card-body p-4 d-flex flex-column">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div class="bg-success bg-opacity-10 p-3 rounded-3">
-                        <i class="bi bi-person-badge text-success fs-3"></i>
-                    </div>
-                </div>
-                <h5 class="card-title fw-bold">Görevli İşlemleri</h5>
-                <p class="card-text text-muted mb-4">Sistemdeki din görevlilerini ve personeli yönetin. Durum, not ve izin takiplerini yapın.</p>
-                <div class="mt-auto d-flex gap-2">
-                    <a asp-controller="Gorevli" asp-action="Index" class="btn btn-success flex-grow-1">Listele / Git</a>
-                    <a asp-controller="Gorevli" asp-action="Create" class="btn btn-outline-success" title="Yeni Ekle"><i class="bi bi-plus-lg"></i></a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Görevlendirmeler Module -->
-    <div class="col-md-6 col-lg-4">
-        <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden module-card transition-all" style="transition: transform 0.2s, box-shadow 0.2s;">
-            <div class="card-body p-4 d-flex flex-column">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div class="bg-warning bg-opacity-10 p-3 rounded-3">
-                        <i class="bi bi-calendar-event text-warning fs-3"></i>
-                    </div>
-                </div>
-                <h5 class="card-title fw-bold">Görevlendirmeler</h5>
-                <p class="card-text text-muted mb-4">Görevlilerin derneklere atamalarını gerçekleştirin, tarih ve süre bazlı planlamalar yapın.</p>
-                <div class="mt-auto d-flex gap-2">
-                    <a asp-controller="Gorevlendirme" asp-action="Index" class="btn btn-warning flex-grow-1 text-dark">Listele / Git</a>
-                    <a asp-controller="Gorevlendirme" asp-action="Create" class="btn btn-outline-warning text-dark" title="Yeni Ekle"><i class="bi bi-plus-lg"></i></a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    @if (User.IsInRole("SuperAdmin"))
-    {
-        <!-- Sistem Tanımlamaları Module -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden module-card transition-all bg-light" style="transition: transform 0.2s, box-shadow 0.2s;">
-                <div class="card-body p-4 d-flex flex-column">
-                    <div class="d-flex justify-content-between align-items-start mb-3">
-                        <div class="bg-secondary bg-opacity-10 p-3 rounded-3">
-                            <i class="bi bi-gear-fill text-secondary fs-3"></i>
-                        </div>
-                        <span class="badge bg-secondary">Admin</span>
-                    </div>
-                    <h5 class="card-title fw-bold">Sistem Tanımlamaları</h5>
-                    <p class="card-text text-muted mb-4">Sistemde kullanılan dinamik verileri (görev türleri, vb.) tanımlayın ve yönetin.</p>
-                    <div class="mt-auto d-flex gap-2">
-                        <a asp-controller="Tanimlamalar" asp-action="Index" class="btn btn-secondary flex-grow-1">Tanımlamalara Git</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
-</div>
-
+<!-- Executive Dashboard CSS Variables & Animations -->
 <style>
-    .module-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    :root {
+        --glass-bg: rgba(255, 255, 255, 0.75);
+        --glass-border: rgba(226, 232, 240, 0.8);
+        --card-shadow: 0 4px 20px -2px rgba(50, 50, 93, 0.05), 0 2px 8px -1px rgba(0, 0, 0, 0.02);
+        --hover-shadow: 0 12px 30px -4px rgba(50, 50, 93, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .executive-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        box-shadow: var(--card-shadow);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+        position: relative;
+    }
+
+    .executive-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--hover-shadow);
+        border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    .metric-icon-wrapper {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        transition: transform 0.3s ease;
+    }
+
+    .executive-card:hover .metric-icon-wrapper {
+        transform: scale(1.1) rotate(3deg);
+    }
+
+    .quick-action-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        border-radius: 12px;
+        border: 1px solid var(--glass-border);
+        background: #ffffff;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        color: #334155;
+    }
+
+    .quick-action-btn:hover {
+        background: #f8fafc;
+        border-color: #3b82f6;
+        color: #2563eb;
+        transform: translateY(-2px);
+    }
+
+    .quick-action-btn i {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .density-bar {
+        height: 8px;
+        border-radius: 4px;
+        background-color: #e2e8f0;
+    }
+
+    .density-bar-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     }
 </style>
+
+<!-- Dashboard Top Header -->
+<div class="row align-items-center mb-4 pb-3 border-bottom">
+    <div class="col-md-8">
+        <h1 class="h3 fw-bold text-slate-800 mb-1"><i class="fa-solid fa-chart-line text-primary me-2"></i>Executive Information Dashboard</h1>
+        <p class="text-muted mb-0">DİTİB Strasbourg (Alsace Bölgesi) Gerçek Zamanlı Yönetim ve Karar Destek Paneli</p>
+    </div>
+    <div class="col-md-4 text-md-end text-muted small mt-2 mt-md-0">
+        <div class="badge bg-white border text-dark p-2 rounded-3 shadow-xs">
+            <i class="fa-regular fa-clock me-1 text-primary"></i> @DateTime.Now.ToString("dd MMMM yyyy, dddd HH:mm")
+        </div>
+    </div>
+</div>
+
+<!-- Dynamic Top Metric Grid -->
+<div class="row g-4 mb-4">
+    <!-- Associations Counter Card -->
+    <div class="col-xl-3 col-md-6">
+        <a asp-controller="DernekIslemleri" asp-action="Index" class="text-decoration-none">
+            <div class="executive-card p-4 h-100 d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-muted fw-semibold small uppercase tracking-wider d-block mb-1">Kurumlar (Dernek & Cami)</span>
+                    <h3 class="fw-bold mb-0 text-slate-900">@Model.TotalKurum</h3>
+                    <span class="text-primary small fw-semibold"><i class="fa-solid fa-arrow-up-right-from-square me-1"></i>Listeyi İncele</span>
+                </div>
+                <div class="metric-icon-wrapper bg-primary bg-opacity-10 text-primary">
+                    <i class="fa-solid fa-hotel fs-4"></i>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Active Staff Counter Card -->
+    <div class="col-xl-3 col-md-6">
+        <a asp-controller="Gorevli" asp-action="Index" class="text-decoration-none">
+            <div class="executive-card p-4 h-100 d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-muted fw-semibold small uppercase tracking-wider d-block mb-1">Toplam Görevli Havuzu</span>
+                    <h3 class="fw-bold mb-0 text-slate-900">@Model.TotalGorevli</h3>
+                    <span class="text-success small fw-semibold">
+                        <i class="fa-solid fa-circle me-1" style="font-size: 8px;"></i> @Model.ActiveGorevli Aktif Görevde
+                    </span>
+                </div>
+                <div class="metric-icon-wrapper bg-success bg-opacity-10 text-success">
+                    <i class="fa-solid fa-users fs-4"></i>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Assignments Counter Card -->
+    <div class="col-xl-3 col-md-6">
+        <a asp-controller="Gorevlendirme" asp-action="Index" class="text-decoration-none">
+            <div class="executive-card p-4 h-100 d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-muted fw-semibold small uppercase tracking-wider d-block mb-1">Görevlendirme Atamaları</span>
+                    <h3 class="fw-bold mb-0 text-slate-900">@Model.TotalGorevlendirme</h3>
+                    <span class="text-warning small fw-semibold">
+                        <i class="fa-solid fa-calendar-check me-1"></i> @Model.UpcomingAssignments Yaklaşan Planlanmış
+                    </span>
+                </div>
+                <div class="metric-icon-wrapper bg-warning bg-opacity-10 text-warning">
+                    <i class="fa-solid fa-calendar-days fs-4"></i>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Assignments This Year Counter Card -->
+    <div class="col-xl-3 col-md-6">
+        <a asp-controller="Gorevlendirme" asp-action="Index" class="text-decoration-none">
+            <div class="executive-card p-4 h-100 d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-muted fw-semibold small uppercase tracking-wider d-block mb-1">Bu Yıl Yapılan Görevler</span>
+                    <h3 class="fw-bold mb-0 text-slate-900">@Model.GorevlendirmeThisYear</h3>
+                    <span class="text-info small fw-semibold">
+                        <i class="fa-solid fa-chart-line me-1"></i> @Model.GorevlendirmeThisMonth Bu Ay Eklenen
+                    </span>
+                </div>
+                <div class="metric-icon-wrapper bg-info bg-opacity-10 text-info">
+                    <i class="fa-solid fa-chart-bar fs-4"></i>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Main Panels Row -->
+<div class="row g-4">
+    <!-- Left Column: OSRM Route Map & Financial Campaign Insights -->
+    <div class="col-lg-8">
+        <!-- OSRM Interactive Route Map -->
+        <div class="executive-card p-0 mb-4 overflow-hidden">
+            <div class="card-header bg-white border-0 py-3 px-4 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold text-slate-800"><i class="fa-solid fa-map-location-dot text-primary me-2"></i>Bölgesel Erişim ve OSRM Rota Ağı</h5>
+                <span class="badge bg-light text-muted">Canlı Harita Servisi</span>
+            </div>
+            <div class="p-0 border-top">
+                @await Component.InvokeAsync("Map")
+            </div>
+        </div>
+
+        <!-- Financial Campaign Insights Panel -->
+        <div class="executive-card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="mb-0 fw-bold text-slate-800"><i class="fa-solid fa-vault text-primary me-2"></i>Yıllık Finansal Kampanya Analizi</h5>
+                <span class="badge bg-primary bg-opacity-10 text-primary">Fitre, Zekat & Fidye</span>
+            </div>
+            
+            <div class="row align-items-center">
+                <div class="col-md-7">
+                    <div style="position: relative; height: 260px; width: 100%;">
+                        <canvas id="financialInsightsChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="table-responsive" style="max-height: 260px; overflow-y: auto;">
+                        <table class="table table-sm table-hover align-middle small mb-0">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th>Yıl</th>
+                                    <th>Kampanya</th>
+                                    <th class="text-end">Toplanan Tutar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.CampaignSummaries?.Count > 0)
+                                {
+                                    @foreach (var campaign in Model.CampaignSummaries)
+                                    {
+                                        <tr>
+                                            <td class="fw-bold">@campaign.Year</td>
+                                            <td>
+                                                @switch (campaign.CampaignType)
+                                                {
+                                                    case "Fitre":
+                                                        <span class="badge bg-teal bg-opacity-10 text-success">Fitre</span>
+                                                        break;
+                                                    case "Zekat":
+                                                        <span class="badge bg-indigo bg-opacity-10 text-primary">Zekat</span>
+                                                        break;
+                                                    case "Fidye":
+                                                        <span class="badge bg-purple bg-opacity-10 text-purple">Fidye</span>
+                                                        break;
+                                                    default:
+                                                        <span class="badge bg-secondary bg-opacity-10 text-muted">@campaign.CampaignType</span>
+                                                        break;
+                                                }
+                                            </td>
+                                            <td class="text-end fw-semibold text-slate-900">@campaign.TotalAmount.ToString("C2", new System.Globalization.CultureInfo("fr-FR"))</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted py-4">Kayıtlı finansal kampanya dönemi bulunmamaktadır.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Regional Density, Sacrificial Ledger & Quick Commands -->
+    <div class="col-lg-4">
+        <!-- Regional Staff Density Widget -->
+        <div class="executive-card p-4 mb-4">
+            <h5 class="mb-3 fw-bold text-slate-800"><i class="fa-solid fa-users-rectangle text-primary me-2"></i>Bölgesel Personel Dağılımı</h5>
+            <div class="list-group list-group-flush">
+                @foreach (var region in Model.RegionalDensities)
+                {
+                    var totalAssignedInRegion = region.ActiveCount;
+                    var totalUnassignedPool = region.UnassignedCount;
+                    var totalRegionPool = totalAssignedInRegion + totalUnassignedPool;
+                    var percentageAssigned = totalRegionPool > 0 ? (double)totalAssignedInRegion / totalRegionPool * 100 : 0;
+
+                    <div class="list-group-item px-0 border-0 mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="fw-bold text-slate-800">Bölge @region.Region</span>
+                            <span class="small text-muted">
+                                <strong>@totalAssignedInRegion</strong> Aktif / @totalUnassignedPool Havuz
+                            </span>
+                        </div>
+                        <div class="density-bar">
+                            <div class="density-bar-fill bg-primary" style="width: @(percentageAssigned)%;"></div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Sacrificial Ledger Accountability Widget -->
+        <div class="executive-card p-4 mb-4">
+            <h5 class="mb-3 fw-bold text-slate-800"><i class="fa-solid fa-calculator text-primary me-2"></i>Kurban Hisse ve Ödemeler</h5>
+            
+            <!-- Progress Bar -->
+            @{
+                var fillRate = Model.TotalKurbanShares > 0 ? (double)Model.SoldKurbanShares / Model.TotalKurbanShares * 100 : 0;
+            }
+            <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-1 small text-muted">
+                    <span>Hisse Satış Oranı</span>
+                    <span class="fw-bold text-slate-900">@fillRate.ToString("F1")%</span>
+                </div>
+                <div class="progress" style="height: 10px;">
+                    <div class="progress-bar bg-warning progress-bar-striped progress-bar-animated" style="width: @fillRate%"></div>
+                </div>
+                <div class="d-flex justify-content-between mt-1 small">
+                    <span class="text-muted">@Model.SoldKurbanShares Satılan</span>
+                    <span class="text-muted">@Model.RemainingKurbanShares Boş Hisse</span>
+                </div>
+            </div>
+
+            <!-- Live Ledger -->
+            <div class="row g-2 border-top pt-3 text-center">
+                <div class="col border-end">
+                    <span class="d-block text-muted small mb-1">Toplam Tahsilat</span>
+                    <h5 class="fw-bold text-success mb-0">@Model.TotalKurbanCollected.ToString("C2", new System.Globalization.CultureInfo("fr-FR"))</h5>
+                </div>
+                <div class="col">
+                    <span class="d-block text-muted small mb-1">Bekleyen Bakiye</span>
+                    <h5 class="fw-bold text-danger mb-0">@Model.TotalKurbanOverdue.ToString("C2", new System.Globalization.CultureInfo("fr-FR"))</h5>
+                </div>
+            </div>
+            
+            <div class="mt-3 text-center">
+                <a asp-controller="Kurban" asp-action="Index" class="btn btn-outline-warning btn-sm w-100 text-dark">
+                    <i class="fa-solid fa-cow me-1"></i> Kurban Detay & Hisse Yönetimi
+                </a>
+            </div>
+        </div>
+
+        <!-- Quick Administrative Actions Panel -->
+        <div class="executive-card p-4">
+            <h5 class="mb-3 fw-bold text-slate-800"><i class="fa-solid fa-bolt text-primary me-2"></i>Hızlı Yönetim Kısayolları</h5>
+            <div class="row g-3">
+                <div class="col-6">
+                    <a asp-controller="DernekIslemleri" asp-action="Create" class="quick-action-btn">
+                        <i class="fa-solid fa-plus text-primary"></i>
+                        <span class="small fw-semibold">Yeni Dernek</span>
+                    </a>
+                </div>
+                <div class="col-6">
+                    <a asp-controller="Gorevli" asp-action="Create" class="quick-action-btn">
+                        <i class="fa-solid fa-user-plus text-success"></i>
+                        <span class="small fw-semibold">Yeni Görevli</span>
+                    </a>
+                </div>
+                <div class="col-6">
+                    <a asp-controller="Gorevlendirme" asp-action="Create" class="quick-action-btn">
+                        <i class="fa-solid fa-calendar-plus text-warning"></i>
+                        <span class="small fw-semibold">Yeni Görev</span>
+                    </a>
+                </div>
+                <div class="col-6">
+                    <a asp-controller="Kurban" asp-action="Index" class="quick-action-btn">
+                        <i class="fa-solid fa-cow text-info"></i>
+                        <span class="small fw-semibold">Kurban Ekle</span>
+                    </a>
+                </div>
+                
+                @if (User.IsInRole("SuperAdmin"))
+                {
+                    <div class="col-6">
+                        <a href="/Admin/TrashBin" class="quick-action-btn bg-light-danger text-danger">
+                            <i class="fa-solid fa-trash-can text-danger"></i>
+                            <span class="small fw-semibold text-danger">Çöp Kutusu</span>
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a href="/Admin/DataMaintenance" class="quick-action-btn">
+                            <i class="fa-solid fa-file-excel text-success"></i>
+                            <span class="small fw-semibold">Excel Yükleme</span>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js Registration & Initialization -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var ctx = document.getElementById('financialInsightsChart');
+        if (ctx) {
+            // Group and format model data dynamically for Chart.js
+            var rawData = @Html.Raw(Json.Serialize(Model.CampaignSummaries));
+            
+            // Extract distinct years and campaign types
+            var years = [...new Set(rawData.map(item => item.year))].sort();
+            var campaignTypes = [...new Set(rawData.map(item => item.campaignType))];
+
+            // Define color palette matching dashboard aesthetics
+            var colorPalette = {
+                'Fitre': 'rgba(20, 184, 166, 0.8)',   // Teal
+                'Zekat': 'rgba(79, 70, 229, 0.8)',   // Indigo
+                'Fidye': 'rgba(147, 51, 234, 0.8)'    // Purple
+            };
+
+            // Build datasets dynamically
+            var datasets = campaignTypes.map(type => {
+                var data = years.map(year => {
+                    var match = rawData.find(item => item.year === year && item.campaignType === type);
+                    return match ? match.totalAmount : 0;
+                });
+
+                return {
+                    label: type,
+                    data: data,
+                    backgroundColor: colorPalette[type] || 'rgba(100, 116, 139, 0.8)',
+                    borderRadius: 6,
+                    borderWidth: 0
+                };
+            });
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: years,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                boxWidth: 12,
+                                font: {
+                                    size: 11,
+                                    family: 'Inter, system-ui, sans-serif'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    var label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: false,
+                            grid: { display: false }
+                        },
+                        y: {
+                            stacked: false,
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumSignificantDigits: 3 }).format(value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>

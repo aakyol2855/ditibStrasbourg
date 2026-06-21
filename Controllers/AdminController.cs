@@ -387,5 +387,172 @@ namespace DitibStasbourg.Controllers
             var progress = _progressTracker.GetProgress(key);
             return Json(new { progress = progress });
         }
+
+        [HttpGet]
+        [Route("Admin/TrashBin")]
+        public async Task<IActionResult> TrashBin()
+        {
+            var retentionSetting = await _context.AppSettings.FirstOrDefaultAsync(s => s.Key == "SoftDeleteRetentionDays");
+            int retentionDays = 30;
+            if (retentionSetting != null && int.TryParse(retentionSetting.Value, out var parsedDays))
+            {
+                retentionDays = parsedDays;
+            }
+
+            var model = new TrashBinViewModel
+            {
+                DeletedAssociations = await _context.Kurum
+                    .IgnoreQueryFilters()
+                    .Where(k => k.IsDeleted)
+                    .ToListAsync(),
+
+                DeletedPersonnel = await _context.Gorevli
+                    .IgnoreQueryFilters()
+                    .Where(g => g.IsDeleted)
+                    .ToListAsync(),
+
+                DeletedAssignments = await _context.Gorevlendirme
+                    .IgnoreQueryFilters()
+                    .Where(a => a.IsDeleted)
+                    .Include(a => a.Gorevli)
+                    .Include(a => a.Kurum)
+                    .ToListAsync(),
+
+                SoftDeleteRetentionDays = retentionDays
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [Route("Admin/TrashBin/UpdateRetentionDays")]
+        public async Task<IActionResult> UpdateRetentionDays(int days)
+        {
+            if (days < 1)
+            {
+                TempData["Error"] = "Saklama süresi en az 1 gün olmalıdır.";
+                return RedirectToAction(nameof(TrashBin));
+            }
+
+            var setting = await _context.AppSettings.FirstOrDefaultAsync(s => s.Key == "SoftDeleteRetentionDays");
+            if (setting == null)
+            {
+                setting = new AppSetting { Key = "SoftDeleteRetentionDays", Value = days.ToString() };
+                _context.AppSettings.Add(setting);
+            }
+            else
+            {
+                setting.Value = days.ToString();
+            }
+
+            await _context.SaveChangesAsync();
+
+            var username = User.Identity?.Name ?? "System_Daemon";
+            await _auditLogService.LogAsync(
+                "Information",
+                username,
+                $"Veri saklama süresi (SoftDeleteRetentionDays) güncellendi: {days} gün.",
+                HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1",
+                "AdminController"
+            );
+
+            TempData["Success"] = "Veri saklama süresi başarıyla güncellendi.";
+            return RedirectToAction(nameof(TrashBin));
+        }
+
+        [HttpGet, HttpPost]
+        [Route("Admin/TrashBin/Restore")]
+        public async Task<IActionResult> Restore(string type, int id)
+        {
+            if (!User.IsInRole("SuperAdmin"))
+            {
+                return Forbid();
+            }
+            var username = User.Identity?.Name ?? "System_Daemon";
+
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    bool success = false;
+                    string name = "";
+
+                    if (string.Equals(type, "Association", StringComparison.OrdinalIgnoreCase) || string.Equals(type, "Dernek", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var association = await _context.Kurum
+                            .IgnoreQueryFilters()
+                            .FirstOrDefaultAsync(k => k.Id == id);
+                        
+                        if (association != null)
+                        {
+                            association.IsDeleted = false;
+                            association.DeletedAt = null;
+                            name = association.Isim;
+                            success = true;
+                        }
+                    }
+                    else if (string.Equals(type, "Personnel", StringComparison.OrdinalIgnoreCase) || string.Equals(type, "Gorevli", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var personnel = await _context.Gorevli
+                            .IgnoreQueryFilters()
+                            .FirstOrDefaultAsync(g => g.Id == id);
+
+                        if (personnel != null)
+                        {
+                            personnel.IsDeleted = false;
+                            personnel.DeletedAt = null;
+                            name = $"{personnel.Ad} {personnel.Soyad}";
+                            success = true;
+                        }
+                    }
+                    else if (string.Equals(type, "Assignment", StringComparison.OrdinalIgnoreCase) || string.Equals(type, "Gorevlendirme", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var assignment = await _context.Gorevlendirme
+                            .IgnoreQueryFilters()
+                            .FirstOrDefaultAsync(a => a.Id == id);
+
+                        if (assignment != null)
+                        {
+                            assignment.IsDeleted = false;
+                            assignment.DeletedAt = null;
+                            name = $"Görevlendirme #{assignment.Id}";
+                            success = true;
+                        }
+                    }
+
+                    if (success)
+                    {
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+
+                        if (_cache is MemoryCache concreteCache)
+                        {
+                            concreteCache.Clear();
+                        }
+
+                        await _auditLogService.LogAsync(
+                            "Information",
+                            username,
+                            $"{type} kaydı çöp kutusundan geri yüklendi: {name} (ID: {id})",
+                            HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1",
+                            "AdminController"
+                        );
+
+                        TempData["Success"] = "Kayıt başarıyla geri yüklendi.";
+                    }
+                    else
+                    {
+                        TempData["Error"] = "Kayıt bulunamadı veya geri yüklenemedi.";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    TempData["Error"] = $"Hata oluştu: {ex.Message}";
+                }
+            }
+
+            return RedirectToAction(nameof(TrashBin));
+        }
     }
 }

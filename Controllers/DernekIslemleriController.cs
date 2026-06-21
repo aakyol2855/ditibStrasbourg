@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using DitibStasbourg.Models;
 using DitibStasbourg.Services.Interfaces;
+using DitibStasbourg.Data;
 using System.IO;
 using MiniExcelLibs;
 
@@ -33,6 +34,7 @@ namespace DitibStasbourg.Controllers
         {            
             ViewBag.Sehirler = await _dernekService.GetSehirlerAsync();
             ViewBag.UstKurumlar = await _dernekService.GetUstKurumlarAsync();
+            ViewBag.YonetimRolleri = await _dernekService.GetYonetimRolleriAsync();
             return View();
         }
 
@@ -43,6 +45,7 @@ namespace DitibStasbourg.Controllers
             ModelState.Remove("UstKurum");
             ModelState.Remove("Gorevlendirmeler");
             ModelState.Remove("DernekUyeleri");
+            ModelState.Remove("YonetimKuruluUyeleri");
             
             if (ModelState.IsValid)
             {
@@ -59,6 +62,7 @@ namespace DitibStasbourg.Controllers
             
             ViewBag.Sehirler = await _dernekService.GetSehirlerAsync();
             ViewBag.UstKurumlar = await _dernekService.GetUstKurumlarAsync();
+            ViewBag.YonetimRolleri = await _dernekService.GetYonetimRolleriAsync();
             return View(dernek);
         }
 
@@ -91,6 +95,7 @@ namespace DitibStasbourg.Controllers
             
             ViewBag.Sehirler = await _dernekService.GetSehirlerAsync();
             ViewBag.UstKurumlar = await _dernekService.GetUstKurumlarAsync();
+            ViewBag.YonetimRolleri = await _dernekService.GetYonetimRolleriAsync();
             return View(dernek);
         }
 
@@ -103,6 +108,7 @@ namespace DitibStasbourg.Controllers
             ModelState.Remove("UstKurum");
             ModelState.Remove("Gorevlendirmeler");
             ModelState.Remove("DernekUyeleri");
+            ModelState.Remove("YonetimKuruluUyeleri");
 
             if (ModelState.IsValid)
             {
@@ -110,7 +116,8 @@ namespace DitibStasbourg.Controllers
                     dernek.Id, dernek.Isim, dernek.Sehir, dernek.Adres, 
                     dernek.KurulusKanunu, dernek.BaskonsoloslukBolgesi, dernek.Bolge, 
                     dernek.CrmUyelikFormDurumu, dernek.UstKurumId, dernek.IletisimNumarasi, 
-                    dernek.Maili, dernek.Latitude, dernek.Longitude);
+                    dernek.Maili, dernek.Latitude, dernek.Longitude,
+                    dernek.CemaatCount, dernek.FrenchRegistrationName, dernek.YonetimKuruluUyeleri?.ToList());
 
                 await _dernekService.UpdateBaskanAsync(dernek.Id, dernek.DernekBaskaniAd ?? "", dernek.DernekBaskaniIletisim ?? "", dernek.BaskanMail);
                 await _dernekService.UpdateDinGorevlisiAsync(dernek.Id, dernek.DinGorevlisiAd ?? "", dernek.DinGorevlisiIletisim ?? "");
@@ -120,6 +127,7 @@ namespace DitibStasbourg.Controllers
 
             ViewBag.Sehirler = await _dernekService.GetSehirlerAsync();
             ViewBag.UstKurumlar = await _dernekService.GetUstKurumlarAsync();
+            ViewBag.YonetimRolleri = await _dernekService.GetYonetimRolleriAsync();
             return View(dernek);
         }
 
@@ -210,9 +218,10 @@ namespace DitibStasbourg.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateDernek(int id, string isim, string? sehir, string? adres, 
             string? kurulusKanunu, string? baskonsoloslukBolgesi, string? bolge, string? crmUyelikFormDurumu, int? ustKurumId,
-            string? iletisimNumarasi, string? maili, double? latitude, double? longitude)
+            string? iletisimNumarasi, string? maili, double? latitude, double? longitude, int? cemaatCount, string? frenchRegistrationName)
         {
-            var success = await _dernekService.UpdateDernekAsync(id, isim, sehir, adres, kurulusKanunu, baskonsoloslukBolgesi, bolge, crmUyelikFormDurumu, ustKurumId, iletisimNumarasi, maili, latitude, longitude);
+            var success = await _dernekService.UpdateDernekAsync(id, isim, sehir, adres, kurulusKanunu, baskonsoloslukBolgesi, 
+                bolge, crmUyelikFormDurumu, ustKurumId, iletisimNumarasi, maili, latitude, longitude, cemaatCount, frenchRegistrationName, null);
             return Json(new { success });
         }
 
@@ -262,6 +271,34 @@ namespace DitibStasbourg.Controllers
 
             var result = await _importService.ImportAssociationsAsync(file);
             return View("ImportResult", result);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddFinancial(KurumFinansalDonem fd, [FromServices] ApplicationDbContext context)
+        {
+            ModelState.Remove("Kurum");
+            if (ModelState.IsValid)
+            {
+                context.KurumFinansalDonemler.Add(fd);
+                await context.SaveChangesAsync();
+                return Json(new { success = true });
+            }
+            return Json(new { success = false, message = "Geçersiz form verisi." });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteFinancial(int id, [FromServices] ApplicationDbContext context)
+        {
+            var fd = await context.KurumFinansalDonemler.FindAsync(id);
+            if (fd != null)
+            {
+                context.KurumFinansalDonemler.Remove(fd);
+                await context.SaveChangesAsync();
+                return Json(new { success = true });
+            }
+            return Json(new { success = false });
         }
     }
 }

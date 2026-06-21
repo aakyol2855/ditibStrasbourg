@@ -4,7 +4,7 @@ using DitibStasbourg.Models.Attributes;
 
 namespace DitibStasbourg.Models
 {
-    public class Gorevli
+    public class Gorevli : ISoftDeletable
     {
         public int Id { get; set; }
 
@@ -169,6 +169,8 @@ namespace DitibStasbourg.Models
 
         [Display(Name = "Silindi mi?")]
         public bool IsDeleted { get; set; } = false;
+
+        public DateTime? DeletedAt { get; set; }
     }
 
     public enum GorevliDurum

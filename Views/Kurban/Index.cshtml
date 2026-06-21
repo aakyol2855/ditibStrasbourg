@@ -73,8 +73,8 @@
                 </div>
                 <div class="card-footer bg-light border-0 py-3 text-center">
                     <div class="btn-group w-100">
-                        <a href="#" class="btn btn-sm btn-outline-primary">Detay</a>
-                        <a href="#" class="btn btn-sm btn-primary @(item.RemainingShares == 0 ? "disabled" : "")">Hisse Ekle</a>
+                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="openShareholdersModal(@item.Id, '@item.TagNumber', '@item.Species', @item.Price, @item.TotalShares, @item.RemainingShares)">Detay &amp; Hisse</button>
+                        <button type="button" class="btn btn-sm btn-primary @(item.RemainingShares == 0 ? "disabled" : "")" onclick="openAddShareholder(@item.Id, '@item.TagNumber', '@item.Species', @item.Price, @item.TotalShares)">Hisse Ekle</button>
                     </div>
                 </div>
             </div>
@@ -89,4 +89,355 @@
         <h4 class="mt-3 text-muted">Henüz kurbanlık kaydı bulunmuyor.</h4>
         <a asp-action="Create" class="btn btn-primary mt-3">İlk Kurbanlığı Ekle</a>
     </div>
+}
+
+<!-- Shareholder Management Modal -->
+<div class="modal fade" id="hissedarModal" tabindex="-1" aria-labelledby="hissedarModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 1.25rem;">
+            <div class="modal-header bg-primary text-white py-3" style="border-top-left-radius: 1.25rem; border-top-right-radius: 1.25rem;">
+                <h5 class="modal-title fw-bold" id="hissedarModalLabel">
+                    <i class="bi bi-people-fill me-2"></i>Hissedar Yönetimi - <span id="modalKurbanInfo"></span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="bg-light p-3 rounded text-center">
+                            <span class="text-muted small d-block">Hisse Bedeli</span>
+                            <h5 class="fw-bold mb-0 text-primary" id="modalPricePerShare">0.00 €</h5>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="bg-light p-3 rounded text-center">
+                            <span class="text-muted small d-block">Toplam / Boş Hisse</span>
+                            <h5 class="fw-bold mb-0 text-dark" id="modalSharesInfo">0 / 0</h5>
+                        </div>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-center justify-content-end">
+                        <button type="button" class="btn btn-success rounded-pill px-4" id="btnShowAddForm" onclick="showShareholderForm()">
+                            <i class="bi bi-person-plus-fill me-2"></i>Yeni Hissedar Ekle
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Shareholder Form (Collapsible/Hidden by default) -->
+                <div id="shareholderFormContainer" class="card border-0 bg-light p-3 mb-4" style="display:none; border-radius: 1rem;">
+                    <h6 class="fw-bold text-secondary mb-3" id="formTitle">Yeni Hissedar Kaydı</h6>
+                    <form id="shareholderForm" onsubmit="event.preventDefault(); saveShareholder();">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" id="shId" name="Id" value="" />
+                        <input type="hidden" id="shKurbanlikId" name="KurbanlikId" value="" />
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Ad Soyad</label>
+                                <input type="text" class="form-control" id="shName" name="Name" required placeholder="Hissedar adı ve soyadı" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Telefon</label>
+                                <input type="text" class="form-control" id="shPhone" name="Phone" required placeholder="06 12 34 56 78" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Ödeme Yöntemi</label>
+                                <select class="form-select" id="shPaymentMethod" name="PaymentMethod" required>
+                                    <option value="0">Nakit</option>
+                                    <option value="1">Banka Havalesi</option>
+                                    <option value="2">Kredi Kartı</option>
+                                    <option value="3">Çek</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Ödenen Tutar (€)</label>
+                                <input type="number" step="0.01" class="form-control" id="shTotalPaid" name="TotalPaid" required min="0" oninput="calculateBalance()" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Kalan Bakiye (€)</label>
+                                <input type="number" step="0.01" class="form-control" id="shRemainingBalance" name="RemainingBalance" required min="0" oninput="calculatePaidFromBalance()" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Ödeme Durumu</label>
+                                <select class="form-select" id="shPaymentStatus" name="PaymentStatus" required>
+                                    <option value="Paid">Ödendi (Paid)</option>
+                                    <option value="Partial">Kısmi Ödendi (Partial)</option>
+                                    <option value="Unpaid">Ödenmedi (Unpaid)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-center mt-4">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="shIsVekaletTaken" name="IsVekaletTaken" value="true" />
+                                    <label class="form-check-label small fw-bold" for="shIsVekaletTaken">Dini Vekalet Alındı</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end justify-content-end gap-2">
+                                <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" onclick="hideShareholderForm()">İptal</button>
+                                <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4">Kaydet</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Shareholders List -->
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 small">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Ad Soyad</th>
+                                <th>Telefon</th>
+                                <th>Ödeme Yöntemi</th>
+                                <th class="text-end">Ödenen</th>
+                                <th class="text-end">Kalan</th>
+                                <th>Durum</th>
+                                <th class="text-center">Vekalet</th>
+                                <th class="text-end" style="width: 100px;">İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody id="shareholdersTableBody">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var currentKurban = {
+            id: null,
+            tagNumber: '',
+            species: '',
+            price: 0,
+            totalShares: 7,
+            remainingShares: 0,
+            pricePerShare: 0
+        };
+
+        var shModal = null;
+
+        document.addEventListener("DOMContentLoaded", function() {
+            shModal = new bootstrap.Modal(document.getElementById('hissedarModal'));
+        });
+
+        function openShareholdersModal(id, tagNumber, species, price, totalShares, remainingShares) {
+            currentKurban.id = id;
+            currentKurban.tagNumber = tagNumber;
+            currentKurban.species = species;
+            currentKurban.price = price;
+            currentKurban.totalShares = totalShares;
+            currentKurban.remainingShares = remainingShares;
+            currentKurban.pricePerShare = price / totalShares;
+
+            document.getElementById('modalKurbanInfo').textContent = `${species} (#${tagNumber})`;
+            document.getElementById('modalPricePerShare').textContent = `${currentKurban.pricePerShare.toFixed(2)} €`;
+            document.getElementById('modalSharesInfo').textContent = `${totalShares - remainingShares} / ${totalShares}`;
+
+            hideShareholderForm();
+            loadShareholdersList(id);
+            
+            // Show modal
+            shModal.show();
+        }
+
+        function openAddShareholder(id, tagNumber, species, price, totalShares) {
+            currentKurban.id = id;
+            currentKurban.tagNumber = tagNumber;
+            currentKurban.species = species;
+            currentKurban.price = price;
+            currentKurban.totalShares = totalShares;
+            currentKurban.pricePerShare = price / totalShares;
+
+            openShareholdersModal(id, tagNumber, species, price, totalShares, currentKurban.remainingShares);
+            setTimeout(showShareholderForm, 400);
+        }
+
+        function loadShareholdersList(kurbanlikId) {
+            var tbody = document.getElementById('shareholdersTableBody');
+            tbody.innerHTML = `<tr><td colspan="8" class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary"></div> Yükleniyor...</td></tr>`;
+
+            fetch(`/Kurban/GetHissedarlar?kurbanlikId=${kurbanlikId}`)
+            .then(res => res.json())
+            .then(data => {
+                tbody.innerHTML = '';
+                if (data && data.length > 0) {
+                    data.forEach(h => {
+                        var vekaletBadge = h.isVekaletTaken 
+                            ? `<span class="badge bg-success-subtle text-success"><i class="bi bi-check-circle-fill me-1"></i>Evet</span>`
+                            : `<span class="badge bg-danger-subtle text-danger"><i class="bi bi-x-circle-fill me-1"></i>Hayır</span>`;
+
+                        var statusClass = h.paymentStatus === 'Paid' ? 'bg-success' : (h.paymentStatus === 'Partial' ? 'bg-warning text-dark' : 'bg-danger');
+
+                        tbody.innerHTML += `
+                            <tr id="tr-sh-${h.id}">
+                                <td class="fw-bold">${h.name}</td>
+                                <td>${h.phone}</td>
+                                <td>${h.paymentMethodName}</td>
+                                <td class="text-end fw-bold">${h.totalPaid.toFixed(2)} €</td>
+                                <td class="text-end fw-bold text-secondary">${h.remainingBalance.toFixed(2)} €</td>
+                                <td><span class="badge ${statusClass}">${h.paymentStatus}</span></td>
+                                <td class="text-center">${vekaletBadge}</td>
+                                <td class="text-end">
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="editShareholder(${JSON.stringify(h).replace(/"/g, '&quot;')})"><i class="bi bi-pencil"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger py-0 px-2" onclick="deleteShareholder(${h.id})"><i class="bi bi-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-3">Bu kurbanlık için henüz hissedar kaydı bulunmuyor.</td></tr>`;
+                }
+            });
+        }
+
+        function showShareholderForm() {
+            document.getElementById('formTitle').textContent = "Yeni Hissedar Kaydı";
+            document.getElementById('shId').value = "";
+            document.getElementById('shKurbanlikId').value = currentKurban.id;
+            document.getElementById('shName').value = "";
+            document.getElementById('shPhone').value = "";
+            document.getElementById('shPaymentMethod').value = "0";
+            document.getElementById('shTotalPaid').value = "0.00";
+            document.getElementById('shRemainingBalance').value = currentKurban.pricePerShare.toFixed(2);
+            document.getElementById('shPaymentStatus').value = "Unpaid";
+            document.getElementById('shIsVekaletTaken').checked = false;
+
+            document.getElementById('shareholderFormContainer').style.display = "block";
+        }
+
+        function hideShareholderForm() {
+            document.getElementById('shareholderFormContainer').style.display = "none";
+        }
+
+        function calculateBalance() {
+            var totalPaid = parseFloat(document.getElementById('shTotalPaid').value) || 0;
+            var limit = currentKurban.pricePerShare;
+
+            // Auto validation during payment registration
+            if (totalPaid > limit) {
+                totalPaid = limit;
+                document.getElementById('shTotalPaid').value = totalPaid.toFixed(2);
+            }
+
+            var balance = limit - totalPaid;
+            document.getElementById('shRemainingBalance').value = balance.toFixed(2);
+
+            // Update payment status dynamically
+            if (totalPaid >= limit) {
+                document.getElementById('shPaymentStatus').value = "Paid";
+            } else if (totalPaid > 0) {
+                document.getElementById('shPaymentStatus').value = "Partial";
+            } else {
+                document.getElementById('shPaymentStatus').value = "Unpaid";
+            }
+        }
+
+        function calculatePaidFromBalance() {
+            var balance = parseFloat(document.getElementById('shRemainingBalance').value) || 0;
+            var limit = currentKurban.pricePerShare;
+
+            if (balance > limit) {
+                balance = limit;
+                document.getElementById('shRemainingBalance').value = balance.toFixed(2);
+            }
+
+            var paid = limit - balance;
+            document.getElementById('shTotalPaid').value = paid.toFixed(2);
+
+            // Update payment status dynamically
+            if (paid >= limit) {
+                document.getElementById('shPaymentStatus').value = "Paid";
+            } else if (paid > 0) {
+                document.getElementById('shPaymentStatus').value = "Partial";
+            } else {
+                document.getElementById('shPaymentStatus').value = "Unpaid";
+            }
+        }
+
+        function editShareholder(h) {
+            document.getElementById('formTitle').textContent = "Hissedar Düzenle";
+            document.getElementById('shId').value = h.id;
+            document.getElementById('shKurbanlikId').value = currentKurban.id;
+            document.getElementById('shName').value = h.name;
+            document.getElementById('shPhone').value = h.phone;
+            document.getElementById('shPaymentMethod').value = h.paymentMethod;
+            document.getElementById('shTotalPaid').value = h.totalPaid.toFixed(2);
+            document.getElementById('shRemainingBalance').value = h.remainingBalance.toFixed(2);
+            document.getElementById('shPaymentStatus').value = h.paymentStatus;
+            document.getElementById('shIsVekaletTaken').checked = h.isVekaletTaken;
+
+            document.getElementById('shareholderFormContainer').style.display = "block";
+        }
+
+        function saveShareholder() {
+            var shId = document.getElementById('shId').value;
+            var isEdit = shId !== "";
+            var action = isEdit ? '/Kurban/UpdateHissedar' : '/Kurban/AddHissedar';
+
+            var formData = new FormData(document.getElementById('shareholderForm'));
+            
+            // Ensure bool value is handled correctly
+            var isVekalet = document.getElementById('shIsVekaletTaken').checked;
+            formData.set('IsVekaletTaken', isVekalet);
+
+            // Verify remaining balance validation: TotalPaid + RemainingBalance must equal PricePerShare
+            var totalPaid = parseFloat(document.getElementById('shTotalPaid').value) || 0;
+            var remainingBalance = parseFloat(document.getElementById('shRemainingBalance').value) || 0;
+            var tolerance = 0.05; // allow small decimal rounding tolerance
+            var diff = Math.abs((totalPaid + remainingBalance) - currentKurban.pricePerShare);
+
+            if (diff > tolerance) {
+                alert(`⚠️ Hata: Ödenen Tutar (${totalPaid.toFixed(2)} €) ile Kalan Bakiye (${remainingBalance.toFixed(2)} €) toplamı, hisse bedeline (${currentKurban.pricePerShare.toFixed(2)} €) eşit olmalıdır!`);
+                return;
+            }
+
+            fetch(action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✓ Hissedar bilgileri başarıyla kaydedildi!');
+                    hideShareholderForm();
+                    loadShareholdersList(currentKurban.id);
+                    // Refresh main page in background to sync status numbers
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    alert('✗ Hata: ' + (data.message || 'Kayıt başarısız.'));
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                alert('✗ Sunucu ile iletişim kurulamadı.');
+            });
+        }
+
+        function deleteShareholder(id) {
+            if (!confirm('Bu hissedarı silmek istediğinizden emin misiniz?')) return;
+
+            var formData = new FormData();
+            formData.append('id', id);
+            var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            formData.append('__RequestVerificationToken', token);
+
+            fetch('/Kurban/DeleteHissedar', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✓ Hissedar silindi!');
+                    loadShareholdersList(currentKurban.id);
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    alert('✗ Silme işlemi gerçekleştirilemedi.');
+                }
+            });
+        }
+    </script>
 }

@@ -40,7 +40,18 @@ namespace DitibStasbourg.Services.Implementations
 
         public string GetFilePath(string fileName, string subFolder = "")
         {
-            return Path.Combine(_basePath, subFolder, fileName);
+            // Security hardening: neutralize path traversal
+            var cleanFileName = Path.GetFileName(fileName);
+            var baseDirectory = Path.GetFullPath(_basePath);
+            var targetFolder = Path.GetFullPath(Path.Combine(baseDirectory, subFolder ?? string.Empty));
+            var fullPath = Path.GetFullPath(Path.Combine(targetFolder, cleanFileName));
+
+            if (!fullPath.StartsWith(baseDirectory, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new UnauthorizedAccessException("Path traversal attempt blocked.");
+            }
+
+            return fullPath;
         }
 
         public void DeleteFile(string fileName, string subFolder = "")

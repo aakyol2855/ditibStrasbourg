@@ -39,6 +39,7 @@ builder.Services.AddScoped<IDynamicExportService, DynamicExportService>();
 builder.Services.AddScoped<ISystemAuditLogService, SystemAuditLogService>();
 builder.Services.AddScoped<IDataMaintenanceService, DataMaintenanceService>();
 builder.Services.AddSingleton<ImportProgressTracker>();
+builder.Services.AddHostedService<SoftDeletePurgeWorker>();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddHttpContextAccessor();
 

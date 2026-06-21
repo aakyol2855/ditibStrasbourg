@@ -60,11 +60,12 @@ namespace DitibStasbourg.Services.Interfaces
         Task<byte[]> ExportFilteredAsync<T>(
             IQueryable<T> query,
             IEnumerable<string> selectedPropertyNames,
-            string worksheetTitle = "") where T : class;
+            string worksheetTitle = "",
+            bool maskSensitiveData = false) where T : class;
 
         /// <summary>
         /// Quick-export preset: automatically includes all columns where IncludeInQuickExport == true.
         /// </summary>
-        Task<byte[]> QuickExportAllAsync<T>(IQueryable<T> query, string worksheetTitle = "") where T : class;
+        Task<byte[]> QuickExportAllAsync<T>(IQueryable<T> query, string worksheetTitle = "", bool maskSensitiveData = false) where T : class;
     }
 }

@@ -77,13 +77,13 @@ namespace DitibStasbourg.Services.Implementations
         // ─── Quick Export ─────────────────────────────────────────────────────────
 
         /// <inheritdoc/>
-        public async Task<byte[]> QuickExportAllAsync<T>(IQueryable<T> query, string worksheetTitle = "") where T : class
+        public async Task<byte[]> QuickExportAllAsync<T>(IQueryable<T> query, string worksheetTitle = "", bool maskSensitiveData = false) where T : class
         {
             var allDescriptors = GetColumnDescriptors<T>()
                 .Where(d => d.IncludeInQuickExport)
                 .Select(d => d.PropertyName);
 
-            return await ExportFilteredAsync(query, allDescriptors, worksheetTitle.Length > 0 ? worksheetTitle : typeof(T).Name);
+            return await ExportFilteredAsync(query, allDescriptors, worksheetTitle.Length > 0 ? worksheetTitle : typeof(T).Name, maskSensitiveData);
         }
 
         // ─── Core Export Pipeline ─────────────────────────────────────────────────
@@ -92,7 +92,8 @@ namespace DitibStasbourg.Services.Implementations
         public async Task<byte[]> ExportFilteredAsync<T>(
             IQueryable<T> query,
             IEnumerable<string> selectedPropertyNames,
-            string worksheetTitle = "") where T : class
+            string worksheetTitle = "",
+            bool maskSensitiveData = false) where T : class
         {
             // 1. Resolve which descriptors correspond to the requested property names
             var allDescriptors = GetColumnDescriptors<T>();
@@ -149,6 +150,7 @@ namespace DitibStasbourg.Services.Implementations
                 {
                     var (descriptor, propInfo) = props[col];
                     var rawValue = propInfo.GetValue(item);
+                    rawValue = GetMaskedValueIfNeeded(descriptor.PropertyName, rawValue, maskSensitiveData);
                     var cell     = worksheet.Cell(rowIndex, col + 1);
 
                     // Apply formatted value
@@ -244,6 +246,31 @@ namespace DitibStasbourg.Services.Implementations
                     cell.Value = rawValue.ToString() ?? "";
                     break;
             }
+        }
+
+        private static object? GetMaskedValueIfNeeded(string propertyName, object? rawValue, bool maskSensitiveData)
+        {
+            if (!maskSensitiveData || rawValue == null) return rawValue;
+
+            var propLower = propertyName.ToLowerInvariant();
+            if (propLower == "tckimlikno")
+            {
+                var tcStr = rawValue.ToString();
+                if (string.IsNullOrEmpty(tcStr)) return tcStr;
+                if (tcStr.Length == 11)
+                    return tcStr.Substring(0, 3) + "******" + tcStr.Substring(9, 2);
+                return "******";
+            }
+            else if (propLower == "ceptelefonu" || propLower == "evtelefonu")
+            {
+                var phoneStr = rawValue.ToString();
+                if (string.IsNullOrEmpty(phoneStr)) return phoneStr;
+                if (phoneStr.Length > 6)
+                    return phoneStr.Substring(0, 3) + "******" + phoneStr.Substring(phoneStr.Length - 2);
+                return "***-***";
+            }
+
+            return rawValue;
         }
     }
 

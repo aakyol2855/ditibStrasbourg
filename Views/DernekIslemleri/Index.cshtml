@@ -646,5 +646,57 @@
                 showToast('error', 'Bir hata oluştu.');
             });
         }
+
+        function toggleAddFinancial(id) {
+            var form = document.getElementById('add-financial-form-' + id);
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function submitAddFinancial(formElement, dernekId) {
+            var formData = new FormData(formElement);
+            fetch('/DernekIslemleri/AddFinancial', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('success', 'Finansal dönem kaydı başarıyla eklendi!');
+                    setTimeout(() => reloadDetails(dernekId), 500);
+                } else {
+                    showToast('error', 'Hata: ' + (data.message || 'Kayıt eklenemedi.'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('error', 'Sunucu bağlantısı başarısız.');
+            });
+        }
+
+        function deleteFinancial(id, dernekId) {
+            if (!confirm('Bu finansal dönem kaydını silmek istediğinizden emin misiniz?')) return;
+            var formData = new FormData();
+            formData.append('id', id);
+            var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            formData.append('__RequestVerificationToken', token);
+
+            fetch('/DernekIslemleri/DeleteFinancial', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('success', 'Finansal dönem kaydı silindi!');
+                    setTimeout(() => reloadDetails(dernekId), 500);
+                } else {
+                    showToast('error', 'Silme işlemi gerçekleştirilemedi.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('error', 'Sunucu bağlantısı başarısız.');
+            });
+        }
     </script>
 }

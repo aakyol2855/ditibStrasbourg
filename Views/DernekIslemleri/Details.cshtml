@@ -111,5 +111,57 @@
                 }
             });
         }
+
+        function toggleAddFinancial(id) {
+            var form = document.getElementById('add-financial-form-' + id);
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function submitAddFinancial(formElement, dernekId) {
+            var formData = new FormData(formElement);
+            fetch('/DernekIslemleri/AddFinancial', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✓ Finansal dönem kaydı başarıyla eklendi!');
+                    reloadDetails(dernekId);
+                } else {
+                    alert('✗ Hata: ' + (data.message || 'Kayıt eklenemedi.'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('✗ Sunucu bağlantısı başarısız.');
+            });
+        }
+
+        function deleteFinancial(id, dernekId) {
+            if (!confirm('Bu finansal dönem kaydını silmek istediğinizden emin misiniz?')) return;
+            var formData = new FormData();
+            formData.append('id', id);
+            var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            formData.append('__RequestVerificationToken', token);
+
+            fetch('/DernekIslemleri/DeleteFinancial', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✓ Finansal dönem kaydı silindi!');
+                    reloadDetails(dernekId);
+                } else {
+                    alert('✗ Silme işlemi gerçekleştirilemedi.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('✗ Sunucu bağlantısı başarısız.');
+            });
+        }
     </script>
 }

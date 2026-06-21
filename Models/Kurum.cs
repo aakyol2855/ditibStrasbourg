@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using DitibStasbourg.Models.Attributes;
@@ -10,7 +12,7 @@ namespace DitibStasbourg.Models
         Dernek
     }
 
-    public class Kurum
+    public class Kurum : ISoftDeletable
     {
         public int Id { get; set; }
 
@@ -92,13 +94,29 @@ namespace DitibStasbourg.Models
         [Display(Name = "Boylam (Longitude)")]
         public double? Longitude { get; set; }
 
+        [Display(Name = "Cemaat Sayısı")]
+        [ExportColumn("Cemaat Sayısı", Order = 17, IncludeInQuickExport = false)]
+        public int? CemaatCount { get; set; }
+
+        [Display(Name = "Resmi Fransızca Adı")]
+        [ExportColumn("Resmi Fransızca Adı", Order = 18, IncludeInQuickExport = false)]
+        public string? FrenchRegistrationName { get; set; }
+
         // Navigation property for assignments
         public ICollection<Gorevlendirme> Gorevlendirmeler { get; set; } = new List<Gorevlendirme>();
         
         // Navigation for Members
         public ICollection<DernekUye> DernekUyeleri { get; set; } = new List<DernekUye>();
 
+        // Navigation for Management Board Members
+        public ICollection<KurumYonetimKuruluUyesi> YonetimKuruluUyeleri { get; set; } = new List<KurumYonetimKuruluUyesi>();
+
+        // Navigation for Financial Periods
+        public virtual ICollection<KurumFinansalDonem> FinansalDonemler { get; set; } = new List<KurumFinansalDonem>();
+
         [Display(Name = "Silindi mi?")]
         public bool IsDeleted { get; set; } = false;
+
+        public DateTime? DeletedAt { get; set; }
     }
 }

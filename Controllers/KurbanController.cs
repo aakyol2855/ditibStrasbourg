@@ -133,6 +133,10 @@ namespace DitibStasbourg.Controllers
                 h.Name,
                 h.Phone,
                 h.PaymentStatus,
+                h.PaymentMethod,
+                PaymentMethodName = h.PaymentMethod.ToString(),
+                h.TotalPaid,
+                h.RemainingBalance,
                 h.IsVekaletTaken,
                 joinedAt = h.JoinedAt.ToString("dd.MM.yyyy HH:mm")
             }));
@@ -140,7 +144,7 @@ namespace DitibStasbourg.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateHissedar(int id, string name, string phone, string paymentStatus, bool isVekaletTaken)
+        public async Task<IActionResult> UpdateHissedar(int id, string name, string phone, string paymentStatus, bool isVekaletTaken, PaymentMethod paymentMethod, decimal totalPaid, decimal remainingBalance)
         {
             var success = await _kurbanService.UpdateHissedarAsync(new Hissedar
             {
@@ -148,7 +152,10 @@ namespace DitibStasbourg.Controllers
                 Name            = name,
                 Phone           = phone,
                 PaymentStatus   = paymentStatus,
-                IsVekaletTaken  = isVekaletTaken
+                IsVekaletTaken  = isVekaletTaken,
+                PaymentMethod   = paymentMethod,
+                TotalPaid       = totalPaid,
+                RemainingBalance = remainingBalance
             });
             return Json(new { success });
         }

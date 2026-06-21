@@ -90,6 +90,13 @@
           "Controller": "Admin",
           "Action": "SystemLog",
           "RequiredClaim": "SuperAdmin"
+        },
+        {
+          "Title": "Geri Dönüşüm Kutusu",
+          "Icon": "bi bi-trash3",
+          "Controller": "Admin",
+          "Action": "TrashBin",
+          "RequiredClaim": "SuperAdmin"
         }
       ]
     }

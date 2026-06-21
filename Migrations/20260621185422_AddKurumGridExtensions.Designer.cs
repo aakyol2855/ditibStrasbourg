@@ -4,6 +4,7 @@ using DitibStasbourg.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DitibStasbourg.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260621185422_AddKurumGridExtensions")]
+    partial class AddKurumGridExtensions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,22 +24,6 @@ namespace DitibStasbourg.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("DitibStasbourg.Models.AppSetting", b =>
-                {
-                    b.Property<string>("Key")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.HasKey("Key");
-
-                    b.ToTable("AppSettings");
-                });
 
             modelBuilder.Entity("DitibStasbourg.Models.Dashboard.DashboardPreference", b =>
                 {
@@ -58,42 +45,6 @@ namespace DitibStasbourg.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("DashboardPreferences");
-                });
-
-            modelBuilder.Entity("DitibStasbourg.Models.DatabaseAuditLogs", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Action")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("EntityName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("NewValues")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OldValues")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Username")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("DatabaseAuditLogs");
                 });
 
             modelBuilder.Entity("DitibStasbourg.Models.DernekUye", b =>
@@ -175,9 +126,6 @@ namespace DitibStasbourg.Migrations
                     b.Property<DateTime?>("BitisTarihi")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("GorevliId")
                         .HasColumnType("int");
 
@@ -250,9 +198,6 @@ namespace DitibStasbourg.Migrations
                     b.Property<int>("GorevlendirmeId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("NotIcerik")
                         .IsRequired()
                         .HasMaxLength(1000)
@@ -306,9 +251,6 @@ namespace DitibStasbourg.Migrations
 
                     b.Property<string>("Cinsiyet")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Derece")
                         .HasColumnType("nvarchar(max)");
@@ -451,9 +393,6 @@ namespace DitibStasbourg.Migrations
                     b.Property<int>("GorevliId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("NotIcerik")
                         .IsRequired()
                         .HasMaxLength(1000)
@@ -540,9 +479,6 @@ namespace DitibStasbourg.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("PaymentMethod")
-                        .HasColumnType("int");
-
                     b.Property<string>("PaymentStatus")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -551,12 +487,6 @@ namespace DitibStasbourg.Migrations
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
-
-                    b.Property<decimal>("RemainingBalance")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("TotalPaid")
-                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -634,9 +564,6 @@ namespace DitibStasbourg.Migrations
 
                     b.Property<string>("CrmUyelikFormDurumu")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("DernekBaskaniAd")
                         .HasColumnType("nvarchar(max)");
@@ -730,42 +657,6 @@ namespace DitibStasbourg.Migrations
                             Sehir = "Strasbourg",
                             Tip = 1
                         });
-                });
-
-            modelBuilder.Entity("DitibStasbourg.Models.KurumFinansalDonem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CampaignType")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("CollectedAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Currency")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<string>("InternalNotes")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("KurumId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Year")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("KurumId");
-
-                    b.ToTable("KurumFinansalDonemler");
                 });
 
             modelBuilder.Entity("DitibStasbourg.Models.KurumYonetimKuruluUyesi", b =>
@@ -1589,17 +1480,6 @@ namespace DitibStasbourg.Migrations
                     b.Navigation("UstKurum");
                 });
 
-            modelBuilder.Entity("DitibStasbourg.Models.KurumFinansalDonem", b =>
-                {
-                    b.HasOne("DitibStasbourg.Models.Kurum", "Kurum")
-                        .WithMany("FinansalDonemler")
-                        .HasForeignKey("KurumId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Kurum");
-                });
-
             modelBuilder.Entity("DitibStasbourg.Models.KurumYonetimKuruluUyesi", b =>
                 {
                     b.HasOne("DitibStasbourg.Models.Kurum", "Kurum")
@@ -1725,8 +1605,6 @@ namespace DitibStasbourg.Migrations
             modelBuilder.Entity("DitibStasbourg.Models.Kurum", b =>
                 {
                     b.Navigation("DernekUyeleri");
-
-                    b.Navigation("FinansalDonemler");
 
                     b.Navigation("Gorevlendirmeler");
 

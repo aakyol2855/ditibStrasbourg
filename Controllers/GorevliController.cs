@@ -38,8 +38,10 @@ namespace DitibStasbourg.Controllers
             filter.PageNumber = filter.PageNumber ?? page;
             
             ViewData["CurrentSort"] = filter.SortOrder;
-            ViewData["NameSortParm"] = string.IsNullOrEmpty(filter.SortOrder) ? "name_desc" : "";
+            ViewData["NameSortParm"] = string.IsNullOrEmpty(filter.SortOrder) || filter.SortOrder == "name_asc" ? "name_desc" : "name_asc";
             ViewData["StatusSortParm"] = filter.SortOrder == "Status" ? "status_desc" : "Status";
+            ViewData["DateSortParm"] = filter.SortOrder == "Date" ? "date_desc" : "Date";
+            ViewData["ActiveSortParm"] = filter.SortOrder == "Active" ? "active_desc" : "Active";
             ViewData["Filter"] = filter;
             
             var paginatedList = await _gorevliService.GetFilteredGorevlilerAsync(filter, pageSize);

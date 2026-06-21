@@ -23,16 +23,23 @@ namespace DitibStasbourg.Controllers
                 return Forbid();
             }
 
-            var filePath = _fileStorage.GetFilePath(fileName, subFolder);
-            if (!System.IO.File.Exists(filePath))
+            try
             {
-                return NotFound();
-            }
+                var filePath = _fileStorage.GetFilePath(fileName, subFolder);
+                if (!System.IO.File.Exists(filePath))
+                {
+                    return NotFound();
+                }
 
-            var mimeType = "application/octet-stream";
-            if (fileName.EndsWith(".xlsx")) mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-            
-            return PhysicalFile(filePath, mimeType, fileName);
+                var mimeType = "application/octet-stream";
+                if (fileName.EndsWith(".xlsx")) mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                
+                return PhysicalFile(filePath, mimeType, fileName);
+            }
+            catch (System.UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
         }
     }
 }

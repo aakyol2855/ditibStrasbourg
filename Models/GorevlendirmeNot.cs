@@ -28,5 +28,8 @@ namespace DitibStasbourg.Models
 
         [ForeignKey("YazanKisiId")]
         public IdentityUser? YazanKisi { get; set; }
+
+        [Display(Name = "Silindi mi?")]
+        public bool IsDeleted { get; set; } = false;
     }
 }

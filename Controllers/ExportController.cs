@@ -33,45 +33,55 @@ namespace DitibStasbourg.Controllers
             ApplicationDbContext ctx,
             List<int>? ids,
             List<string>? columns,
-            bool isQuick);
+            bool isQuick,
+            bool maskSensitiveData);
 
         private static readonly Dictionary<string, (Type EntityType, ExportDelegate Execute)>
             _moduleRegistry = new(StringComparer.OrdinalIgnoreCase)
             {
-                ["Gorevli"] = (typeof(Gorevli), async (svc, ctx, ids, cols, quick) =>
+                ["Gorevli"] = (typeof(Gorevli), async (svc, ctx, ids, cols, quick, mask) =>
                 {
                     var q = ctx.Gorevli.AsNoTracking();
                     if (ids?.Count > 0) q = q.Where(e => ids.Contains(e.Id));
                     return quick
-                        ? await svc.QuickExportAllAsync(q, "Görevliler")
-                        : await svc.ExportFilteredAsync(q, cols ?? [], "Görevliler");
+                        ? await svc.QuickExportAllAsync(q, "Görevliler", mask)
+                        : await svc.ExportFilteredAsync(q, cols ?? [], "Görevliler", mask);
                 }),
 
-                ["Dernek"] = (typeof(Kurum), async (svc, ctx, ids, cols, quick) =>
+                ["KurumFinansalDonem"] = (typeof(KurumFinansalDonem), async (svc, ctx, ids, cols, quick, mask) =>
+                {
+                    var q = ctx.KurumFinansalDonemler.AsNoTracking();
+                    if (ids?.Count > 0) q = q.Where(e => ids.Contains(e.Id));
+                    return quick
+                        ? await svc.QuickExportAllAsync(q, "FinansalDonemler", mask)
+                        : await svc.ExportFilteredAsync(q, cols ?? [], "FinansalDonemler", mask);
+                }),
+
+                ["Dernek"] = (typeof(Kurum), async (svc, ctx, ids, cols, quick, mask) =>
                 {
                     var q = ctx.Kurum.Where(k => k.Tip == KurumTip.Dernek).AsNoTracking();
                     if (ids?.Count > 0) q = q.Where(e => ids.Contains(e.Id));
                     return quick
-                        ? await svc.QuickExportAllAsync(q, "Dernekler")
-                        : await svc.ExportFilteredAsync(q, cols ?? [], "Dernekler");
+                        ? await svc.QuickExportAllAsync(q, "Dernekler", mask)
+                        : await svc.ExportFilteredAsync(q, cols ?? [], "Dernekler", mask);
                 }),
 
-                ["Hissedar"] = (typeof(Hissedar), async (svc, ctx, ids, cols, quick) =>
+                ["Hissedar"] = (typeof(Hissedar), async (svc, ctx, ids, cols, quick, mask) =>
                 {
                     var q = ctx.Hissedarlar.AsNoTracking();
                     if (ids?.Count > 0) q = q.Where(e => ids.Contains(e.Id));
                     return quick
-                        ? await svc.QuickExportAllAsync(q, "Hissedarlar")
-                        : await svc.ExportFilteredAsync(q, cols ?? [], "Hissedarlar");
+                        ? await svc.QuickExportAllAsync(q, "Hissedarlar", mask)
+                        : await svc.ExportFilteredAsync(q, cols ?? [], "Hissedarlar", mask);
                 }),
 
-                ["Kurbanlik"] = (typeof(Kurbanlik), async (svc, ctx, ids, cols, quick) =>
+                ["Kurbanlik"] = (typeof(Kurbanlik), async (svc, ctx, ids, cols, quick, mask) =>
                 {
                     var q = ctx.Kurbanliklar.AsNoTracking();
                     if (ids?.Count > 0) q = q.Where(e => ids.Contains(e.Id));
                     return quick
-                        ? await svc.QuickExportAllAsync(q, "Kurbanlıklar")
-                        : await svc.ExportFilteredAsync(q, cols ?? [], "Kurbanlıklar");
+                        ? await svc.QuickExportAllAsync(q, "Kurbanlıklar", mask)
+                        : await svc.ExportFilteredAsync(q, cols ?? [], "Kurbanlıklar", mask);
                 }),
             };
 
@@ -146,27 +156,29 @@ namespace DitibStasbourg.Controllers
         {
             try
             {
-                List<int>? ids = null;
-                if (!string.IsNullOrEmpty(selectedIds))
-                    try { ids = JsonSerializer.Deserialize<List<int>>(selectedIds); } catch { /* ignore */ }
+                var ids = !string.IsNullOrEmpty(selectedIds)
+                    ? JsonSerializer.Deserialize<List<int>>(selectedIds)
+                    : null;
 
-                // Fully typed delegate — no IQueryable<object> boxing, no reflection on queries
-                byte[] bytes = await reg.Execute(_exportService, _context, ids, columns, isQuick);
+                bool hasAccess = User.HasClaim(c => c.Type == "privateInfoRead" || c.Value == "privateInfoRead" || (c.Type == "Permission" && c.Value == "privateInfoRead"));
+                if (!hasAccess)
+                {
+                    return Forbid();
+                }
+                bool maskSensitive = false;
+                var fileBytes = await reg.Execute(_exportService, _context, ids, columns, isQuick, maskSensitive);
 
-                var username  = User.Identity?.Name ?? "anonymous";
-                var modeLabel = isQuick ? "Hızlı" : "Filtreli";
+                var username = User.Identity?.Name ?? "anonymous";
+                string modeLabel = isQuick ? "Hızlı" : "Filtreli";
                 await _auditService.LogAsync(
-                    "Information", username,
-                    $"{modeLabel} Excel dışa aktarımı: Modül={module}, " +
-                    $"Sütun sayısı={columns?.Count ?? 0}, " +
-                    $"ID filtresi={(ids?.Count > 0 ? ids.Count.ToString() + " satır" : "tümü")}",
+                    "Information",
+                    username,
+                    $"{modeLabel} Excel dışa aktarımı: Modül={module}, Sütun sayısı={columns?.Count ?? 0}, ID filtresi={(ids?.Count > 0 ? ids.Count.ToString() + " satır" : "tümü")}",
                     HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1",
                     "ExportController");
 
                 var fileName = $"DITIB_{module}_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
-                return File(bytes,
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    fileName);
+                return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
             }
             catch (Exception ex)
             {
