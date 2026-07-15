@@ -8,8 +8,36 @@
     <link rel="icon" type="image/x-icon" href="@Configuration["Branding:FaviconUrl"]" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/custom.css?v=@DateTime.UtcNow.Ticks" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+    <style>
+        /* Absolute High-Contrast Checkbox Overwrites */
+        input[type="checkbox"].form-check-input, 
+        .table .form-check-input {
+            border: 3px solid #0d6efd !important;
+            background-color: #ffffff !important;
+            opacity: 1 !important;
+            min-width: 1.3rem !important;
+            min-height: 1.3rem !important;
+            display: inline-block !important;
+            visibility: visible !important;
+        }
+        input[type="checkbox"].form-check-input:checked, 
+        .table .form-check-input:checked {
+            background-color: #0d6efd !important;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e") !important;
+            background-size: 100% 100% !important;
+        }
+        @@keyframes flash-highlight {
+            0% { background-color: rgba(255, 193, 7, 0.4); }
+            100% { background-color: transparent; }
+        }
+        .highlight-row {
+            animation: flash-highlight 2s ease-out;
+        }
+    </style>
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body class="overflow-hidden @(User.Identity?.IsAuthenticated == true ? "layout-authenticated" : "layout-guest")">
 @inject Microsoft.Extensions.Configuration.IConfiguration Configuration
@@ -53,7 +81,31 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
+                    <ul class="navbar-nav ms-auto mt-2 mt-lg-0 align-items-center">
+                         @if (User.Identity?.IsAuthenticated ?? false)
+                         {
+                             <!-- Global Notification Bell Dropdown -->
+                             <li class="nav-item dropdown me-3" id="globalNotificationDropdownContainer">
+                                 <button class="btn btn-outline-danger btn-sm dropdown-toggle position-relative px-3" type="button" id="globalNotificationBellBtn" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                     <i class="bi bi-bell-fill"></i>
+                                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="globalNotificationBadgeCount" style="display: none;">0</span>
+                                 </button>
+                                 <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-0" aria-labelledby="globalNotificationBellBtn" style="width: 380px; max-height: 400px; overflow-y: auto; border-radius: 0.5rem; z-index: 1050;">
+                                     <div class="p-3 border-bottom bg-light">
+                                         <div class="d-flex justify-content-between align-items-center">
+                                             <h6 class="fw-bold mb-0 text-dark">Bildirimler & Alarmlar</h6>
+                                             <span class="badge bg-danger-subtle text-danger rounded-pill" id="globalNotificationHeaderCount">0 Aktif</span>
+                                         </div>
+                                     </div>
+                                     <div class="list-group list-group-flush" id="globalNotificationListGroup">
+                                         <div class="p-4 text-center text-muted" id="globalNoNotificationsPlaceholder">
+                                             <i class="bi bi-bell-slash fs-3 mb-2 d-block text-secondary"></i>
+                                             <span class="small">Aktif bildirim bulunmamaktadır.</span>
+                                         </div>
+                                     </div>
+                                 </div>
+                             </li>
+                         }
                          <partial name="_LoginPartial" />
                     </ul>
                 </div>
@@ -87,6 +139,265 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
 <script src="~/js/app-common.js" asp-append-version="true"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        function loadGlobalNotifications() {
+            fetch('/Maliye/GetOverdueNotifications?unreadOnly=false')
+                .then(response => response.json())
+                .then(data => {
+                    const badgeCountEl = document.getElementById('globalNotificationBadgeCount');
+                    const headerCountEl = document.getElementById('globalNotificationHeaderCount');
+                    const listGroup = document.getElementById('globalNotificationListGroup');
+                    
+                    if (!listGroup) return;
+
+                    const unreadCount = data.filter(n => !n.isRead).length;
+                    if (badgeCountEl) {
+                        if (unreadCount > 0) {
+                            badgeCountEl.innerText = unreadCount;
+                            badgeCountEl.style.display = 'inline-block';
+                        } else {
+                            badgeCountEl.style.display = 'none';
+                        }
+                    }
+
+                    if (headerCountEl) {
+                        headerCountEl.innerText = `${data.length} Aktif`;
+                    }
+
+                    if (data.length === 0) {
+                        listGroup.innerHTML = `
+                            <div class="p-4 text-center text-muted" id="globalNoNotificationsPlaceholder">
+                                <i class="bi bi-bell-slash fs-3 mb-2 d-block text-secondary"></i>
+                                <span class="small">Aktif bildirim bulunmamaktadır.</span>
+                            </div>`;
+                        return;
+                    }
+
+                    let html = '';
+                    data.forEach(alert => {
+                        const severityClass = alert.severity === 'Critical' ? 'bg-danger' : 'bg-warning';
+                        let actionBtn = '';
+                        
+                        if (alert.notificationType === 'OdemeGecikme' && alert.kurumButcePeriodId) {
+                            actionBtn = `
+                                <button type="button" class="btn btn-primary btn-xs global-noti-pay-btn" data-period-id="${alert.kurumButcePeriodId}" data-alert-id="${alert.id}" style="font-size: 0.7rem; padding: 2px 8px;">
+                                    <i class="bi bi-cash me-1"></i>Ödemeye Git
+                                </button>`;
+                        } else if ((alert.notificationType === 'VizeSuresi' || alert.notificationType === 'PasaportSuresi' || alert.notificationType === 'OturumIzni') && alert.relatedGorevliId) {
+                            actionBtn = `
+                                <button type="button" class="btn btn-success btn-xs global-noti-gorevli-btn" data-gorevli-id="${alert.relatedGorevliId}" data-alert-id="${alert.id}" style="font-size: 0.7rem; padding: 2px 8px;">
+                                    <i class="bi bi-person me-1"></i>Görevliye Git
+                                </button>`;
+                        } else {
+                            actionBtn = `
+                                <button type="button" class="btn btn-outline-danger btn-xs global-noti-dismiss-btn" data-alert-id="${alert.id}" style="font-size: 0.7rem; padding: 2px 8px;">
+                                    <i class="bi bi-check-circle me-1"></i>Kapat
+                                </button>`;
+                        }
+
+                        html += `
+                            <div class="list-group-item p-3 border-bottom global-noti-item ${alert.isRead ? 'opacity-75' : ''}" id="noti-item-${alert.id}" data-id="${alert.id}">
+                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                    <span class="badge ${severityClass} text-white" style="font-size: 0.7rem;">${alert.severity}</span>
+                                    <span class="text-muted small">${alert.createdAt.split(' ')[0]}</span>
+                                </div>
+                                <h6 class="fw-bold mb-1 text-dark" style="font-size: 0.85rem;">${alert.title}</h6>
+                                <p class="mb-2 text-muted small" style="font-size: 0.75rem;">${alert.message || ''}</p>
+                                <div class="d-flex gap-2 justify-content-end align-items-center">
+                                    ${!alert.isRead ? `
+                                        <button type="button" class="btn btn-link text-decoration-none text-muted p-0 me-auto global-noti-read-btn" data-alert-id="${alert.id}" title="Okundu İşaretle" style="font-size: 0.75rem;">
+                                            <i class="bi bi-envelope-open"></i> Okundu
+                                        </button>
+                                    ` : ''}
+                                    ${actionBtn}
+                                </div>
+                            </div>`;
+                    });
+                    listGroup.innerHTML = html;
+                    setupGlobalNotificationActions();
+                })
+                .catch(err => console.error("Error loading notifications:", err));
+        }
+        window.loadGlobalNotifications = loadGlobalNotifications;
+
+        window.removeNotificationDOM = function(id) {
+            const item = document.getElementById('noti-item-' + id);
+            if (item) {
+                item.style.transition = 'all 0.4s ease';
+                item.style.opacity = '0';
+                item.style.height = '0';
+                item.style.padding = '0';
+                setTimeout(() => {
+                    item.remove();
+                    const badgeCountEl = document.getElementById('globalNotificationBadgeCount');
+                    const headerCountEl = document.getElementById('globalNotificationHeaderCount');
+                    let currentCount = 0;
+                    if (headerCountEl) {
+                        const match = headerCountEl.innerText.match(/\d+/);
+                        if (match) {
+                            currentCount = parseInt(match[0]) - 1;
+                            headerCountEl.innerText = `${currentCount} Aktif`;
+                        }
+                    }
+                    if (badgeCountEl) {
+                        let unreadCount = parseInt(badgeCountEl.innerText) - 1;
+                        if (unreadCount <= 0) {
+                            badgeCountEl.style.display = 'none';
+                        } else {
+                            badgeCountEl.innerText = unreadCount;
+                        }
+                    }
+                    const listGroup = document.getElementById('globalNotificationListGroup');
+                    if (listGroup && listGroup.querySelectorAll('.global-noti-item').length === 0) {
+                        listGroup.innerHTML = `
+                            <div class="p-4 text-center text-muted" id="globalNoNotificationsPlaceholder">
+                                <i class="bi bi-bell-slash fs-3 mb-2 d-block text-secondary"></i>
+                                <span class="small">Aktif bildirim bulunmamaktadır.</span>
+                            </div>`;
+                    }
+                }, 400);
+            }
+        };
+
+        function setupGlobalNotificationActions() {
+            document.querySelectorAll('.global-noti-read-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const alertId = this.getAttribute('data-alert-id');
+                    const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+                    const formData = new FormData();
+                    formData.append('notificationId', alertId);
+                    if (token) formData.append('__RequestVerificationToken', token);
+
+                    fetch('/Maliye/MarkNotificationRead', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(res => {
+                        if (res.success) {
+                            loadGlobalNotifications();
+                        }
+                    });
+                });
+            });
+
+            document.querySelectorAll('.global-noti-dismiss-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const alertId = this.getAttribute('data-alert-id');
+                    if (confirm('Bu bildirimi çözüldü olarak işaretlemek istediğinize emin misiniz?')) {
+                        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+                        const formData = new FormData();
+                        if (token) formData.append('__RequestVerificationToken', token);
+
+                        fetch('/Maliye/DismissNotification/' + alertId, {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(res => {
+                            if (res.success) {
+                                window.removeNotificationDOM(alertId);
+                            } else {
+                                alert("Bildirim kapatılamadı.");
+                            }
+                        })
+                        .catch(err => alert("Bağlantı hatası!"));
+                    }
+                });
+            });
+
+            document.querySelectorAll('.global-noti-pay-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const periodId = this.getAttribute('data-period-id');
+                    const alertId = this.getAttribute('data-alert-id');
+                    
+                    const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+                    const formData = new FormData();
+                    formData.append('notificationId', alertId);
+                    if (token) formData.append('__RequestVerificationToken', token);
+                    fetch('/Maliye/MarkNotificationRead', { method: 'POST', body: formData });
+
+                    const isMaliyeIndex = window.location.pathname.toLowerCase().includes('/maliye') && !window.location.pathname.toLowerCase().includes('/maliye/create');
+                    if (isMaliyeIndex) {
+                        const dropdownElement = document.getElementById('globalNotificationBellBtn');
+                        if (dropdownElement) {
+                            const dropdown = bootstrap.Dropdown.getOrCreateInstance(dropdownElement);
+                            dropdown.hide();
+                        }
+                        
+                        const checkbox = document.getElementById('cb-' + periodId);
+                        if (checkbox) {
+                            const row = checkbox.closest('tr');
+                            if (row) {
+                                if (typeof filteredRows !== 'undefined' && typeof showPage !== 'undefined') {
+                                    const rowIndex = filteredRows.indexOf(row);
+                                    if (rowIndex !== -1) {
+                                        const targetPage = Math.floor(rowIndex / rowsPerPage) + 1;
+                                        showPage(targetPage);
+                                    }
+                                }
+                                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                row.classList.add('highlight-row');
+                                setTimeout(() => row.classList.remove('highlight-row'), 2000);
+
+                                if (!checkbox.checked) {
+                                    checkbox.checked = true;
+                                    checkbox.dispatchEvent(new Event('change'));
+                                }
+                            }
+                        }
+                    } else {
+                        window.location.href = `/Maliye/Index?focusPeriodId=${periodId}`;
+                    }
+                });
+            });
+
+            document.querySelectorAll('.global-noti-gorevli-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const gorevliId = this.getAttribute('data-gorevli-id');
+                    const alertId = this.getAttribute('data-alert-id');
+
+                    const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+                    const formData = new FormData();
+                    formData.append('notificationId', alertId);
+                    if (token) formData.append('__RequestVerificationToken', token);
+                    fetch('/Maliye/MarkNotificationRead', { method: 'POST', body: formData });
+
+                    const isGorevliIndex = window.location.pathname.toLowerCase().includes('/gorevli') && !window.location.pathname.toLowerCase().includes('/gorevli/create');
+                    if (isGorevliIndex) {
+                        const dropdownElement = document.getElementById('globalNotificationBellBtn');
+                        if (dropdownElement) {
+                            const dropdown = bootstrap.Dropdown.getOrCreateInstance(dropdownElement);
+                            dropdown.hide();
+                        }
+
+                        const heading = document.getElementById('heading-' + gorevliId);
+                        if (heading) {
+                            heading.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            const collapseEl = document.getElementById('collapse-' + gorevliId);
+                            if (collapseEl) {
+                                const collapse = bootstrap.Collapse.getOrCreateInstance(collapseEl);
+                                collapse.show();
+                            }
+                            heading.classList.add('highlight-row');
+                            setTimeout(() => heading.classList.remove('highlight-row'), 2000);
+                        }
+                    } else {
+                        window.location.href = `/Gorevli/Index?focusGorevliId=${gorevliId}`;
+                    }
+                });
+            });
+        }
+
+        const isAuth = @(User.Identity?.IsAuthenticated ?? false ? "true" : "false");
+        if (isAuth) {
+            loadGlobalNotifications();
+            setInterval(loadGlobalNotifications, 60000);
+        }
+    });
+</script>
 
 
 

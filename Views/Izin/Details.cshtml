@@ -1,0 +1,316 @@
+@model DitibStasbourg.Models.GorevliIzin
+@using DitibStasbourg.Models.Enums
+
+@{
+    ViewData["Title"] = "İzin Detayı";
+    var gorevliAd = Model.Gorevli != null ? $"{Model.Gorevli.Ad} {Model.Gorevli.Soyad}" : $"Görevli #{Model.GorevliId}";
+    var totalAccrued = ViewBag.TotalAccrued as decimal? ?? 0m;
+    var totalUsed = Model.ToplamGun;
+    var remaining = totalAccrued - totalUsed;
+
+    var evrak = Model.EvrakDosyaYolu;
+    var evrakExt = string.IsNullOrEmpty(evrak) ? "" : System.IO.Path.GetExtension(evrak).ToLowerInvariant();
+    var isPdf = evrakExt == ".pdf";
+    var isImage = evrakExt == ".png" || evrakExt == ".jpg" || evrakExt == ".jpeg";
+}
+
+<div class="container-fluid px-0">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h1 class="h2 fw-bold mb-1">
+                <i class="bi bi-card-list text-primary me-2"></i>İzin Detayı
+            </h1>
+            <p class="text-muted mb-0">@gorevliAd — <span class="text-primary">@Model.BaslangicTarihi.ToString("dd.MM.yyyy") – @Model.BitisTarihi.ToString("dd.MM.yyyy")</span></p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="@Url.Action("Index", "Izin")" class="btn btn-outline-secondary btn-sm rounded-pill">
+                <i class="bi bi-arrow-left me-1"></i> İzin Listesine Dön
+            </a>
+            <a href="@Url.Action("DownloadIzinPdf", "Izin", new { id = Model.Id })" class="btn btn-outline-dark btn-sm rounded-pill">
+                <i class="bi bi-file-pdf me-1"></i> PDF İndir
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Accrual Summary Strip -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-4">
+            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);">
+                <div class="card-body d-flex align-items-center gap-3 p-3">
+                    <div class="rounded-circle bg-white bg-opacity-25 d-flex align-items-center justify-content-center" style="width:48px;height:48px;">
+                        <i class="bi bi-calendar-plus text-white fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="small text-white text-opacity-75">Biriken İzin Hakkı</div>
+                        <div class="fw-bold text-white fs-5">@totalAccrued.ToString("0.0") Gün</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                <div class="card-body d-flex align-items-center gap-3 p-3">
+                    <div class="rounded-circle bg-white bg-opacity-25 d-flex align-items-center justify-content-center" style="width:48px;height:48px;">
+                        <i class="bi bi-calendar-minus text-white fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="small text-white text-opacity-75">Bu İzin (Kullanılan)</div>
+                        <div class="fw-bold text-white fs-5">@totalUsed Gün</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                <div class="card-body d-flex align-items-center gap-3 p-3">
+                    <div class="rounded-circle bg-white bg-opacity-25 d-flex align-items-center justify-content-center" style="width:48px;height:48px;">
+                        <i class="bi bi-calendar-check text-white fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="small text-white text-opacity-75">Kalan İzin</div>
+                        <div class="fw-bold text-white fs-5">@remaining.ToString("0.0") Gün</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dual Column Layout -->
+    <div class="row g-4">
+
+        <!-- LEFT COLUMN: Leave Details -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-info-circle text-primary me-2"></i>İzin Bilgileri</h5>
+                </div>
+                <div class="card-body px-4 pb-4">
+                    <table class="table table-borderless table-sm align-middle">
+                        <tbody>
+                            <tr>
+                                <th class="text-muted fw-normal ps-0" style="width:40%">Görevli</th>
+                                <td class="fw-semibold">@gorevliAd</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted fw-normal ps-0">İzin Türü</th>
+                                <td><span class="badge bg-info-subtle text-info">@Model.IzinTuru</span></td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted fw-normal ps-0">Başlangıç</th>
+                                <td>@Model.BaslangicTarihi.ToString("dd MMMM yyyy", new System.Globalization.CultureInfo("tr-TR"))</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted fw-normal ps-0">Bitiş</th>
+                                <td>@Model.BitisTarihi.ToString("dd MMMM yyyy", new System.Globalization.CultureInfo("tr-TR"))</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted fw-normal ps-0">Toplam Gün</th>
+                                <td><span class="badge bg-primary-subtle text-primary fw-bold">@Model.ToplamGun gün</span></td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted fw-normal ps-0">Talep Tarihi</th>
+                                <td>@Model.TalepTarihi.ToString("dd.MM.yyyy")</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted fw-normal ps-0">Durum</th>
+                                <td>
+                                    @switch (Model.OnayDurumu)
+                                    {
+                                        case OnayDurumu.Beklemede:
+                                            <span class="badge bg-warning-subtle text-warning"><i class="bi bi-hourglass-split me-1"></i>Beklemede</span>
+                                            break;
+                                        case OnayDurumu.Onaylandi:
+                                            <span class="badge bg-success-subtle text-success"><i class="bi bi-check-circle me-1"></i>Onaylandı</span>
+                                            break;
+                                        case OnayDurumu.Reddedildi:
+                                            <span class="badge bg-danger-subtle text-danger"><i class="bi bi-x-circle me-1"></i>Reddedildi</span>
+                                            break;
+                                        case OnayDurumu.IptalEdildi:
+                                            <span class="badge bg-secondary-subtle text-secondary"><i class="bi bi-slash-circle me-1"></i>İptal</span>
+                                            break;
+                                    }
+                                </td>
+                            </tr>
+                            @if (!string.IsNullOrEmpty(Model.OnaylayanKisi))
+                            {
+                                <tr>
+                                    <th class="text-muted fw-normal ps-0">Onaylayan</th>
+                                    <td>@Model.OnaylayanKisi</td>
+                                </tr>
+                            }
+                            @if (Model.OnayTarihi.HasValue)
+                            {
+                                <tr>
+                                    <th class="text-muted fw-normal ps-0">Onay Tarihi</th>
+                                    <td>@Model.OnayTarihi.Value.ToString("dd.MM.yyyy")</td>
+                                </tr>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.IzinAdresi))
+                            {
+                                <tr>
+                                    <th class="text-muted fw-normal ps-0">İzin Adresi</th>
+                                    <td>@Model.IzinAdresi</td>
+                                </tr>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.IzinTelefonu))
+                            {
+                                <tr>
+                                    <th class="text-muted fw-normal ps-0">İzin Telefonu</th>
+                                    <td>@Model.IzinTelefonu</td>
+                                </tr>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.EvrakNo))
+                            {
+                                <tr>
+                                    <th class="text-muted fw-normal ps-0">Evrak No</th>
+                                    <td>@Model.EvrakNo</td>
+                                </tr>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.Aciklama))
+                            {
+                                <tr>
+                                    <th class="text-muted fw-normal ps-0">Açıklama</th>
+                                    <td class="text-muted small">@Model.Aciklama</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Document Viewer / Upload -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-paperclip text-primary me-2"></i>Fiziksel Evrak</h5>
+                    @if (!string.IsNullOrEmpty(evrak))
+                    {
+                        <a href="@evrak" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill">
+                            <i class="bi bi-box-arrow-up-right me-1"></i> Yeni Sekmede Aç
+                        </a>
+                    }
+                </div>
+                <div class="card-body px-4 pb-4">
+
+                    @if (isPdf)
+                    {
+                        <!-- PDF inline viewer -->
+                        <div class="rounded-3 overflow-hidden border" style="height: 600px;">
+                            <iframe src="@evrak" width="100%" height="100%" style="border:none;" title="İzin Evrakı PDF"></iframe>
+                        </div>
+                    }
+                    else if (isImage)
+                    {
+                        <!-- Image viewer with zoom modal -->
+                        <div class="text-center mb-3">
+                            <img src="@evrak"
+                                 id="evrakImg"
+                                 alt="İzin Evrakı"
+                                 class="img-fluid rounded-3 border shadow-sm"
+                                 style="max-height: 560px; cursor: zoom-in; object-fit: contain;"
+                                 data-bs-toggle="modal"
+                                 data-bs-target="#imageZoomModal" />
+                        </div>
+                        <p class="text-center text-muted small mb-0">
+                            <i class="bi bi-zoom-in me-1"></i>Büyütmek için görsele tıklayın
+                        </p>
+
+                        <!-- Zoom Modal -->
+                        <div class="modal fade" id="imageZoomModal" tabindex="-1" aria-labelledby="imageZoomModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-xl modal-dialog-centered">
+                                <div class="modal-content border-0 shadow-lg">
+                                    <div class="modal-header border-0 pb-0">
+                                        <h6 class="modal-title fw-semibold" id="imageZoomModalLabel">
+                                            <i class="bi bi-image me-2 text-primary"></i>İzin Evrakı
+                                        </h6>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body p-3 text-center">
+                                        <img src="@evrak" alt="İzin Evrakı" class="img-fluid rounded" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- No document yet — upload box -->
+                        <div class="border border-2 border-dashed rounded-4 p-5 text-center"
+                             style="border-color: #d1d5db !important; background: #f9fafb;"
+                             id="dropZone">
+                            <div class="mb-3">
+                                <i class="bi bi-cloud-upload text-primary" style="font-size: 3rem;"></i>
+                            </div>
+                            <p class="fw-semibold mb-1 text-dark">Amir imzalı fiziksel evrak yüklemek için dosya seçiniz</p>
+                            <p class="text-muted small mb-4">PDF, PNG veya JPG — Maksimum 10MB</p>
+
+                            <form asp-action="EvrakYukle" asp-controller="Izin" method="post" enctype="multipart/form-data" id="uploadForm">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <label for="evrakDosyasi" class="btn btn-primary rounded-pill px-4" style="cursor:pointer;">
+                                    <i class="bi bi-folder2-open me-2"></i>Dosya Seç
+                                </label>
+                                <input type="file"
+                                       id="evrakDosyasi"
+                                       name="evrakDosyasi"
+                                       accept=".pdf,.png,.jpg,.jpeg"
+                                       class="d-none"
+                                       onchange="handleFileSelect(this)" />
+                            </form>
+
+                            <div id="filePreview" class="mt-3 d-none">
+                                <div class="alert alert-info border-0 d-inline-flex align-items-center gap-2 rounded-pill px-4 py-2 small">
+                                    <i class="bi bi-file-earmark-check"></i>
+                                    <span id="fileName"></span>
+                                    <button type="button" class="btn btn-sm btn-primary rounded-pill ms-2 px-3" onclick="document.getElementById('uploadForm').submit();">
+                                        <i class="bi bi-upload me-1"></i>Yükle
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(evrak))
+                    {
+                        <!-- Replace document section -->
+                        <div class="mt-4 pt-3 border-top">
+                            <p class="text-muted small mb-2">
+                                <i class="bi bi-arrow-repeat me-1"></i>Mevcut evrakı değiştirmek için yeni dosya yükleyin:
+                            </p>
+                            <form asp-action="EvrakYukle" asp-controller="Izin" method="post" enctype="multipart/form-data" class="d-flex align-items-center gap-2 flex-wrap">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <input type="file"
+                                       name="evrakDosyasi"
+                                       accept=".pdf,.png,.jpg,.jpeg"
+                                       class="form-control form-control-sm"
+                                       style="max-width: 280px;"
+                                       required />
+                                <button type="submit" class="btn btn-sm btn-outline-primary rounded-pill">
+                                    <i class="bi bi-upload me-1"></i>Değiştir
+                                </button>
+                            </form>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

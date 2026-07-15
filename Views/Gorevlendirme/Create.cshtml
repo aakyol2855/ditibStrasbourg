@@ -4,6 +4,10 @@
     ViewData["Title"] = "Yeni Görevlendirme";
 }
 
+@section Styles {
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+}
+
 <h1>Yeni Görevlendirme Ekle</h1>
 
 <h4>Görevlendirme</h4>
@@ -18,7 +22,9 @@
             </div>
             <div class="form-group mb-3">
                 <label asp-for="KurumId" class="control-label"></label>
-                <select asp-for="KurumId" class ="form-control" asp-items="ViewBag.KurumId"></select>
+                <select asp-for="KurumId" class ="form-control" asp-items="ViewBag.KurumId">
+                    <option value="">-- Seçiniz --</option>
+                </select>
             </div>
             <div class="form-group mb-3">
                 <label asp-for="Tarih" class="control-label"></label>

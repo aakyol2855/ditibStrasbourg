@@ -41,6 +41,22 @@
                 <a class="list-group-item list-group-item-action standard-menu-item border-0 @(isActive ? "active" : "")" asp-controller="@item.Controller" asp-action="@item.Action">
                     <i class="@(item.Icon ?? "bi bi-record-circle") me-3 fs-5"></i> <span class="menu-text">@item.Title</span>
                 </a>
+                if (item.Title == "Kurban Bağış")
+                {
+                    <div class="px-4 pb-1">
+                        <a href="/Kurban/Create" class="btn btn-sm btn-link text-start py-1 px-3 mt-1 border-0 w-100 text-decoration-none" style="font-size: 0.75rem; border-radius: 6px; background-color: rgba(13, 110, 253, 0.08); color: #0d6efd; display: block;">
+                            <i class="bi bi-plus-circle me-2"></i>Yeni Kampanya Ekle
+                        </a>
+                    </div>
+                }
+                else if (item.Title == "Maliye Yönetimi")
+                {
+                    <div class="px-4 pb-1">
+                        <a href="/Maliye/Create" class="btn btn-sm btn-link text-start py-1 px-3 mt-1 border-0 w-100 text-decoration-none" style="font-size: 0.75rem; border-radius: 6px; background-color: rgba(25, 135, 84, 0.08); color: #198754; display: block;">
+                            <i class="bi bi-plus-circle me-2"></i>Yeni Bütçe Ekle
+                        </a>
+                    </div>
+                }
             }
         }
 

@@ -10,7 +10,7 @@
 <hr />
 <div class="row">
     <div class="col-md-12">
-        <form asp-action="Create">
+        <form asp-action="Create" id="createForm" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="row">
@@ -23,18 +23,18 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6 form-group mb-3">
-                                    <label asp-for="Ad" class="control-label"></label>
+                                    <label asp-for="Ad" class="control-label">Ad <span class="text-danger">*</span></label>
                                     <input asp-for="Ad" class="form-control" />
                                     <span asp-validation-for="Ad" class="text-danger"></span>
                                 </div>
                                 <div class="col-md-6 form-group mb-3">
-                                    <label asp-for="Soyad" class="control-label"></label>
+                                    <label asp-for="Soyad" class="control-label">Soyad <span class="text-danger">*</span></label>
                                     <input asp-for="Soyad" class="form-control" />
                                     <span asp-validation-for="Soyad" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="form-group mb-3">
-                                <label asp-for="Email" class="control-label"></label>
+                                <label asp-for="Email" class="control-label">E-posta <span class="text-danger">*</span></label>
                                 <input asp-for="Email" class="form-control" />
                                 <span asp-validation-for="Email" class="text-danger"></span>
                             </div>
@@ -48,8 +48,15 @@
                                 </div>
                                 <div class="col-md-6 form-group mb-3">
                                     <label asp-for="SozlesmeTipId" class="control-label"></label>
-                                    <select asp-for="SozlesmeTipId" class="form-control" asp-items="@(new SelectList(ViewBag.SozlesmeTipleri, "Id", "Ad"))">
+                                    <select asp-for="SozlesmeTipId" class="form-control" id="SozlesmeTipId">
                                         <option value="">Seçiniz</option>
+                                        @if (ViewBag.SozlesmeTipleri != null)
+                                        {
+                                            foreach (var item in (IEnumerable<DitibStasbourg.Models.Ref_SozlesmeTip>)ViewBag.SozlesmeTipleri)
+                                            {
+                                                <option value="@item.Id" data-is-local="@item.IsLocalContract.ToString().ToLower()">@item.Ad</option>
+                                            }
+                                        }
                                     </select>
                                     <span asp-validation-for="SozlesmeTipId" class="text-danger"></span>
                                 </div>
@@ -88,10 +95,17 @@
                             <h5 class="mb-0">Kimlik ve İletişim</h5>
                         </div>
                         <div class="card-body">
-                             <div class="form-group mb-3">
+                             <div class="form-group mb-3" id="tcKimlikGroup">
                                 <label asp-for="TCKimlikNo" class="control-label"></label>
-                                <input asp-for="TCKimlikNo" class="form-control" maxlength="11" />
+                                <input asp-for="TCKimlikNo" class="form-control" maxlength="11" id="TCKimlikNo" />
                                 <span asp-validation-for="TCKimlikNo" class="text-danger"></span>
+                                <div class="form-text text-muted small">Türkiye Cumhuriyeti vatandaşları için zorunludur.</div>
+                            </div>
+                            <div class="form-group mb-3" id="frenchIdGroup">
+                                <label asp-for="FrenchNationalId" class="control-label"></label>
+                                <input asp-for="FrenchNationalId" class="form-control" maxlength="50" id="FrenchNationalId" placeholder="NSS / Titre de Séjour / Carte de Résident No" />
+                                <span asp-validation-for="FrenchNationalId" class="text-danger"></span>
+                                <div class="form-text text-muted small">Fransız vatandaşları veya oturum kartı sahipleri için.</div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6 form-group mb-3">
@@ -209,6 +223,23 @@
                                 <input asp-for="MezuniyetBolum" class="form-control" />
                                 <span asp-validation-for="MezuniyetBolum" class="text-danger"></span>
                             </div>
+                             <div class="row">
+                                 <div class="col-md-6 form-group mb-3">
+                                     <label asp-for="Universite" class="control-label">Mezun Olunan Üniversite</label>
+                                     <input asp-for="Universite" class="form-control" placeholder="örn. Sorbonne Üniversitesi" />
+                                     <span asp-validation-for="Universite" class="text-danger"></span>
+                                 </div>
+                                 <div class="col-md-6 form-group mb-3">
+                                     <label asp-for="Agno" class="control-label">Not Ortalaması (AGNO)</label>
+                                     <input asp-for="Agno" class="form-control" type="number" step="0.01" min="0" max="4" placeholder="örn. 3.20" />
+                                     <span asp-validation-for="Agno" class="text-danger"></span>
+                                 </div>
+                             </div>
+                             <div class="form-group mb-3">
+                                 <label asp-for="Diller" class="control-label">Bilinen Diller</label>
+                                 <input asp-for="Diller" class="form-control" placeholder="örn. Fransızca, İngilizce, Arapça" />
+                                 <span asp-validation-for="Diller" class="text-danger"></span>
+                             </div>
                         </div>
                     </div>
                 </div>
@@ -236,18 +267,38 @@
                                     <input asp-for="IlkGoreveBaslamaTarihi" class="form-control" type="date" />
                                     <span asp-validation-for="IlkGoreveBaslamaTarihi" class="text-danger"></span>
                                 </div>
-                                <div class="col-md-6 form-group mb-3">
+                                <div class="col-md-6 form-group mb-3" id="emeklilik-container">
                                     <label asp-for="EmeklilikTarihi" class="control-label"></label>
                                     <input asp-for="EmeklilikTarihi" class="form-control" type="date" />
                                     <span asp-validation-for="EmeklilikTarihi" class="text-danger"></span>
                                     <small class="text-muted">Emekli görevliler de görevlendirilebilir</small>
                                 </div>
                             </div>
-                            <div class="form-group mb-3">
+                            <div class="row">
+                                <div class="col-md-6 form-group mb-3" id="diyanet-giris-container">
                                     <label asp-for="DiyanetGirisTarihi" class="control-label"></label>
                                     <input asp-for="DiyanetGirisTarihi" class="form-control" type="date" />
                                     <span asp-validation-for="DiyanetGirisTarihi" class="text-danger"></span>
                                 </div>
+                                <div class="col-md-6 form-group mb-3">
+                                    <label asp-for="FransaGirisTarihi" class="control-label"></label>
+                                    <input asp-for="FransaGirisTarihi" class="form-control" type="date" />
+                                    <span asp-validation-for="FransaGirisTarihi" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 form-group mb-3">
+                                    <div class="form-check mt-4">
+                                        <input asp-for="IsMerkezPersoneli" class="form-check-input" type="checkbox" id="IsMerkezPersoneli" />
+                                        <label asp-for="IsMerkezPersoneli" class="form-check-label fw-bold">Strasbourg Merkez Personeli mi?</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 form-group mb-3" id="merkez-gorev-alani-container" style="display: none;">
+                                    <label asp-for="MerkezGorevAlani" class="control-label">Merkez Görev Alanı</label>
+                                    <input asp-for="MerkezGorevAlani" class="form-control" id="MerkezGorevAlani" placeholder="örn. Cenaze İşleri, İdari İşler" />
+                                    <span asp-validation-for="MerkezGorevAlani" class="text-danger"></span>
+                                </div>
+                            </div>
                          </div>
                     </div>
                 </div>
@@ -269,8 +320,55 @@
                 </div>
             </div>
 
+             <!-- Resmi Belge Yükle (İsteğe Bağlı) -->
+             <div class="col-md-12 mb-4">
+                 <div class="card border-0 shadow-sm">
+                     <div class="card-header bg-primary text-white d-flex align-items-center">
+                         <h5 class="mb-0"><i class="bi bi-file-earmark-arrow-up me-2"></i>İlk Resmi Belge / Sertifika Ekle (İsteğe Bağlı)</h5>
+                     </div>
+                     <div class="card-body bg-light-subtle">
+                         <div class="row g-3">
+                             <div class="col-md-3">
+                                 <label class="form-label fw-bold small text-muted">Belge Tipi</label>
+                                 <select name="BelgeTipi" class="form-select">
+                                     <option value="">Seçiniz...</option>
+                                     <option value="0">Oturum Kartı</option>
+                                     <option value="1">Dil Belgesi</option>
+                                     <option value="2">Laiklik Belgesi</option>
+                                     <option value="3">Pasaport</option>
+                                     <option value="4">Vize</option>
+                                     <option value="5">Sözleşme</option>
+                                     <option value="6">Diploma / Mezuniyet</option>
+                                     <option value="7">Diğer</option>
+                                 </select>
+                             </div>
+                             <div class="col-md-3">
+                                 <label class="form-label fw-bold small text-muted">Seri / Belge No</label>
+                                 <input type="text" name="BelgeSeriNo" class="form-control" placeholder="örn. A12B3456" />
+                             </div>
+                             <div class="col-md-3">
+                                 <label class="form-label fw-bold small text-muted">Geçerlilik Bitiş Tarihi</label>
+                                 <input type="date" name="BelgeExpirationDate" class="form-control" />
+                             </div>
+                             <div class="col-md-3">
+                                 <label class="form-label fw-bold small text-muted">Dosya Seç (PDF, JPG, PNG)</label>
+                                 <input type="file" name="BelgeFile" class="form-control" accept=".pdf,.jpg,.jpeg,.png" />
+                             </div>
+                             <div class="col-md-12">
+                                 <label class="form-label fw-bold small text-muted">Belge Açıklaması</label>
+                                 <input type="text" name="BelgeDescription" class="form-control" placeholder="Belgeye dair kısa açıklama..." />
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+
+            <div id="duplicateWarningBanner" class="alert alert-warning d-none" role="alert">
+                <strong>⚠️ DİKKAT:</strong> Girmekte olduğunuz bilgilere benzer kayıtlar sistemde mevcut. Eğer eminseniz işleme devam edebilirsiniz, sistem yöneticiye doğrulama bildirimi gönderecektir.
+            </div>
+
             <div class="form-group text-center mt-3">
-                <input type="submit" value="Kaydet" class="btn btn-primary btn-lg px-5" />
+                <input type="submit" value="Kaydet" class="btn btn-primary btn-lg px-5" id="btnSubmit" />
                 <a asp-action="Index" class="btn btn-secondary btn-lg">İptal</a>
             </div>
         </form>

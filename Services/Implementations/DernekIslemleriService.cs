@@ -27,7 +27,7 @@ namespace DitibStasbourg.Services.Implementations
         {
             var query = _context.Kurum
                 .AsNoTracking()
-                .Where(k => k.Tip == KurumTip.Dernek && k.AktifMi == true)
+                .Where(k => k.AktifMi == true)
                 .Include(k => k.UstKurum)
                 .AsQueryable();
 
@@ -49,7 +49,7 @@ namespace DitibStasbourg.Services.Implementations
         public async Task<List<Kurum>> GetActiveDerneklerAsync()
         {
             return await _context.Kurum
-                .Where(k => k.Tip == KurumTip.Dernek && k.AktifMi == true)
+                .Where(k => k.AktifMi == true)
                 .Include(k => k.UstKurum)
                 .OrderBy(k => k.Isim)
                 .AsNoTracking()
@@ -83,12 +83,15 @@ namespace DitibStasbourg.Services.Implementations
             return await _context.Kurum
                 .Include(k => k.UstKurum)
                 .Include(k => k.DernekUyeleri)
+                .Include(k => k.FinansalDonemler)
                 .Include(k => k.YonetimKuruluUyeleri)
                     .ThenInclude(y => y.YonetimRol)
                 .Include(k => k.Gorevlendirmeler)
                     .ThenInclude(g => g.Gorevli)
                 .Include(k => k.Gorevlendirmeler)
                     .ThenInclude(g => g.GorevlendirmeNotlari)
+                .Include(k => k.DernekNotlari)
+                .Include(k => k.DernekGorselleri)
                 .FirstOrDefaultAsync(k => k.Id == id);
         }
 
@@ -213,7 +216,7 @@ namespace DitibStasbourg.Services.Implementations
 
         public async Task<bool> UpdateDernekAsync(int id, string isim, string? sehir, string? adres, 
             string? kurulusKanunu, string? baskonsoloslukBolgesi, string? bolge, string? crmUyelikFormDurumu, int? ustKurumId,
-            string? iletisimNumarasi, string? maili, double? latitude, double? longitude, int? cemaatCount, string? frenchRegistrationName, List<KurumYonetimKuruluUyesi>? yonetimKurulu)
+            string? iletisimNumarasi, string? maili, string? ibanNo, string? siretNo, string? rnaNo, double? latitude, double? longitude, int? cemaatCount, string? frenchRegistrationName, List<KurumYonetimKuruluUyesi>? yonetimKurulu)
         {
             var dernek = await _context.Kurum.FindAsync(id);
             if (dernek == null) return false;
@@ -228,6 +231,9 @@ namespace DitibStasbourg.Services.Implementations
             dernek.UstKurumId = ustKurumId;
             dernek.IletisimNumarasi = iletisimNumarasi;
             dernek.Maili = maili;
+            dernek.IbanNo = ibanNo ?? string.Empty;
+            dernek.SiretNo = siretNo ?? string.Empty;
+            dernek.RnaNo = rnaNo ?? string.Empty;
             dernek.CemaatCount = cemaatCount;
             dernek.FrenchRegistrationName = frenchRegistrationName;
 

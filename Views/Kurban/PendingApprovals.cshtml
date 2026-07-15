@@ -1,0 +1,120 @@
+@model IEnumerable<DitibStasbourg.Models.KurbanCampaignRecord>
+@{
+    ViewData["Title"] = "Onay Bekleyen Kurban Kampanyaları";
+}
+
+<style type="text/css">
+    .hover-up {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .hover-up:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.12) !important;
+    }
+    .card-glass {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-0">
+                <i class="bi bi-shield-lock text-warning me-2"></i>Onay Bekleyen Kurban Kampanyaları
+            </h2>
+            <p class="text-muted mb-0 small">Kurban kayıtlarının resmi analiz ve dashboard ekranına yansıması için onaylanması gerekmektedir.</p>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm shadow-sm">
+                <i class="bi bi-arrow-left me-1"></i>Kampanya Paneline Dön
+            </a>
+        </div>
+    </div>
+
+    <!-- Alert / Banner for feedback -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm border-0" role="alert" style="border-radius: 12px;">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Grid table list -->
+    <div class="card card-glass shadow-sm border-0" style="border-radius: 1.25rem; overflow: hidden;">
+        <div class="card-header bg-white py-3 border-0">
+            <h5 class="card-title mb-0 fw-bold text-dark">
+                <i class="bi bi-hourglass-split text-warning me-2"></i>Onay Sırasındaki Kayıtlar
+            </h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 text-center">
+                <thead class="table-light text-uppercase font-monospace" style="font-size: 0.8rem;">
+                    <tr>
+                        <th class="px-3 text-start">Bölge</th>
+                        <th class="text-start">Cami</th>
+                        <th>FYS Sorumlusu</th>
+                        <th>Diğer Ülkeler</th>
+                        <th>Türkiye</th>
+                        <th>Toplam Kayıt Tutarı</th>
+                        <th>Toplam Ödenen</th>
+                        <th>Kalan Bakiye</th>
+                        <th>Kampanya Yılı</th>
+                        <th>Aksiyonlar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="10" class="text-muted py-5">
+                                <i class="bi bi-check2-circle display-4 text-success mb-2 d-block"></i>
+                                <span class="fw-semibold">Tebrikler! Onay bekleyen kurban kampanyası kaydı bulunmamaktadır.</span>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var r in Model)
+                        {
+                            var totalQuota = r.DigerMiktar + r.TrMiktar;
+                            <tr>
+                                <td class="px-3 text-start"><span class="badge bg-secondary-subtle text-secondary">@r.Bolge</span></td>
+                                <td class="text-start fw-semibold text-primary">@r.Cami</td>
+                                <td class="text-muted">@r.FysSorumlusu</td>
+                                <td>
+                                    <span class="fw-bold">@r.DigerAdet Adet</span>
+                                    <div class="text-muted small">@r.DigerMiktar.ToString("C2", new System.Globalization.CultureInfo("fr-FR"))</div>
+                                </td>
+                                <td>
+                                    <span class="fw-bold">@r.TrAdet Adet</span>
+                                    <div class="text-muted small">@r.TrMiktar.ToString("C2", new System.Globalization.CultureInfo("fr-FR"))</div>
+                                </td>
+                                <td class="fw-bold text-dark">
+                                    @totalQuota.ToString("C2", new System.Globalization.CultureInfo("fr-FR"))
+                                </td>
+                                <td class="fw-bold text-success">
+                                    @r.ToplamOdenen.ToString("C2", new System.Globalization.CultureInfo("fr-FR"))
+                                </td>
+                                <td class="fw-bold @(r.KalanBakiye > 0 ? "text-danger" : "text-success")">
+                                    @r.KalanBakiye.ToString("C2", new System.Globalization.CultureInfo("fr-FR"))
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">@r.Yil</span>
+                                </td>
+                                <td>
+                                    <a asp-action="Approve" asp-route-id="@r.Id" class="btn btn-sm btn-success rounded-pill px-3 shadow-sm hover-up">
+                                        <i class="bi bi-check-lg me-1"></i>Onayla
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

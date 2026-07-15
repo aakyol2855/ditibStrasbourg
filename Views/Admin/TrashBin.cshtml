@@ -196,6 +196,12 @@
                                                 <a href="@Url.Action("Restore", "Admin", new { type = "Association", id = association.Id })" class="btn btn-success btn-sm px-3 rounded-pill" onclick="return confirm('@association.Isim derneğini kurtarmak ve geri yüklemek istediğinize emin misiniz?')">
                                                     <i class="bi bi-arrow-counterclockwise me-1"></i> Geri Yükle
                                                 </a>
+                                                <button type="button" class="btn btn-outline-danger btn-sm rounded-pill ms-1 btn-hard-delete"
+                                                        data-type="Association"
+                                                        data-id="@association.Id"
+                                                        data-name="@association.Isim">
+                                                    <i class="bi bi-trash3-fill me-1"></i> Kalıcı Sil
+                                                </button>
                                             </td>
                                         </tr>
                                     }
@@ -258,6 +264,12 @@
                                                 <a href="@Url.Action("Restore", "Admin", new { type = "Personnel", id = gorevli.Id })" class="btn btn-success btn-sm px-3 rounded-pill" onclick="return confirm('@gorevli.Ad @gorevli.Soyad görevlisini kurtarmak ve geri yüklemek istediğinize emin misiniz?')">
                                                     <i class="bi bi-arrow-counterclockwise me-1"></i> Geri Yükle
                                                 </a>
+                                                <button type="button" class="btn btn-outline-danger btn-sm rounded-pill ms-1 btn-hard-delete"
+                                                        data-type="Personnel"
+                                                        data-id="@gorevli.Id"
+                                                        data-name="@gorevli.Ad @gorevli.Soyad">
+                                                    <i class="bi bi-trash3-fill me-1"></i> Kalıcı Sil
+                                                </button>
                                             </td>
                                         </tr>
                                     }
@@ -338,6 +350,12 @@
                                                 <a href="@Url.Action("Restore", "Admin", new { type = "Assignment", id = assignment.Id })" class="btn btn-success btn-sm px-3 rounded-pill" onclick="return confirm('Görevlendirmeyi kurtarmak ve geri yüklemek istediğinize emin misiniz?')">
                                                     <i class="bi bi-arrow-counterclockwise me-1"></i> Geri Yükle
                                                 </a>
+                                                <button type="button" class="btn btn-outline-danger btn-sm rounded-pill ms-1 btn-hard-delete"
+                                                        data-type="Assignment"
+                                                        data-id="@assignment.Id"
+                                                        data-name="Görevlendirme #@assignment.Id">
+                                                    <i class="bi bi-trash3-fill me-1"></i> Kalıcı Sil
+                                                </button>
                                             </td>
                                         </tr>
                                     }
@@ -351,3 +369,68 @@
         </div>
     </div>
 </div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     ZORUNLU KALICI SİLME ONAY MODALI
+     DİTİB Strasbourg — Silme Güvenlik Duvarı v2.0
+     ═══════════════════════════════════════════════════════════════════════ -->
+<div class="modal fade" id="hardDeleteModal" tabindex="-1" aria-labelledby="hardDeleteModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title fw-bold" id="hardDeleteModalLabel">
+                    <i class="bi bi-exclamation-octagon-fill me-2"></i> KESİN SİLME — GERİ ALINAMAZ!
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body py-4">
+                <div class="alert alert-danger border-2 fw-semibold mb-3">
+                    <i class="bi bi-shield-exclamation me-2"></i>
+                    DİKKAT: Bu işlem geri alınamaz! Devam ederseniz veri geri dönüşümsüz olarak silinecektir.
+                </div>
+                <p class="text-muted small mb-1">Kalıcı olarak silmek istediğiniz kayıt:</p>
+                <p class="fw-bold text-dark fs-6" id="hardDeleteTargetName">—</p>
+                <p class="text-muted small">Bu işlemi onaylamak için lütfen aşağıdaki kutuya <strong>"SİL"</strong> yazınız.</p>
+                <input type="text" id="hardDeleteConfirmInput" class="form-control" placeholder='Onaylamak için "SİL" yazın' autocomplete="off" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal Et</button>
+                <form id="hardDeleteForm" method="post" action="@Url.Action("HardDeleteFromTrashBin", "Admin")">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="type" id="hdType" />
+                    <input type="hidden" name="id" id="hdId" />
+                    <button type="submit" id="hardDeleteSubmitBtn" class="btn btn-danger fw-bold" disabled>
+                        <i class="bi bi-trash3-fill me-1"></i> Evet, Kalıcı Olarak Sil
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    // Hard Delete Modal Logic — strict confirmation required
+    document.querySelectorAll('.btn-hard-delete').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const type = this.getAttribute('data-type');
+            const id   = this.getAttribute('data-id');
+            const name = this.getAttribute('data-name');
+
+            document.getElementById('hdType').value = type;
+            document.getElementById('hdId').value   = id;
+            document.getElementById('hardDeleteTargetName').textContent = name;
+            document.getElementById('hardDeleteConfirmInput').value = '';
+            document.getElementById('hardDeleteSubmitBtn').disabled = true;
+
+            const modal = new bootstrap.Modal(document.getElementById('hardDeleteModal'));
+            modal.show();
+        });
+    });
+
+    document.getElementById('hardDeleteConfirmInput').addEventListener('input', function() {
+        const submitBtn = document.getElementById('hardDeleteSubmitBtn');
+        submitBtn.disabled = this.value.trim().toUpperCase() !== 'SİL';
+    });
+</script>
+}

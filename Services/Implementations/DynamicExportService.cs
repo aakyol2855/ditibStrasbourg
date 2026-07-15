@@ -3,22 +3,21 @@ using ClosedXML.Excel;
 using DitibStasbourg.Models.Attributes;
 using DitibStasbourg.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using DitibStasbourg.Data;
+using DitibStasbourg.Models;
 
 namespace DitibStasbourg.Services.Implementations
 {
-    /// <summary>
-    /// Metadata-driven, generic Excel export engine.
-    ///
-    /// Architecture principles applied:
-    ///   - Open/Closed Principle: Adding export support to a new entity requires ONLY
-    ///     adding [ExportColumn] attributes on its properties — zero changes here.
-    ///   - Single Responsibility: This class owns only spreadsheet generation logic.
-    ///   - Dependency Inversion: Depends on the IQueryable<T> abstraction, not any
-    ///     concrete DbContext or repository.
-    ///   - Zero switch-case: All type branching is replaced by .NET Reflection metadata.
-    /// </summary>
     public class DynamicExportService : IDynamicExportService
     {
+        private readonly ApplicationDbContext _context;
+        private readonly IIzinHesaplamaService _izinEngine;
+
+        public DynamicExportService(ApplicationDbContext context, IIzinHesaplamaService izinEngine)
+        {
+            _context = context;
+            _izinEngine = izinEngine;
+        }
         // ─── Descriptor Cache ─────────────────────────────────────────────────────
         // Reflection is expensive on hot paths. Cache results per entity type.
         private static readonly System.Collections.Concurrent.ConcurrentDictionary<Type, IReadOnlyList<ExportColumnDescriptor>>
@@ -117,6 +116,73 @@ namespace DitibStasbourg.Services.Implementations
 
             // 3. Materialise data from EF Core
             var data = await query.AsNoTracking().ToListAsync();
+
+            if (typeof(T) == typeof(Gorevli))
+            {
+                var gorevliler = data.Cast<Gorevli>().ToList();
+                var ids = gorevliler.Select(g => g.Id).ToList();
+
+                if (ids.Any())
+                {
+                    // 1. Fetch active assignments and previous assignments
+                    var assignments = await _context.Gorevlendirme
+                        .Include(g => g.Kurum)
+                        .Where(g => ids.Contains(g.GorevliId) && !g.IsDeleted)
+                        .ToListAsync();
+
+                    // 2. Fetch previous duties (GorevGecmisleri)
+                    var histories = await _context.GorevGecmisleri
+                        .Include(h => h.Kurum)
+                        .Where(h => ids.Contains(h.GorevliId))
+                        .ToListAsync();
+
+                    // 3. Fetch approved annual leaves (YillikIzin)
+                    var leaves = await _context.GorevliIzinler
+                        .Where(l => ids.Contains(l.GorevliId) && !l.IsDeleted && l.IzinTuru == DitibStasbourg.Models.Enums.IzinTuru.YillikIzin && l.OnayDurumu == DitibStasbourg.Models.Enums.OnayDurumu.Onaylandi)
+                        .ToListAsync();
+
+                    // 4. Fetch notes (GorevliNotlari)
+                    var notes = await _context.GorevliNotlari
+                        .Where(n => ids.Contains(n.GorevliId) && !n.IsDeleted)
+                        .ToListAsync();
+
+                    var today = DateTime.Today;
+
+                    foreach (var g in gorevliler)
+                    {
+                        // Active Assignment
+                        var active = assignments
+                            .Where(a => a.GorevliId == g.Id)
+                            .FirstOrDefault(a => today >= a.Tarih && (!a.BitisTarihi.HasValue || today <= a.BitisTarihi.Value));
+                        g.ExportAktifGorevYeri = active?.Kurum?.Isim ?? "Görevlendirilmemiş";
+
+                        // Previous duties
+                        var prevAssignments = assignments
+                            .Where(a => a.GorevliId == g.Id && a != active)
+                            .Select(a => $"{a.Kurum?.Isim} ({a.Tarih:dd.MM.yyyy} - {(a.BitisTarihi.HasValue ? a.BitisTarihi.Value.ToString("dd.MM.yyyy") : "Devam Ediyor")})");
+                        var prevHistories = histories
+                            .Where(h => h.GorevliId == g.Id)
+                            .Select(h => $"{h.Kurum?.Isim} ({h.BaslangicTarihi:dd.MM.yyyy} - {(h.BitisTarihi.HasValue ? h.BitisTarihi.Value.ToString("dd.MM.yyyy") : "")})");
+                        var allPrev = prevAssignments.Concat(prevHistories).Distinct().ToList();
+                        g.ExportOncekiGorevYerleri = allPrev.Any() ? string.Join(", ", allPrev) : "-";
+
+                        // Leave balance: Toplam Kazanılan, Kullanılan, Kalan Bakiye
+                        var startDate = g.FransaGirisTarihi 
+                            ?? assignments.Where(a => a.GorevliId == g.Id && !a.IsDeleted).OrderBy(a => a.Tarih).Select(a => (DateTime?)a.Tarih).FirstOrDefault();
+                        var totalAccrued = _izinEngine.CalculateTotalAccruedDays(startDate, null);
+                        var totalUsed = leaves.Where(l => l.GorevliId == g.Id).Sum(l => l.ToplamGun);
+                        var netBalance = totalAccrued - totalUsed;
+                        g.ExportMevcutIzinBilgileri = $"Kazanılan: {totalAccrued:F1}, Kullanılan: {totalUsed}, Bakiye: {netBalance:F1}";
+
+                        // System notes formatted as a single merged text block
+                        var gNotes = notes
+                            .Where(n => n.GorevliId == g.Id)
+                            .OrderByDescending(n => n.Tarih)
+                            .Select(n => $"[{n.Tarih:dd.MM.yyyy}] {n.NotIcerik}");
+                        g.ExportSistemNotlari = gNotes.Any() ? string.Join(" | ", gNotes) : "-";
+                    }
+                }
+            }
 
             // 4. Build workbook with premium styling
             using var workbook  = new XLWorkbook();

@@ -6,16 +6,39 @@
 
 <h1>Düzenle</h1>
 
-<h4>Görevli</h4>
-<hr />
-<div class="row">
-    <div class="col-md-12">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
+<!-- Bootstrap 5 Nav Tabs -->
+<ul class="nav nav-tabs mb-3" id="gorevliEditTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button" role="tab" aria-controls="general" aria-selected="true">Genel Özlük Bilgileri</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">İletişim & Kimlik</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="assignment-tab" data-bs-toggle="tab" data-bs-target="#assignment" type="button" role="tab" aria-controls="assignment" aria-selected="false">Kadro & Atama</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="education-tab" data-bs-toggle="tab" data-bs-target="#education" type="button" role="tab" aria-controls="education" aria-selected="false">Eğitim Bilgileri</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="career-tab" data-bs-toggle="tab" data-bs-target="#career" type="button" role="tab" aria-controls="career" aria-selected="false">Kariyer Bilgileri</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="notes-tab" data-bs-toggle="tab" data-bs-target="#notes" type="button" role="tab" aria-controls="notes" aria-selected="false">Notlar</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="documents-tab" data-bs-toggle="tab" data-bs-target="#documents" type="button" role="tab" aria-controls="documents" aria-selected="false">Resmi Belge Yükle</button>
+    </li>
+</ul>
 
+<form asp-action="Edit" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="Id" />
+
+    <div class="tab-content" id="gorevliEditTabsContent">
+        <!-- General Tab Pane -->
+        <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
             <div class="row">
-                <!-- Temel Bilgiler -->
                 <div class="col-md-6 mb-4">
                     <div class="card h-100">
                         <div class="card-header bg-primary text-white">
@@ -24,33 +47,47 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6 form-group mb-3">
-                                    <label asp-for="Ad" class="control-label"></label>
+                                    <label asp-for="Ad" class="control-label">Ad <span class="text-danger">*</span></label>
                                     <input asp-for="Ad" class="form-control" />
                                     <span asp-validation-for="Ad" class="text-danger"></span>
                                 </div>
                                 <div class="col-md-6 form-group mb-3">
-                                    <label asp-for="Soyad" class="control-label"></label>
+                                    <label asp-for="Soyad" class="control-label">Soyad <span class="text-danger">*</span></label>
                                     <input asp-for="Soyad" class="form-control" />
                                     <span asp-validation-for="Soyad" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="form-group mb-3">
-                                <label asp-for="Email" class="control-label"></label>
+                                <label asp-for="Email" class="control-label">E-posta <span class="text-danger">*</span></label>
                                 <input asp-for="Email" class="form-control" />
                                 <span asp-validation-for="Email" class="text-danger"></span>
                             </div>
                             <div class="row">
                                 <div class="col-md-6 form-group mb-3">
                                     <label asp-for="GorevliDurumId" class="control-label"></label>
-                                    <select asp-for="GorevliDurumId" class="form-control" asp-items="@(new SelectList(ViewBag.Durumlar, "Id", "Ad"))">
+                                    <select asp-for="GorevliDurumId" class="form-control">
                                         <option value="">Seçiniz</option>
+                                        @if (ViewBag.Durumlar != null)
+                                        {
+                                            foreach (var item in (IEnumerable<DitibStasbourg.Models.Ref_GorevliDurum>)ViewBag.Durumlar)
+                                            {
+                                                <option value="@item.Id" selected="@(Model.GorevliDurumId == item.Id)">@item.Ad</option>
+                                            }
+                                        }
                                     </select>
                                     <span asp-validation-for="GorevliDurumId" class="text-danger"></span>
                                 </div>
                                 <div class="col-md-6 form-group mb-3">
                                     <label asp-for="SozlesmeTipId" class="control-label"></label>
-                                    <select asp-for="SozlesmeTipId" class="form-control" asp-items="@(new SelectList(ViewBag.SozlesmeTipleri, "Id", "Ad"))">
+                                    <select asp-for="SozlesmeTipId" class="form-control" id="SozlesmeTipId">
                                         <option value="">Seçiniz</option>
+                                        @if (ViewBag.SozlesmeTipleri != null)
+                                        {
+                                            foreach (var item in (IEnumerable<DitibStasbourg.Models.Ref_SozlesmeTip>)ViewBag.SozlesmeTipleri)
+                                            {
+                                                <option value="@item.Id" selected="@(Model.SozlesmeTipId == item.Id)" data-is-local="@item.IsLocalContract.ToString().ToLower()">@item.Ad</option>
+                                            }
+                                        }
                                     </select>
                                     <span asp-validation-for="SozlesmeTipId" class="text-danger"></span>
                                 </div>
@@ -74,18 +111,29 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <!-- Kimlik & İletişim -->
+        <!-- Contact Tab Pane -->
+        <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+            <div class="row">
                 <div class="col-md-6 mb-4">
                     <div class="card h-100">
                         <div class="card-header bg-info text-white">
                             <h5 class="mb-0">Kimlik ve İletişim</h5>
                         </div>
                         <div class="card-body">
-                             <div class="form-group mb-3">
+                            <div class="form-group mb-3" id="tcKimlikGroup">
                                 <label asp-for="TCKimlikNo" class="control-label"></label>
-                                <input asp-for="TCKimlikNo" class="form-control" maxlength="11" />
+                                <input asp-for="TCKimlikNo" class="form-control" maxlength="11" id="TCKimlikNo" />
                                 <span asp-validation-for="TCKimlikNo" class="text-danger"></span>
+                                <div class="form-text text-muted small">Türkiye Cumhuriyeti vatandaşları için zorunludur.</div>
+                            </div>
+                            <div class="form-group mb-3" id="frenchIdGroup">
+                                <label asp-for="FrenchNationalId" class="control-label"></label>
+                                <input asp-for="FrenchNationalId" class="form-control" maxlength="50" id="FrenchNationalId" placeholder="NSS / Titre de Séjour / Carte de Résident No" />
+                                <span asp-validation-for="FrenchNationalId" class="text-danger"></span>
+                                <div class="form-text text-muted small">Fransız vatandaşları veya oturum kartı sahipleri için.</div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6 form-group mb-3">
@@ -107,11 +155,11 @@
                                 </div>
                                 <div class="col-md-6 form-group mb-3">
                                     <label asp-for="DogumTarihi" class="control-label"></label>
-                                    <input asp-for="DogumTarihi" class="form-control" type="date" />
+                                    <input asp-for="DogumTarihi" class="form-control" type="date" value="@(Model.DogumTarihi?.ToString("yyyy-MM-dd"))" />
                                     <span asp-validation-for="DogumTarihi" class="text-danger"></span>
                                 </div>
                             </div>
-                             <div class="row">
+                            <div class="row">
                                 <div class="col-md-6 form-group mb-3">
                                     <label asp-for="CepTelefonu" class="control-label"></label>
                                     <input asp-for="CepTelefonu" class="form-control" />
@@ -126,26 +174,44 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <!-- Görev ve Kadro -->
+        <!-- Assignment Tab Pane -->
+        <div class="tab-pane fade" id="assignment" role="tabpanel" aria-labelledby="assignment-tab">
+            <div class="row">
                 <div class="col-md-6 mb-4">
                     <div class="card h-100">
                         <div class="card-header bg-warning text-dark">
-                            <h5 class="mb-0">Görev ve Kadro Bilgileri</h5>
+                            <h5 class="mb-0">Kadro & Atama</h5>
                         </div>
                         <div class="card-body">
-                             <div class="row">
+                            <div class="row">
                                 <div class="col-md-6 form-group mb-3">
                                     <label asp-for="UnvanId" class="control-label"></label>
-                                    <select asp-for="UnvanId" class="form-control" asp-items="@(new SelectList(ViewBag.Unvanlar, "Id", "Ad"))">
+                                    <select asp-for="UnvanId" class="form-control">
                                         <option value="">Seçiniz</option>
+                                        @if (ViewBag.Unvanlar != null)
+                                        {
+                                            foreach (var item in (IEnumerable<DitibStasbourg.Models.Ref_Unvan>)ViewBag.Unvanlar)
+                                            {
+                                                <option value="@item.Id" selected="@(Model.UnvanId == item.Id)">@item.Ad</option>
+                                            }
+                                        }
                                     </select>
                                     <span asp-validation-for="UnvanId" class="text-danger"></span>
                                 </div>
                                 <div class="col-md-6 form-group mb-3">
                                     <label asp-for="KadroTuruId" class="control-label"></label>
-                                    <select asp-for="KadroTuruId" class="form-control" asp-items="@(new SelectList(ViewBag.KadroTurleri, "Id", "Ad"))">
+                                    <select asp-for="KadroTuruId" class="form-control">
                                         <option value="">Seçiniz</option>
+                                        @if (ViewBag.KadroTurleri != null)
+                                        {
+                                            foreach (var item in (IEnumerable<DitibStasbourg.Models.Ref_KadroTuru>)ViewBag.KadroTurleri)
+                                            {
+                                                <option value="@item.Id" selected="@(Model.KadroTuruId == item.Id)">@item.Ad</option>
+                                            }
+                                        }
                                     </select>
                                     <span asp-validation-for="KadroTuruId" class="text-danger"></span>
                                 </div>
@@ -153,123 +219,241 @@
                             <div class="row">
                                 <div class="col-md-6 form-group mb-3">
                                     <label asp-for="AskerlikDurumuId" class="control-label"></label>
-                                   <select asp-for="AskerlikDurumuId" class="form-control" asp-items="@(new SelectList(ViewBag.AskerlikDurumlari, "Id", "Ad"))">
+                                    <select asp-for="AskerlikDurumuId" class="form-control">
                                         <option value="">Seçiniz</option>
+                                        @if (ViewBag.AskerlikDurumlari != null)
+                                        {
+                                            foreach (var item in (IEnumerable<DitibStasbourg.Models.Ref_AskerlikDurumu>)ViewBag.AskerlikDurumlari)
+                                            {
+                                                <option value="@item.Id" selected="@(Model.AskerlikDurumuId == item.Id)">@item.Ad</option>
+                                            }
+                                        }
                                     </select>
                                     <span asp-validation-for="AskerlikDurumuId" class="text-danger"></span>
                                 </div>
                                 <div class="col-md-6 form-group mb-3">
                                     <label asp-for="KanGrubuId" class="control-label"></label>
-                                    <select asp-for="KanGrubuId" class="form-control" asp-items="@(new SelectList(ViewBag.KanGruplari, "Id", "Ad"))">
+                                    <select asp-for="KanGrubuId" class="form-control">
                                         <option value="">Seçiniz</option>
+                                        @if (ViewBag.KanGruplari != null)
+                                        {
+                                            foreach (var item in (IEnumerable<DitibStasbourg.Models.Ref_KanGrubu>)ViewBag.KanGruplari)
+                                            {
+                                                <option value="@item.Id" selected="@(Model.KanGrubuId == item.Id)">@item.Ad</option>
+                                            }
+                                        }
                                     </select>
                                     <span asp-validation-for="KanGrubuId" class="text-danger"></span>
                                 </div>
                             </div>
+                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#assignLocationModal">
+                                <i class="fas fa-exchange-alt me-1"></i> Yeni Atama Oluştur
+                            </button>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <!-- Eğitim Bilgileri -->
+        <!-- Education Tab Pane -->
+        <div class="tab-pane fade" id="education" role="tabpanel" aria-labelledby="education-tab">
+            <div class="row">
                 <div class="col-md-6 mb-4">
                     <div class="card h-100">
                         <div class="card-header bg-success text-white">
                             <h5 class="mb-0">Eğitim Bilgileri</h5>
                         </div>
                         <div class="card-body">
-                             <div class="row">
+                            <div class="row">
                                 <div class="col-md-6 form-group mb-3">
                                     <label asp-for="EgitimDurumuId" class="control-label"></label>
-                                    <select asp-for="EgitimDurumuId" class="form-control" asp-items="@(new SelectList(ViewBag.EgitimDurumlari, "Id", "Ad"))">
+                                    <select asp-for="EgitimDurumuId" class="form-control">
                                         <option value="">Seçiniz</option>
+                                        @if (ViewBag.EgitimDurumlari != null)
+                                        {
+                                            foreach (var item in (IEnumerable<DitibStasbourg.Models.Ref_EgitimDurumu>)ViewBag.EgitimDurumlari)
+                                            {
+                                                <option value="@item.Id" selected="@(Model.EgitimDurumuId == item.Id)">@item.Ad</option>
+                                            }
+                                        }
                                     </select>
                                     <span asp-validation-for="EgitimDurumuId" class="text-danger"></span>
                                 </div>
-                                 <div class="col-md-6 form-group mb-3">
+                                <div class="col-md-6 form-group mb-3">
                                     <label asp-for="HafizlikDurumuId" class="control-label"></label>
-                                    <select asp-for="HafizlikDurumuId" class="form-control" asp-items="@(new SelectList(ViewBag.HafizlikDurumlari, "Id", "Ad"))">
+                                    <select asp-for="HafizlikDurumuId" class="form-control">
                                         <option value="">Seçiniz</option>
+                                        @if (ViewBag.HafizlikDurumlari != null)
+                                        {
+                                            foreach (var item in (IEnumerable<DitibStasbourg.Models.Ref_HafizlikDurumu>)ViewBag.HafizlikDurumlari)
+                                            {
+                                                <option value="@item.Id" selected="@(Model.HafizlikDurumuId == item.Id)">@item.Ad</option>
+                                            }
+                                        }
                                     </select>
                                     <span asp-validation-for="HafizlikDurumuId" class="text-danger"></span>
                                 </div>
                             </div>
-                             <div class="form-group mb-3">
+                            <div class="form-group mb-3">
                                 <label asp-for="MezuniyetOkul" class="control-label"></label>
                                 <input asp-for="MezuniyetOkul" class="form-control" />
                                 <span asp-validation-for="MezuniyetOkul" class="text-danger"></span>
                             </div>
-                             <div class="form-group mb-3">
+                            <div class="form-group mb-3">
                                 <label asp-for="MezuniyetBolum" class="control-label"></label>
                                 <input asp-for="MezuniyetBolum" class="form-control" />
                                 <span asp-validation-for="MezuniyetBolum" class="text-danger"></span>
                             </div>
+                            <div class="row">
+                                <div class="col-md-6 form-group mb-3">
+                                    <label asp-for="Universite" class="control-label">Mezun Olunan Üniversite</label>
+                                    <input asp-for="Universite" class="form-control" placeholder="örn. Sorbonne Üniversitesi" />
+                                    <span asp-validation-for="Universite" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6 form-group mb-3">
+                                    <label asp-for="Agno" class="control-label">Not Ortalaması (AGNO)</label>
+                                    <input asp-for="Agno" class="form-control" type="number" step="0.01" min="0" max="4" placeholder="örn. 3.20" />
+                                    <span asp-validation-for="Agno" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label asp-for="Diller" class="control-label">Bilinen Diller</label>
+                                <input asp-for="Diller" class="form-control" placeholder="örn. Fransızca, İngilizce, Arapça" />
+                                <span asp-validation-for="Diller" class="text-danger"></span>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                 <!-- Kariyer Bilgileri -->
+        <!-- Career Tab Pane -->
+        <div class="tab-pane fade" id="career" role="tabpanel" aria-labelledby="career-tab">
+            <div class="row">
                 <div class="col-md-12 mb-4">
-                    <div class="card">
+                    <div class="card h-100">
                         <div class="card-header bg-secondary text-white">
                             <h5 class="mb-0">Kariyer Bilgileri</h5>
                         </div>
-                         <div class="card-body">
-                             <div class="row">
+                        <div class="card-body">
+                            <div class="row">
                                 <div class="col-md-3 form-group mb-3">
                                     <label asp-for="Derece" class="control-label"></label>
-                                    <input asp-for="Derece" class="form-control" />
+                                    <input asp-for="Derece" class="form-control" placeholder="Örn: 1" />
                                     <span asp-validation-for="Derece" class="text-danger"></span>
                                 </div>
                                 <div class="col-md-3 form-group mb-3">
                                     <label asp-for="Kademe" class="control-label"></label>
-                                    <input asp-for="Kademe" class="form-control" />
+                                    <input asp-for="Kademe" class="form-control" placeholder="Örn: 3" />
                                     <span asp-validation-for="Kademe" class="text-danger"></span>
                                 </div>
-                                <div class="col-md-6 form-group mb-3">
+                                <div class="col-md-3 form-group mb-3">
                                     <label asp-for="IlkGoreveBaslamaTarihi" class="control-label"></label>
-                                    <input asp-for="IlkGoreveBaslamaTarihi" class="form-control" type="date" />
+                                    <input asp-for="IlkGoreveBaslamaTarihi" class="form-control" type="date" value="@(Model.IlkGoreveBaslamaTarihi?.ToString("yyyy-MM-dd"))" />
                                     <span asp-validation-for="IlkGoreveBaslamaTarihi" class="text-danger"></span>
                                 </div>
-                                <div class="col-md-6 form-group mb-3">
-                                    <label asp-for="EmeklilikTarihi" class="control-label"></label>
-                                    <input asp-for="EmeklilikTarihi" class="form-control" type="date" />
-                                    <span asp-validation-for="EmeklilikTarihi" class="text-danger"></span>
-                                    <small class="text-muted">Emekli görevliler de görevlendirilebilir</small>
-                                </div>
-                                <div class="col-md-3 form-group mb-3">
+                                <div class="col-md-3 form-group mb-3" id="diyanet-giris-container">
                                     <label asp-for="DiyanetGirisTarihi" class="control-label"></label>
-                                    <input asp-for="DiyanetGirisTarihi" class="form-control" type="date" />
+                                    <input asp-for="DiyanetGirisTarihi" class="form-control" type="date" value="@(Model.DiyanetGirisTarihi?.ToString("yyyy-MM-dd"))" />
                                     <span asp-validation-for="DiyanetGirisTarihi" class="text-danger"></span>
                                 </div>
                             </div>
-                         </div>
+                            <div class="row mt-3">
+                                <div class="col-md-6 form-group mb-3" id="emeklilik-container">
+                                    <label asp-for="EmeklilikTarihi" class="control-label"></label>
+                                    <input asp-for="EmeklilikTarihi" class="form-control" type="date" value="@(Model.EmeklilikTarihi?.ToString("yyyy-MM-dd"))" />
+                                    <span asp-validation-for="EmeklilikTarihi" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6 form-group mb-3">
+                                    <label asp-for="FransaGirisTarihi" class="control-label"></label>
+                                    <input asp-for="FransaGirisTarihi" class="form-control" type="date" value="@(Model.FransaGirisTarihi?.ToString("yyyy-MM-dd"))" />
+                                    <span asp-validation-for="FransaGirisTarihi" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-3 form-group mb-3">
+                                    <label asp-for="PasaportTuru" class="control-label"></label>
+                                    <select asp-for="PasaportTuru" class="form-control">
+                                        <option value="">Seçiniz</option>
+                                        @foreach (var type in Enum.GetValues<DitibStasbourg.Models.Enums.PasaportTuru>())
+                                        {
+                                            <option value="@((int)type)" selected="@(Model.PasaportTuru == type)">@type.ToString()</option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="PasaportTuru" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-3 form-group mb-3">
+                                    <label asp-for="PasaportNo" class="control-label"></label>
+                                    <input asp-for="PasaportNo" class="form-control" maxlength="20" />
+                                    <span asp-validation-for="PasaportNo" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-3 form-group mb-3">
+                                    <label asp-for="GorevUzatmaBitisTarihi" class="control-label"></label>
+                                    <input asp-for="GorevUzatmaBitisTarihi" class="form-control" type="date" value="@(Model.GorevUzatmaBitisTarihi?.ToString("yyyy-MM-dd"))" />
+                                    <span asp-validation-for="GorevUzatmaBitisTarihi" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-3 form-group mb-3">
+                                    <label asp-for="EgitimKursBelgeleri" class="control-label"></label>
+                                    <input asp-for="EgitimKursBelgeleri" class="form-control" />
+                                    <span asp-validation-for="EgitimKursBelgeleri" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-6 form-group mb-3">
+                                    <div class="form-check mt-4">
+                                        <input asp-for="IsMerkezPersoneli" class="form-check-input" type="checkbox" id="IsMerkezPersoneli" />
+                                        <label asp-for="IsMerkezPersoneli" class="form-check-label fw-bold">Strasbourg Merkez Personeli mi?</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 form-group mb-3" id="merkez-gorev-alani-container" style="display: none;">
+                                    <label asp-for="MerkezGorevAlani" class="control-label">Merkez Görev Alanı</label>
+                                    <input asp-for="MerkezGorevAlani" class="form-control" id="MerkezGorevAlani" placeholder="örn. Cenaze İşleri, İdari İşler" />
+                                    <span asp-validation-for="MerkezGorevAlani" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Mevcut Notlar -->
+        <!-- Notes Tab Pane -->
+        <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="notes-tab">
             @if (Model.GorevliNotlari != null && Model.GorevliNotlari.Any())
             {
                 <div class="col-md-12 mb-4">
-                    <div class="card">
+                    <div class="card h-100">
                         <div class="card-header bg-info text-white">
                             <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Mevcut Notlar</h5>
                         </div>
                         <div class="card-body">
                             @foreach (var not in Model.GorevliNotlari.OrderByDescending(n => n.Tarih))
                             {
-                                <div class="alert alert-light border-start border-4 border-info mb-2">
+                                <div class="alert alert-light border-start border-4 border-info mb-2" id="note-container-@not.Id">
                                     <div class="d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <p class="mb-1">@not.NotIcerik</p>
+                                        <div class="flex-grow-1 me-3">
+                                            <p class="mb-1 note-text" id="note-text-@not.Id">@not.NotIcerik</p>
+                                            <div class="note-edit-form d-none" id="note-edit-form-@not.Id">
+                                                <textarea class="form-control mb-2 note-edit-textarea" id="note-textarea-@not.Id" rows="3">@not.NotIcerik</textarea>
+                                                <button type="button" class="btn btn-sm btn-primary rounded-pill px-3" onclick="saveInlineNote(@not.Id)">Kaydet</button>
+                                                <button type="button" class="btn btn-sm btn-secondary rounded-pill px-3" onclick="cancelInlineNoteEdit(@not.Id)">İptal</button>
+                                            </div>
                                         </div>
-                                        <small class="text-muted">
-                                            @not.Tarih.ToShortDateString() @not.Tarih.ToShortTimeString()
-                                            @if (not.YazanKisi != null)
-                                            {
-                                                <br/>@not.YazanKisi.UserName
-                                            }
-                                        </small>
+                                        <div class="text-end">
+                                            <small class="text-muted d-block mb-1">
+                                                @not.Tarih.ToString("dd.MM.yyyy") @not.Tarih.ToShortTimeString()
+                                                @if (not.YazanKisi != null)
+                                                {
+                                                    <span> - @not.YazanKisi.UserName</span>
+                                                }
+                                            </small>
+                                            <button type="button" class="btn btn-sm btn-link text-info p-0 me-2" onclick="editInlineNote(@not.Id)">
+                                                <i class="fas fa-edit"></i> Düzenle
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-link text-danger p-0" onclick="deleteInlineNote(@not.Id)">
+                                                <i class="fas fa-trash-alt"></i> Sil
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             }
@@ -277,10 +461,8 @@
                     </div>
                 </div>
             }
-
-            <!-- Yeni Not Ekle -->
             <div class="col-md-12 mb-4">
-                <div class="card">
+                <div class="card h-100">
                     <div class="card-header bg-dark text-white">
                         <h5 class="mb-0"><i class="fas fa-sticky-note me-2"></i>Yeni Not Ekle (İsteğe Bağlı)</h5>
                     </div>
@@ -293,12 +475,92 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="form-group text-center mt-3">
-                <input type="submit" value="Kaydet" class="btn btn-primary btn-lg px-5" />
-                <a asp-action="Index" class="btn btn-secondary btn-lg">İptal</a>
+        <!-- Documents Tab Pane -->
+        <div class="tab-pane fade" id="documents" role="tabpanel" aria-labelledby="documents-tab">
+            <div class="col-md-12 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-file-invoice me-2"></i>Yeni Resmi Belge / Sertifika Ekle (İsteğe Bağlı)</h5>
+                    </div>
+                    <div class="card-body">
+                         <div class="row g-3">
+                             <div class="col-md-3">
+                                 <label class="form-label fw-bold small text-muted">Belge Tipi</label>
+                                 <select name="BelgeTipi" class="form-select">
+                                     <option value="">Seçiniz...</option>
+                                     <option value="0">Oturum Kartı</option>
+                                     <option value="1">Dil Belgesi</option>
+                                     <option value="2">Laiklik Belgesi</option>
+                                     <option value="3">Pasaport</option>
+                                     <option value="4">Vize</option>
+                                     <option value="5">Sözleşme</option>
+                                     <option value="6">Diploma / Mezuniyet</option>
+                                     <option value="7">Diğer</option>
+                                 </select>
+                             </div>
+                             <div class="col-md-3">
+                                 <label class="form-label fw-bold small text-muted">Seri / Belge No</label>
+                                 <input type="text" name="BelgeSeriNo" class="form-control" placeholder="örn. A12B3456" />
+                             </div>
+                             <div class="col-md-3">
+                                 <label class="form-label fw-bold small text-muted">Geçerlilik Bitiş Tarihi</label>
+                                 <input type="date" name="BelgeExpirationDate" class="form-control" />
+                             </div>
+                             <div class="col-md-3">
+                                 <label class="form-label fw-bold small text-muted">Dosya Seç (PDF, JPG, PNG)</label>
+                                 <input type="file" name="BelgeFile" class="form-control" accept=".pdf,.jpg,.jpeg,.png" />
+                             </div>
+                             <div class="col-md-12">
+                                 <label class="form-label fw-bold small text-muted">Belge Açıklaması</label>
+                                 <input type="text" name="BelgeDescription" class="form-control" placeholder="Belgeye dair kısa açıklama..." />
+                             </div>
+                         </div>
+                    </div>
+                </div>
             </div>
-        </form>
+        </div>
+    </div>
+
+    <div class="form-group text-center mt-3">
+        <input type="submit" value="Kaydet" class="btn btn-primary btn-lg px-5" />
+        <a asp-action="Index" class="btn btn-secondary btn-lg">İptal</a>
+    </div>
+</form>
+
+<!-- Assignment Modal (Rotation Wizard) -->
+<div class="modal fade" id="assignLocationModal" tabindex="-1" aria-labelledby="assignLocationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="assignLocationModalLabel"><i class="fas fa-exchange-alt me-2"></i>Yeni Atama Oluştur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="assignLocationForm">
+                    <input type="hidden" name="gorevliId" value="@Model.Id" />
+                    <div class="mb-3">
+                        <label for="newKurumId" class="form-label">Yeni Kurum</label>
+                        <select id="newKurumId" name="newKurumId" class="form-select">
+                            <option value="">Seçiniz</option>
+                            @if (ViewBag.Kurumlar != null)
+                            {
+                                foreach (var item in (IEnumerable<DitibStasbourg.Models.Kurum>)ViewBag.Kurumlar)
+                                {
+                                    <option value="@item.Id">@item.Isim</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </form>
+                <div id="assignLocationFeedback" class="mt-2"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-success" id="assignLocationConfirmBtn"><i class="fas fa-check me-1"></i>Atamayı Kaydet</button>
+            </div>
+        </div>
     </div>
 </div>
 

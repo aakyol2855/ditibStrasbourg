@@ -1,0 +1,240 @@
+@model IEnumerable<DitibStasbourg.Services.Interfaces.IzinListDto>
+@using DitibStasbourg.Models.Enums
+@using System.Reflection
+@using System.ComponentModel.DataAnnotations
+
+@{
+    ViewData["Title"] = "İzin Takip Sistemi";
+    var currentGorevliId = ViewBag.CurrentGorevliId as int?;
+
+    // Helper: get Display name from enum
+    Func<IzinTuru, string> izinLabel = (tur) =>
+    {
+        var member = typeof(IzinTuru).GetMember(tur.ToString()).FirstOrDefault();
+        var display = member?.GetCustomAttribute<DisplayAttribute>();
+        return display?.Name ?? tur.ToString();
+    };
+}
+
+<div class="container-fluid px-0">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h1 class="h2 fw-bold mb-1"><i class="bi bi-calendar-check text-primary me-2"></i>İzin Takip Sistemi</h1>
+            <p class="text-muted mb-0">Görevli izin başvuruları, onay süreçleri ve geçmiş kayıtların yönetimi.</p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap align-items-center">
+            <div class="d-flex align-items-center me-2">
+                <label for="yearSelector" class="form-label mb-0 me-2 fw-semibold text-muted">Yıl:</label>
+                <select id="yearSelector" class="form-select form-select-sm rounded-pill" style="width: 100px;">
+                    @foreach (var yr in (List<int>)(ViewBag.AvailableYears ?? new List<int> { DateTime.Today.Year }))
+                    {
+                        if (yr == DateTime.Today.Year)
+                        {
+                            <option value="@yr" selected>@yr</option>
+                        }
+                        else
+                        {
+                            <option value="@yr">@yr</option>
+                        }
+                    }
+                </select>
+            </div>
+            <a href="/Izin/DownloadMerkezIzinDefteri?year=@DateTime.Today.Year" id="btnDownloadMerkez" class="btn btn-success rounded-pill px-3 me-2"><i class="bi bi-file-earmark-excel-fill"></i> Merkez İzin Defteri (Q1-Q4) İndir</a>
+            <a href="/Izin/DownloadImamIzinDefteri?year=@DateTime.Today.Year" id="btnDownloadImam" class="btn btn-outline-success rounded-pill px-3"><i class="bi bi-file-earmark-excel"></i> Görevli İmamlar İzin Defteri (Q1-Q4) İndir</a>
+            @if (currentGorevliId.HasValue)
+            {
+                <a href="@Url.Action("Details", "Gorevli", new { id = currentGorevliId })" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i> Görevliye Dön
+                </a>
+            }
+            <a href="@Url.Action("Create", "Izin", new { gorevliId = currentGorevliId })" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-circle me-1"></i> Yeni İzin Talebi
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Statistics Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="bg-warning-subtle text-warning p-3 rounded-3 fs-4"><i class="bi bi-hourglass-split"></i></div>
+                    <div>
+                        <div class="text-muted small">Beklemede</div>
+                        <div class="fw-bold fs-5">@Model.Count(i => i.OnayDurumu == OnayDurumu.Beklemede)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="bg-success-subtle text-success p-3 rounded-3 fs-4"><i class="bi bi-check-circle-fill"></i></div>
+                    <div>
+                        <div class="text-muted small">Onaylandı</div>
+                        <div class="fw-bold fs-5">@Model.Count(i => i.OnayDurumu == OnayDurumu.Onaylandi)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="bg-danger-subtle text-danger p-3 rounded-3 fs-4"><i class="bi bi-x-circle-fill"></i></div>
+                    <div>
+                        <div class="text-muted small">Reddedildi</div>
+                        <div class="fw-bold fs-5">@Model.Count(i => i.OnayDurumu == OnayDurumu.Reddedildi)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="bg-primary-subtle text-primary p-3 rounded-3 fs-4"><i class="bi bi-calendar-range"></i></div>
+                    <div>
+                        <div class="text-muted small">Toplam Kayıt</div>
+                        <div class="fw-bold fs-5">@Model.Count()</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Data Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 py-3">
+            <h5 class="fw-bold mb-0"><i class="bi bi-table me-2 text-primary"></i>İzin Kayıtları</h5>
+        </div>
+        <div class="card-body p-0">
+            @if (!Model.Any())
+            {
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-calendar-x fs-2 d-block mb-3 opacity-50"></i>
+                    <h6 class="fw-bold">Henüz izin kaydı bulunmamaktadır.</h6>
+                    <p class="small">Yeni bir izin talebi oluşturmak için "Yeni İzin Talebi" butonunu kullanın.</p>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light text-uppercase small">
+                            <tr>
+                                <th class="px-4">Görevli</th>
+                                <th>İzin Türü</th>
+                                <th>Başlangıç</th>
+                                <th>Bitiş</th>
+                                <th class="text-center">Gün</th>
+                                <th class="text-center">Kazanılan Hak</th>
+                                <th class="text-center">Kalan Bakiye</th>
+                                <th class="text-center">Giriş Kanalı</th>
+                                <th class="text-center">Durum</th>
+                                <th>Onaylayan</th>
+                                <th class="text-end pe-4">Aksiyonlar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var izin in Model)
+                            {
+                                <tr>
+                                    <td class="px-4">
+                                        <span class="fw-semibold text-dark">@izin.GorevliAdSoyad</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info-subtle text-info">@izinLabel(izin.IzinTuru)</span>
+                                    </td>
+                                    <td class="text-muted small">@izin.BaslangicTarihi.ToString("dd.MM.yyyy")</td>
+                                    <td class="text-muted small">@izin.BitisTarihi.ToString("dd.MM.yyyy")</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-primary-subtle text-primary fw-bold">@izin.ToplamGun gün</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-purple-soft text-purple">
+                                            @izin.AccruedDays.ToString("0.0") Gün
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge fw-bold @(izin.RemainingDays < 0 ? "bg-danger-subtle text-danger" : "bg-success-subtle text-success")">
+                                            @izin.RemainingDays.ToString("0.0") g
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        @if (izin.IsManualEntryByAdmin)
+                                        {
+                                            <span class="badge bg-secondary-subtle text-secondary"><i class="bi bi-file-earmark-text me-1"></i>Evrak</span>
+                                            @if (!string.IsNullOrEmpty(izin.EvrakNo))
+                                            {
+                                                <div class="small text-muted mt-1" style="font-size: 0.75rem;">No: @izin.EvrakNo</div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-info-subtle text-info"><i class="bi bi-display me-1"></i>Sistem</span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        @switch (izin.OnayDurumu)
+                                        {
+                                            case OnayDurumu.Beklemede:
+                                                <span class="badge bg-warning-subtle text-warning"><i class="bi bi-hourglass-split me-1"></i>Beklemede</span>
+                                                break;
+                                            case OnayDurumu.Onaylandi:
+                                                <span class="badge bg-success-subtle text-success"><i class="bi bi-check-circle me-1"></i>Onaylandı</span>
+                                                break;
+                                            case OnayDurumu.Reddedildi:
+                                                <span class="badge bg-danger-subtle text-danger"><i class="bi bi-x-circle me-1"></i>Reddedildi</span>
+                                                break;
+                                            case OnayDurumu.IptalEdildi:
+                                                <span class="badge bg-secondary-subtle text-secondary"><i class="bi bi-slash-circle me-1"></i>İptal</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td class="small text-muted">@(izin.OnaylayanKisi ?? "—")</td>
+                                    <td class="text-end pe-4">
+                                        <div class="d-flex justify-content-end gap-1">
+                                            @if (izin.OnayDurumu == OnayDurumu.Beklemede)
+                                            {
+                                                <form asp-action="UpdateStatus" asp-controller="Izin" method="post" class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@izin.Id" />
+                                                    <input type="hidden" name="durum" value="@((int)OnayDurumu.Onaylandi)" />
+                                                    <button type="submit" class="btn btn-sm btn-success rounded-pill" title="Onayla">
+                                                        <i class="bi bi-check-lg"></i>
+                                                    </button>
+                                                </form>
+                                                <form asp-action="UpdateStatus" asp-controller="Izin" method="post" class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@izin.Id" />
+                                                    <input type="hidden" name="durum" value="@((int)OnayDurumu.Reddedildi)" />
+                                                    <button type="submit" class="btn btn-sm btn-danger rounded-pill" title="Reddet">
+                                                        <i class="bi bi-x-lg"></i>
+                                                    </button>
+                                                </form>
+                                            }
+                                            <a href="@Url.Action("Details", "Izin", new { id = izin.Id })" class="btn btn-sm btn-outline-primary rounded-pill" title="Detay">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="@Url.Action("DownloadIzinPdf", "Izin", new { id = izin.Id })" class="btn btn-sm btn-outline-secondary rounded-pill" title="PDF İndir">
+                                                <i class="bi bi-file-pdf"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

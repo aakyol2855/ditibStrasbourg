@@ -1,0 +1,83 @@
+@model DitibStasbourg.Models.KurumButce
+@{
+    ViewData["Title"] = "Yeni Kurum Bütçesi Tanımla";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <div class="card border-0 shadow-lg" style="border-radius: 1.25rem; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);">
+            <div class="card-header bg-primary text-white py-3" style="border-top-left-radius: 1.25rem; border-top-right-radius: 1.25rem;">
+                <h4 class="mb-0 fw-bold"><i class="bi bi-bank me-2"></i>Yeni Kurum Bütçesi Tanımla</h4>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Kurum / Dernek / Cami</label>
+                        <select name="KurumId" class="form-select" required>
+                            <option value="">-- Kurum Seçin --</option>
+                            @foreach (var kurum in ViewBag.Kurumlar)
+                            {
+                                <option value="@kurum.Id">@kurum.Isim (@kurum.Sehir)</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="Yil" class="form-label fw-bold">Yıl</label>
+                            <input asp-for="Yil" type="number" class="form-control" value="2026" required />
+                            <span asp-validation-for="Yil" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="TotalBudget" class="form-label fw-bold">Toplam Bütçe (€)</label>
+                            <input asp-for="TotalBudget" type="number" step="0.01" class="form-control" placeholder="0.00" required oninput="calculateContributions()" />
+                            <span asp-validation-for="TotalBudget" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold mt-4 mb-3 border-bottom pb-2 text-primary">Otomatik 80/20 Hesaplama Önizleme</h5>
+                    <div class="p-3 bg-light rounded-3 mb-4">
+                        <div class="row text-center font-monospace">
+                            <div class="col-4">
+                                <span class="small text-muted d-block">DİTİB Katkısı (%80)</span>
+                                <strong id="lblDitib" class="fs-6 text-primary">0.00 €</strong>
+                            </div>
+                            <div class="col-4">
+                                <span class="small text-muted d-block">Dernek Katkısı (%20)</span>
+                                <strong id="lblDernek" class="fs-6 text-secondary">0.00 €</strong>
+                            </div>
+                            <div class="col-4">
+                                <span class="small text-muted d-block">4 x Taksit Tutarı</span>
+                                <strong id="lblInstallment" class="fs-6 text-success">0.00 €</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between pt-3">
+                        <a asp-action="Index" class="btn btn-light px-4">İptal</a>
+                        <button type="submit" class="btn btn-primary px-5">Kaydet ve Dağıt</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function calculateContributions() {
+            const total = parseFloat(document.getElementById('TotalBudget').value) || 0;
+            const ditib = total * 0.80;
+            const dernek = total * 0.20;
+            const installment = ditib / 4;
+
+            document.getElementById('lblDitib').textContent = ditib.toFixed(2) + ' €';
+            document.getElementById('lblDernek').textContent = dernek.toFixed(2) + ' €';
+            document.getElementById('lblInstallment').textContent = installment.toFixed(2) + ' €';
+        }
+
+        document.addEventListener("DOMContentLoaded", calculateContributions);
+    </script>
+}

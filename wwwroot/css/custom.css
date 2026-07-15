@@ -1,0 +1,22 @@
+/* Clean, Modern Bootstrap 5 Checkbox Styling with High Visibility Checked States */
+.table .form-check-input[type="checkbox"],
+input[type="checkbox"].form-check-input {
+    border: 2px solid #0d6efd !important;
+    background-color: #ffffff !important;
+    min-width: 1.25rem !important;
+    min-height: 1.25rem !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: inline-block !important;
+    border-radius: 0.25rem !important;
+}
+
+.table .form-check-input[type="checkbox"]:checked,
+input[type="checkbox"].form-check-input:checked {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e") !important;
+    background-size: 100% 100% !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+}

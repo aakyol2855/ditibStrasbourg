@@ -48,6 +48,12 @@ namespace DitibStasbourg.Models
         // Navigation
         public ICollection<GorevlendirmeNot>? GorevlendirmeNotlari { get; set; }
 
+        [Display(Name = "Aktif mi?")]
+        public bool IsActive { get; set; }
+
+        [Display(Name = "Giriş/Başlangıç Tarihi")]
+        public DateTime BaslangicTarihi { get; set; }
+
         [Display(Name = "Silindi mi?")]
         public bool IsDeleted { get; set; } = false;
 

@@ -15,7 +15,7 @@ namespace DitibStasbourg.Services.Interfaces
         Task AddUyeAsync(DernekUye uye);
         Task DeleteUyeAsync(int id);
         Task<bool> UpdateUyeAsync(int id, string adSoyad, string iletisim, int aileUyeSayisi);
-        Task<bool> UpdateDernekAsync(int id, string isim, string? sehir, string? adres, string? kurulusKanunu, string? baskonsoloslukBolgesi, string? bolge, string? crmUyelikFormDurumu, int? ustKurumId, string? iletisimNumarasi, string? maili, double? latitude, double? longitude, int? cemaatCount, string? frenchRegistrationName, List<KurumYonetimKuruluUyesi>? yonetimKurulu);
+        Task<bool> UpdateDernekAsync(int id, string isim, string? sehir, string? adres, string? kurulusKanunu, string? baskonsoloslukBolgesi, string? bolge, string? crmUyelikFormDurumu, int? ustKurumId, string? iletisimNumarasi, string? maili, string? ibanNo, string? siretNo, string? rnaNo, double? latitude, double? longitude, int? cemaatCount, string? frenchRegistrationName, List<KurumYonetimKuruluUyesi>? yonetimKurulu);
         Task<bool> SoftDeleteDernekAsync(int id);
         Task<PaginatedList<Kurum>> GetPaginatedDerneklerAsync(string? search, string? sehir, string? bolge, int pageIndex, int pageSize);
         Task<List<Ref_YonetimRol>> GetYonetimRolleriAsync();

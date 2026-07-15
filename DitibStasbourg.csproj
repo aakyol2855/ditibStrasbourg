@@ -4,12 +4,13 @@
         <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <NoWarn>$(NoWarn);CS8618;CS8602;CS8604;CS8600;CS8603;CS8625;CS1998;CS8619</NoWarn>
+        <NoWarn>$(NoWarn);CS8618;CS8602;CS8604;CS8600;CS8603;CS8625;CS1998;CS8619;NU1901;NU1902;NU1903;NU1904</NoWarn>
         <UserSecretsId>aspnet-DitibStasbourg-1d13fdee-d28c-4ae4-bad9-2d3577689686</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
         <None Update="app.db" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+        <None Update="openssl.cnf" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
     <ItemGroup>
@@ -22,6 +23,7 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.2" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.2" />
         <PackageReference Include="MiniExcel" Version="1.44.1" />
+        <PackageReference Include="PDFsharp" Version="6.2.4" />
     </ItemGroup>
 
 </Project>

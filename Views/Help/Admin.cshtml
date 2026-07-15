@@ -47,7 +47,7 @@
                                 <span class="text-muted small">Herkes</span>
                             }
                         </td>
-                        <td>@item.CreatedAt.ToShortDateString()</td>
+                        <td>@item.CreatedAt.ToString("dd.MM.yyyy")</td>
                         <td class="text-end">
                             <div class="btn-group">
                                 <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">

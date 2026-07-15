@@ -48,12 +48,22 @@ namespace DitibStasbourg.ViewComponents
                 .ToList();
 
             // ── Kurban Summary ──
-            var kurbanlar = await _context.Kurbanliklar.ToListAsync();
+            var approvedCampaigns = await _context.KurbanCampaignRecords
+                .Where(r => r.IsApproved && r.Yil == 2026)
+                .ToListAsync();
+
+            int totalShares = 500;
+            var quotaSetting = await _context.AppSettings.FirstOrDefaultAsync(s => s.Key == "KurbanHisseLimit");
+            if (quotaSetting != null && int.TryParse(quotaSetting.Value, out var parsedQuota))
+                totalShares = parsedQuota;
+
+            int takenShares = approvedCampaigns.Sum(r => r.DigerAdet + r.TrAdet);
+
             model.KurbanSummary = new KurbanSummary
             {
-                TotalAnimals = kurbanlar.Count,
-                TotalShares  = kurbanlar.Sum(k => k.TotalShares),
-                TakenShares  = kurbanlar.Sum(k => k.TotalShares - k.RemainingShares)
+                TotalAnimals = approvedCampaigns.Count,
+                TotalShares  = totalShares,
+                TakenShares  = takenShares
             };
 
             return View(model);

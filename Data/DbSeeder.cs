@@ -14,6 +14,7 @@ public static class DbSeeder
         var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
         var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
         var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
+        var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
 
         // Create Roles
         string[] roleNames = { "SuperAdmin", "Admin", "User" };
@@ -57,14 +58,13 @@ public static class DbSeeder
                 {
                     foreach (var error in createPowerUser.Errors)
                     {
-                        Console.WriteLine($"Create Admin Error: {error.Description}");
+                        logger.LogError("Admin oluşturma hatası: {Description}", error.Description);
                     }
                 }
             }
             catch (Exception ex)
             {
-                 Console.WriteLine($"Create Admin Exception: {ex.Message}");
-                 // If duplicate key, try to retrieve again
+                 logger.LogError(ex, "Admin oluşturma sırasında istisna");
                  adminUser = await userManager.FindByNameAsync(adminEmail);
             }
         }
@@ -84,7 +84,7 @@ public static class DbSeeder
                 adminUser.UserName = adminEmail;
                 await userManager.UpdateNormalizedUserNameAsync(adminUser);
                 await userManager.SetUserNameAsync(adminUser, adminEmail);
-                Console.WriteLine($"[SEEDER] Updated UserName to {adminEmail}");
+                logger.LogInformation("[SEEDER] UserName güncellendi: {Email}", adminEmail);
             }
 
             // FORCE RESET PASSWORD
@@ -96,17 +96,17 @@ public static class DbSeeder
                 {
                    foreach (var error in result.Errors)
                    {
-                       Console.WriteLine($"Password reset failed: {error.Description}");
+                       logger.LogError("Şifre sıfırlama başarısız: {Description}", error.Description);
                    }
                 }
                 else
                 {
-                    Console.WriteLine("Password reset successfully to Admin123!");
+                    logger.LogInformation("Parola başarıyla sıfırlandı.");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception during password reset: {ex.Message}");
+                logger.LogError(ex, "Parola sıfırlama sırasında istisna");
             }
 
             // Ensure Admin has SuperAdmin role
@@ -188,36 +188,6 @@ public static class DbSeeder
         {
             context.AppSettings.Add(new AppSetting { Key = "SoftDeleteRetentionDays", Value = "30" });
             await context.SaveChangesAsync();
-        }
-        
-        // Seed Gorevli Data
-        if (!context.Gorevli.Any(g => g.Id > 3)) 
-        {
-             var gorevliler = new List<Gorevli>
-             {
-                 new Gorevli { Ad = "Fatma", Soyad = "Çelik", Email = "fatma.celik@example.com", Durum = GorevliDurum.Yesil },
-                 new Gorevli { Ad = "Ali", Soyad = "Öztürk", Email = "ali.ozturk@example.com", Durum = GorevliDurum.Yesil },
-                 new Gorevli { Ad = "Cem", Soyad = "Yılmaz", Email = "cem.yilmaz@example.com", Durum = GorevliDurum.Turuncu },
-                 new Gorevli { Ad = "Canan", Soyad = "Erkin", Email = "canan.erkin@example.com", Durum = GorevliDurum.Kirmizi },
-                 new Gorevli { Ad = "Mustafa", Soyad = "Demir", Email = "mustafa.demir@example.com", Durum = GorevliDurum.Yesil },
-                 new Gorevli { Ad = "Zeynep", Soyad = "Kaya", Email = "zeynep.kaya@example.com", Durum = GorevliDurum.Turuncu },
-                 new Gorevli { Ad = "Hasan", Soyad = "Tekin", Email = "hasan.tekin@example.com", Durum = GorevliDurum.Yesil },
-                 new Gorevli { Ad = "Elif", Soyad = "Polat", Email = "elif.polat@example.com", Durum = GorevliDurum.Yesil },
-                 new Gorevli { Ad = "Murat", Soyad = "Sönmez", Email = "murat.sonmez@example.com", Durum = GorevliDurum.Kirmizi },
-                 new Gorevli { Ad = "Ayşe", Soyad = "Yıldız", Email = "ayse.yildiz@example.com", Durum = GorevliDurum.Yesil },
-                 new Gorevli { Ad = "Burak", Soyad = "Arslan", Email = "burak.arslan@example.com", Durum = GorevliDurum.Yesil },
-                 new Gorevli { Ad = "Selin", Soyad = "Koç", Email = "selin.koc@example.com", Durum = GorevliDurum.Turuncu },
-                 new Gorevli { Ad = "Kemal", Soyad = "Aydın", Email = "kemal.aydin@example.com", Durum = GorevliDurum.Yesil },
-                 new Gorevli { Ad = "Merve", Soyad = "Güler", Email = "merve.guler@example.com", Durum = GorevliDurum.Yesil },
-                 new Gorevli { Ad = "Okan", Soyad = "Şahin", Email = "okan.sahin@example.com", Durum = GorevliDurum.Kirmizi }
-             };
-             await context.Gorevli.AddRangeAsync(gorevliler);
-             await context.SaveChangesAsync();
-             Console.WriteLine("[SEEDER] Added 15 sample personnel data.");
-        }
-        else
-        {
-             Console.WriteLine("[SEEDER] Personnel data already exists.");
         }
     }
 }

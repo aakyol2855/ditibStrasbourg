@@ -48,53 +48,79 @@ public class HomeController : Controller
             .ThenBy(c => c.CampaignType)
             .ToListAsync();
 
-        // Regional Staff Density
-        var activeAssignments = await _context.Gorevlendirme
-            .Include(g => g.Kurum)
-            .Where(g => today >= g.Tarih && (!g.BitisTarihi.HasValue || today <= g.BitisTarihi))
+        // Kurban metrics (Aggregated exclusively from verified 2026 campaign records)
+        var approvedCampaigns = await _context.KurbanCampaignRecords
+            .Where(r => r.IsApproved && r.Yil == 2026)
             .ToListAsync();
 
-        var allStaff = await _context.Gorevli.ToListAsync();
-        var activeStaffIds = activeAssignments.Select(a => a.GorevliId).ToHashSet();
-        var totalUnassigned = allStaff.Count(s => !activeStaffIds.Contains(s.Id));
+        int totalShares = 500;
+        var quotaSetting = await _context.AppSettings.FirstOrDefaultAsync(s => s.Key == "KurbanHisseLimit");
+        if (quotaSetting != null && int.TryParse(quotaSetting.Value, out var parsedQuota))
+            totalShares = parsedQuota;
 
-        var regionalDensities = activeAssignments
-            .Where(a => a.Kurum != null && !string.IsNullOrEmpty(a.Kurum.Bolge))
-            .GroupBy(a => a.Kurum.Bolge)
-            .Select(g => new RegionalStaffDensityDto
-            {
-                Region = g.Key ?? string.Empty,
-                ActiveCount = g.Select(a => a.GorevliId).Distinct().Count(),
-                UnassignedCount = 0
-            })
-            .ToList();
+        int soldShares = approvedCampaigns.Sum(r => r.DigerAdet + r.TrAdet);
+        int remainingShares = Math.Max(0, totalShares - soldShares);
+        decimal totalKurbanCollected = approvedCampaigns.Sum(r => r.ToplamOdenen);
+        decimal totalKurbanOverdue = approvedCampaigns.Sum(r => r.KalanBakiye);
 
-        // Ensure base regions (57, 67, 68) exist
-        var baseRegions = new[] { "57", "67", "68" };
-        foreach (var r in baseRegions)
+        // Immigration alerts (documents expiring within 3 months)
+        var threeMonthsLater = today.AddMonths(3);
+        var expiringGorevliler = await _context.Gorevli
+            .Where(g => g.IsDeleted == false && 
+                       ((g.VisaExpirationDate.HasValue && g.VisaExpirationDate.Value <= threeMonthsLater) ||
+                        (g.PassportExpirationDate.HasValue && g.PassportExpirationDate.Value <= threeMonthsLater) ||
+                        (g.ResidencePermitExpirationDate.HasValue && g.ResidencePermitExpirationDate.Value <= threeMonthsLater)))
+            .ToListAsync();
+
+        var immigrationWarnings = new List<GorevliImmigrationWarningDto>();
+        foreach (var g in expiringGorevliler)
         {
-            if (!regionalDensities.Any(rd => rd.Region == r))
+            if (g.VisaExpirationDate.HasValue && g.VisaExpirationDate.Value <= threeMonthsLater)
             {
-                regionalDensities.Add(new RegionalStaffDensityDto { Region = r, ActiveCount = 0, UnassignedCount = 0 });
+                immigrationWarnings.Add(new GorevliImmigrationWarningDto
+                {
+                    GorevliId = g.Id,
+                    AdSoyad = g.AdSoyad,
+                    WarningType = "Vize",
+                    ExpirationDate = g.VisaExpirationDate.Value,
+                    RemainingDays = (g.VisaExpirationDate.Value - today).Days
+                });
+            }
+            if (g.PassportExpirationDate.HasValue && g.PassportExpirationDate.Value <= threeMonthsLater)
+            {
+                immigrationWarnings.Add(new GorevliImmigrationWarningDto
+                {
+                    GorevliId = g.Id,
+                    AdSoyad = g.AdSoyad,
+                    WarningType = "Pasaport",
+                    ExpirationDate = g.PassportExpirationDate.Value,
+                    RemainingDays = (g.PassportExpirationDate.Value - today).Days
+                });
+            }
+            if (g.ResidencePermitExpirationDate.HasValue && g.ResidencePermitExpirationDate.Value <= threeMonthsLater)
+            {
+                immigrationWarnings.Add(new GorevliImmigrationWarningDto
+                {
+                    GorevliId = g.Id,
+                    AdSoyad = g.AdSoyad,
+                    WarningType = "Oturum Kartı (Titre de Séjour)",
+                    ExpirationDate = g.ResidencePermitExpirationDate.Value,
+                    RemainingDays = (g.ResidencePermitExpirationDate.Value - today).Days
+                });
             }
         }
 
-        foreach (var rd in regionalDensities)
-        {
-            rd.UnassignedCount = totalUnassigned;
-        }
+        // Vacancies: active institutions with no active assignments
+        var gorevlisiOlmayanKurumlar = await _context.Kurum
+            .Where(k => k.AktifMi && !k.Gorevlendirmeler.Any(a => today >= a.Tarih && (!a.BitisTarihi.HasValue || today <= a.BitisTarihi)))
+            .ToListAsync();
 
-        regionalDensities = regionalDensities.OrderBy(rd => rd.Region).ToList();
-
-        // Kurban metrics
-        var kurbanlar = await _context.Kurbanliklar.ToListAsync();
-        var totalShares = kurbanlar.Sum(k => k.TotalShares);
-        var remainingShares = kurbanlar.Sum(k => k.RemainingShares);
-        var soldShares = totalShares - remainingShares;
-
-        var hissedarlar = await _context.Hissedarlar.ToListAsync();
-        var totalKurbanCollected = hissedarlar.Sum(h => h.TotalPaid);
-        var totalKurbanOverdue = hissedarlar.Sum(h => h.RemainingBalance);
+        // Expiring: active assignments ending within 3 months
+        var suresiBitenGorevlendirmeler = await _context.Gorevlendirme
+            .Include(g => g.Kurum)
+            .Include(g => g.Gorevli)
+            .Where(g => today >= g.Tarih && g.BitisTarihi.HasValue && today <= g.BitisTarihi && g.BitisTarihi.Value <= threeMonthsLater)
+            .ToListAsync();
 
         var model = new DashboardViewModel
         {
@@ -106,12 +132,15 @@ public class HomeController : Controller
             GorevlendirmeThisYear = gorevlendirmeThisYear,
             UpcomingAssignments = upcomingAssignments,
             CampaignSummaries = campaignSummaries,
-            RegionalDensities = regionalDensities,
+            RegionalDensities = new List<RegionalStaffDensityDto>(),
             TotalKurbanShares = totalShares,
             SoldKurbanShares = soldShares,
             RemainingKurbanShares = remainingShares,
             TotalKurbanCollected = totalKurbanCollected,
-            TotalKurbanOverdue = totalKurbanOverdue
+            TotalKurbanOverdue = totalKurbanOverdue,
+            ImmigrationWarnings = immigrationWarnings.OrderBy(w => w.RemainingDays).ToList(),
+            GorevlisiOlmayanKurumlar = gorevlisiOlmayanKurumlar,
+            SuresiBitenGorevlendirmeler = suresiBitenGorevlendirmeler
         };
 
         return View(model);
@@ -139,20 +168,7 @@ public class HomeController : Controller
         return View();
     }
 
-    public async Task<IActionResult> SeedTestData()
-    {
-        try
-        {
-            await TestDataSeeder.SeedTestDataAsync(_context);
-            return Content("✅ Test verileri başarıyla eklendi!\n\n" +
-                "5 Cami, 8 Görevli, 8 Görevlendirme, 3 Dernek + Üyeler\n\n" +
-                "Sistemi test edebilirsiniz!");
-        }
-        catch (Exception ex)
-        {
-            return Content($"❌ Hata: {ex.Message}");
-        }
-    }
+
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

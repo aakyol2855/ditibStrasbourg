@@ -10,11 +10,16 @@ namespace DitibStasbourg.Controllers
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly ILogger<AccountController> _logger;
 
-        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        public AccountController(
+            UserManager<IdentityUser> userManager,
+            SignInManager<IdentityUser> signInManager,
+            ILogger<AccountController> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -27,11 +32,11 @@ namespace DitibStasbourg.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            Console.WriteLine($"[DEBUG] Login POST received for Email: '{model.Email}'");
+            _logger.LogInformation("Kullanıcı giriş denemesi: {Email}", model.Email);
 
-            if (!ModelState.IsValid) 
+            if (!ModelState.IsValid)
             {
-                Console.WriteLine("[DEBUG] ModelState invalid");
+                _logger.LogWarning("Login: ModelState geçersiz. Email={Email}", model.Email);
                 return View(model);
             }
 
@@ -39,13 +44,13 @@ namespace DitibStasbourg.Controllers
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
-                Console.WriteLine($"[DEBUG] FindByEmailAsync returned null for '{model.Email}'. Trying FindByNameAsync...");
+                _logger.LogDebug("FindByEmailAsync sonuç döndürmedi: '{Email}'. UserName ile deneniyor...", model.Email);
                 user = await _userManager.FindByNameAsync(model.Email);
             }
 
             if (user == null)
             {
-                Console.WriteLine($"[DEBUG] User not found by Email OR Name: '{model.Email}'");
+                _logger.LogWarning("Kullanıcı bulunamadı: '{Email}'", model.Email);
                 ModelState.AddModelError(string.Empty, "Geçersiz giriş denemesi. (Kullanıcı bulunamadı)");
                 return View(model);
             }
@@ -53,7 +58,7 @@ namespace DitibStasbourg.Controllers
             // Check if user has a password
             if (!await _userManager.HasPasswordAsync(user))
             {
-                Console.WriteLine("[DEBUG] User has no password. Redirecting to SetPassword.");
+                _logger.LogInformation("Kullanıcının şifresi yok, SetPassword'a yönlendiriliyor. Email={Email}", model.Email);
                 return RedirectToAction("SetPassword", new { email = model.Email });
             }
 
@@ -63,22 +68,18 @@ namespace DitibStasbourg.Controllers
                 return View(model);
             }
 
-            // DIAGNOSTIC LOGS
-            Console.WriteLine($"[DEBUG] User Found: ID={user.Id}, UserName={user.UserName}, Email={user.Email}, Confirmed={user.EmailConfirmed}");
-            Console.WriteLine($"[DEBUG] Password Input: '{model.Password}'");
-            
+            _logger.LogDebug("Kullanıcı bulundu: ID={Id}, UserName={UserName}, EmailConfirmed={Confirmed}",
+                user.Id, user.UserName, user.EmailConfirmed);
+
             var checkPassword = await _userManager.CheckPasswordAsync(user, model.Password);
-            Console.WriteLine($"[DEBUG] Password Check Result: {checkPassword}");
 
             if (!checkPassword)
             {
-                 Console.WriteLine("[DEBUG] Password mismatch. Hash in DB does not match input.");
-                 // Optional: Print hash for debug (be careful in prod)
-                 Console.WriteLine($"[DEBUG] Stored Hash: {user.PasswordHash}");
+                _logger.LogWarning("Şifre doğrulama başarısız. Email={Email}", model.Email);
             }
 
-            var result = await _signInManager.PasswordSignInAsync(user.UserName, model.Password, false, lockoutOnFailure: false);
-            Console.WriteLine($"[DEBUG] SignInManager Result: {result}");
+            var result = await _signInManager.PasswordSignInAsync(user.UserName!, model.Password, false, lockoutOnFailure: false);
+            _logger.LogInformation("SignInManager sonucu: {Result} — Email={Email}", result, model.Email);
 
             if (result.Succeeded)
             {
@@ -88,8 +89,8 @@ namespace DitibStasbourg.Controllers
             if (result.RequiresTwoFactor) ModelState.AddModelError(string.Empty, "2FA Required");
             if (result.IsLockedOut) ModelState.AddModelError(string.Empty, "User Locked Out");
             if (result.IsNotAllowed) ModelState.AddModelError(string.Empty, "User Not Allowed (Email Confirmed?)");
-            
-            ModelState.AddModelError(string.Empty, "Geçersiz giriş denemesi. (Check Console Logs)");
+
+            ModelState.AddModelError(string.Empty, "Geçersiz giriş denemesi. Lütfen bilgilerinizi kontrol edin.");
             return View(model);
         }
 

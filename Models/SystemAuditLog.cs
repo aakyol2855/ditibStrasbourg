@@ -13,5 +13,9 @@ namespace DitibStasbourg.Models
         public string Action { get; set; } = string.Empty;
         public string IpAddress { get; set; } = string.Empty;
         public string Component { get; set; } = string.Empty;
+
+        public string? UserId { get; set; }
+        public string? LogType { get; set; }
+        public string? Message { get; set; }
     }
 }

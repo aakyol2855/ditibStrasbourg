@@ -71,6 +71,28 @@ namespace DitibStasbourg.Models.ViewModels
         // Contact
         public string? CepTelefonu { get; set; }
 
+        // Fransa Girişi Date Range Filter
+        [DataType(DataType.Date)]
+        [Display(Name = "Fransa Giriş Tarihi (Başlangıç)")]
+        public DateTime? FransaGirisBaslangic { get; set; }
+
+        [DataType(DataType.Date)]
+        [Display(Name = "Fransa Giriş Tarihi (Bitiş)")]
+        public DateTime? FransaGirisBitis { get; set; }
+
+        // Sözleşme Başlangıcı Date Range Filter
+        [DataType(DataType.Date)]
+        [Display(Name = "Sözleşme Başlangıcı (Başlangıç)")]
+        public DateTime? SozlesmeBaslangicMin { get; set; }
+
+        [DataType(DataType.Date)]
+        [Display(Name = "Sözleşme Başlangıcı (Bitiş)")]
+        public DateTime? SozlesmeBaslangicMax { get; set; }
+
+        // Leave status filter
+        [Display(Name = "İzin Durumu")]
+        public bool? HasLeave { get; set; } // null=all, true=has approved leave, false=no approved leave
+
         // Pagination & Sorting
         public string? SortOrder { get; set; }
         public int? PageNumber { get; set; }

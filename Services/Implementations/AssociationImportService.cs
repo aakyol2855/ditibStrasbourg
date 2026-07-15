@@ -248,6 +248,9 @@ namespace DitibStasbourg.Services.Implementations
                         }
 
                         var frenchRegName = GetValueByKeywords(row, "resmi fransızca adı", "resmi fransizca adi", "fransızca adı", "fransizca adi", "prefecture name", "french name", "nom officiel", "official french name");
+                        var ibanNo = GetValueByKeywords(row, "iban no", "iban", "iban numarası", "iban numara");
+                        var siretNo = GetValueByKeywords(row, "siret no", "siret", "siret numarası", "siret numara");
+                        var rnaNo = GetValueByKeywords(row, "rna no", "rna", "rna numarası", "rna numara");
 
                         var dernek = new Kurum
                         {
@@ -267,7 +270,10 @@ namespace DitibStasbourg.Services.Implementations
                             Latitude = lat,
                             Longitude = lon,
                             CemaatCount = cemaatCount,
-                            FrenchRegistrationName = string.IsNullOrWhiteSpace(frenchRegName) ? null : frenchRegName
+                            FrenchRegistrationName = string.IsNullOrWhiteSpace(frenchRegName) ? null : frenchRegName,
+                            IbanNo = string.IsNullOrWhiteSpace(ibanNo) ? string.Empty : ibanNo,
+                            SiretNo = string.IsNullOrWhiteSpace(siretNo) ? string.Empty : siretNo,
+                            RnaNo = string.IsNullOrWhiteSpace(rnaNo) ? string.Empty : rnaNo
                         };
 
                         _context.Kurum.Add(dernek);

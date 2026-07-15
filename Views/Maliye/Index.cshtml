@@ -1,0 +1,930 @@
+@model IEnumerable<DitibStasbourg.Models.KurumButce>
+@{
+    ViewData["Title"] = "Maliye Yönetim Paneli";
+    
+    var totalBudget = Model.Sum(b => b.TotalBudget);
+    var totalDitib = Model.Sum(b => b.DitibContribution);
+    var totalPaid = Model.SelectMany(b => b.Periods).Where(p => p.IsPaid).Sum(p => p.ScheduledAmount);
+    var totalRemaining = totalDitib - totalPaid;
+}
+
+<style type="text/css">
+    .hover-up {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .hover-up:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1) !important;
+    }
+    .sortable-header {
+        cursor: pointer;
+        user-select: none;
+    }
+    .sortable-header:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+    @@keyframes flash-highlight {
+        0% { background-color: rgba(255, 193, 7, 0.4); }
+        100% { background-color: transparent; }
+    }
+    .highlight-row {
+        animation: flash-highlight 2s ease-out;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-0"><i class="bi bi-bank me-2 text-primary"></i>Maliye Yönetim Paneli</h2>
+            <p class="text-muted mb-0 small">Kurum bütçeleri, ödeme dönemleri ve havuz transferlerinin yönetim merkezi.</p>
+        </div>
+        <div class="d-flex gap-2 align-items-center">
+            <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#globalBroadcastModal">
+                <i class="bi bi-broadcast me-1"></i>Sistem Duyurusu Yayınla
+            </button>
+            <a asp-action="Create" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-lg me-1"></i>Yeni Kurum Bütçesi Tanımla
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100 hover-up" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: white; border-radius: 1rem;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="text-white-50 mb-0 fw-bold">Toplam Bütçe</h6>
+                        <i class="bi bi-wallet2 fs-4 text-white-50"></i>
+                    </div>
+                    <h3 class="fw-bold mb-0" id="statTotalBudget">@totalBudget.ToString("C2")</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100 hover-up" style="background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%); color: white; border-radius: 1rem;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="text-white-50 mb-0 fw-bold">DİTİB Katkısı</h6>
+                        <i class="bi bi-shield-check fs-4 text-white-50"></i>
+                    </div>
+                    <h3 class="fw-bold mb-0" id="statDitibContribution">@totalDitib.ToString("C2")</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100 hover-up" style="background: linear-gradient(135deg, #047857 0%, #10b981 100%); color: white; border-radius: 1rem;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="text-white-50 mb-0 fw-bold">Toplam Ödenen</h6>
+                        <i class="bi bi-cash-stack fs-4 text-white-50"></i>
+                    </div>
+                    <h3 class="fw-bold mb-0" id="statTotalPaid">@totalPaid.ToString("C2")</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100 hover-up" style="background: linear-gradient(135deg, #be123c 0%, #f43f5e 100%); color: white; border-radius: 1rem;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="text-white-50 mb-0 fw-bold">Kalan DİTİB Bakiyesi</h6>
+                        <i class="bi bi-clock-history fs-4 text-white-50"></i>
+                    </div>
+                    <h3 class="fw-bold mb-0" id="statRemainingBalance">@totalRemaining.ToString("C2")</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Parametric Excel & Table Form -->
+    <form id="excelExportForm" asp-action="ExportExcel" method="post">
+        @Html.AntiForgeryToken()
+        
+        <div class="card border-0 shadow-sm mb-4" style="border-radius: 1rem; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px);">
+            <div class="card-body p-3">
+                <div class="row align-items-center g-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold mb-1 small text-muted">Excel Raporu Ödeme Filtresi</label>
+                        <select name="paymentFilter" class="form-select form-select-sm">
+                            <option value="All">Tüm Dönemler</option>
+                            <option value="PaidOnly">Sadece Ödenenler</option>
+                            <option value="UnpaidOnly">Sadece Ödenmeyenler</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold mb-1 small text-muted">Excel Raporu Yıl Seçimi</label>
+                        <select name="selectedYear" class="form-select form-select-sm d-inline-block w-auto">
+                            <option value="">-- Tüm Yıllar (Tüm Kampanyalar) --</option>
+                            <option value="2024" selected="@(ViewBag.SelectedYear == 2024 ? "selected" : null)">2024 Kampanyası</option>
+                            <option value="2025" selected="@(ViewBag.SelectedYear == 2025 ? "selected" : null)">2025 Kampanyası</option>
+                            <option value="2026" selected="@(ViewBag.SelectedYear == 2026 ? "selected" : null)">2026 Kampanyası</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 text-md-end d-flex justify-content-md-end gap-2 align-items-end">
+                        <button type="button" id="btnFilterPage" class="btn btn-primary btn-sm shadow-sm">
+                            <i class="bi bi-funnel me-1"></i>Listeyi Filtrele
+                        </button>
+                        <button type="submit" class="btn btn-success btn-sm shadow-sm">
+                            <i class="bi bi-file-earmark-excel me-1"></i>Seçilen Camiler İçin Excel Raporu Al
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Budgets Table -->
+        <div class="card border-0 shadow-sm mb-4" style="border-radius: 1rem; overflow: hidden;">
+            <div class="card-header bg-white py-3 border-0">
+                <h5 class="card-title mb-0 fw-bold text-dark">Bütçeler ve Ödeme Planları</h5>
+            </div>
+            <div class="table-responsive">
+                <table id="maliyeTable" class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="px-4" style="width: 50px;">
+                                <input type="checkbox" id="selectAllKurums" class="form-check-input" />
+                            </th>
+                            <th class="px-4 sortable-header" data-sort-order="asc">Dernek / Cami Adı <i class="bi bi-arrow-down-up ms-1 small"></i></th>
+                            <th class="sortable-header" data-sort-order="asc">Yıl <i class="bi bi-arrow-down-up ms-1 small"></i></th>
+                            <th class="sortable-header" data-sort-order="asc">Toplam Bütçe <i class="bi bi-arrow-down-up ms-1 small"></i></th>
+                            <th class="sortable-header" data-sort-order="asc">DİTİB Katkısı <i class="bi bi-arrow-down-up ms-1 small"></i></th>
+                            <th class="sortable-header" data-sort-order="asc">Dernek Katkısı <i class="bi bi-arrow-down-up ms-1 small"></i></th>
+                            <th class="px-4" style="width: 45%;">Dönemsel Ödemeler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="px-4">
+                                    <input type="checkbox" name="selectedKurumIds" value="@item.Id" class="form-check-input select-kurum-checkbox" @(ViewBag.SelectedKurumIds != null && ((List<int>)ViewBag.SelectedKurumIds).Contains(item.Id) ? "checked" : "") />
+                                </td>
+                                <td class="px-4 fw-bold text-dark">
+                                    @item.Kurum.Isim
+                                    <div class="text-muted small">IBAN: @(string.IsNullOrEmpty(item.Kurum.IbanNo) ? "Tanımsız" : item.Kurum.IbanNo)</div>
+                                    <button type="button" class="btn btn-outline-warning btn-xs py-0 px-2 fw-semibold mt-1 open-revision-modal" 
+                                            data-budget-id="@item.Id" 
+                                            data-kurum-name="@item.Kurum.Isim" 
+                                            data-year="@item.Yil" 
+                                            style="font-size: 0.75rem;">
+                                        <i class="bi bi-pencil-square me-1"></i>Bütçe Revize Et
+                                    </button>
+                                </td>
+                                <td><span class="badge bg-secondary">@item.Yil</span></td>
+                                <td class="fw-bold">@item.TotalBudget.ToString("C2")</td>
+                                <td class="text-primary fw-bold">@item.DitibContribution.ToString("C2")</td>
+                                <td class="text-muted">@item.DernekContribution.ToString("C2")</td>
+                                <td class="px-4">
+                                    <div class="row g-2">
+                                        @foreach (var period in item.Periods.OrderBy(p => p.PeriodNumber))
+                                        {
+                                            <div class="col-md-6">
+                                                <div class="p-2 border rounded @(period.IsPaid ? "bg-light border-success-subtle text-success" : "bg-white border-warning-subtle text-warning")" style="font-size: 0.85rem;" id="period-container-@period.Id">
+                                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                                        <span class="fw-bold">@period.PeriodNumber. Dönem</span>
+                                                        <span class="badge @(period.IsPaid ? "bg-success-subtle text-success-emphasis" : "bg-warning-subtle text-warning-emphasis") rounded-pill small" style="font-size: 0.75rem;" id="period-badge-@period.Id">
+                                                            @if (period.IsPaid)
+                                                            {
+                                                                <i class="bi bi-check-circle-fill me-1"></i><span>Ödendi</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span>Bekliyor</span>
+                                                            }
+                                                        </span>
+                                                    </div>
+                                                    <div class="text-dark fw-semibold mb-1">Tutar: @period.ScheduledAmount.ToString("C2")</div>
+                                                    
+                                                    <div class="text-muted small" style="font-size: 0.75rem;" id="period-details-@period.Id">
+                                                        @if (period.IsPaid)
+                                                        {
+                                                            <div>Tarih: @period.PaymentDate?.ToString("dd.MM.yyyy")</div>
+                                                            <div class="text-truncate" title="@period.TransactionTutanakNo">No: @period.TransactionTutanakNo</div>
+                                                            @if (!string.IsNullOrEmpty(period.PaidFromSource))
+                                                            {
+                                                                <div>Kasa: <span class="fw-semibold text-dark">@period.PaidFromSource</span></div>
+                                                            }
+                                                            @if (!string.IsNullOrEmpty(period.AttachmentPath))
+                                                            {
+                                                                <div class="mt-1">
+                                                                    <a href="@period.AttachmentPath" target="_blank" class="btn btn-xs btn-outline-primary py-0 px-2 fw-semibold" style="font-size: 0.7rem;">
+                                                                        <i class="bi bi-file-earmark-arrow-down-fill me-1"></i>Dekont İndir
+                                                                    </a>
+                                                                </div>
+                                                            }
+                                                        }
+                                                    </div>
+                                                     <div class="form-check form-switch mt-2">
+                                                        <input type="checkbox" 
+                                                               class="form-check-input maliye-paid-checkbox" 
+                                                               data-period-id="@period.Id" 
+                                                               id="cb-@period.Id"
+                                                               @(period.IsPaid ? "checked" : "") />
+                                                        <label class="form-check-label text-muted small fw-semibold" for="cb-@period.Id" id="cb-label-@period.Id">
+                                                            @(period.IsPaid ? "Ödendi" : "Ödeme Girişi Yap")
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <!-- Interactive Client-side Pagination Footer -->
+            <div class="card-footer bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                <div class="text-muted small" id="paginationInfo">
+                    Gösterilen: <span id="paginationStart">0</span>-<span id="paginationEnd">0</span> / Toplam <span id="paginationTotal">0</span> kayıt
+                </div>
+                <nav aria-label="Tablo Sayfalama">
+                    <ul class="pagination pagination-sm mb-0" id="paginationControls">
+                        <!-- Dynamic pagination buttons -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Payment Details Entry Modal -->
+<div class="modal fade" id="paymentDetailsModal" tabindex="-1" aria-labelledby="paymentDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content card-glass">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold text-dark" id="paymentDetailsModalLabel"><i class="bi bi-cash-coin text-primary me-2"></i>Ödeme Bilgilerini Girin</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <form id="paymentDetailsForm" class="no-loader" enctype="multipart/form-data">
+                <input type="hidden" id="modalPeriodId" name="periodId" />
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="paidFromSource" class="form-label fw-bold">Ödeme Yapılan Banka / Kasa</label>
+                        <select class="form-select" id="paidFromSource" name="paidFromSource" required>
+                            <option value="KT Bank">KT Bank</option>
+                            <option value="Banque Postale">Banque Postale</option>
+                            <option value="Nakit Havuz">Nakit Havuz</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="tutanakNo" class="form-label fw-bold">Tutanak / Dekont No</label>
+                        <input type="text" class="form-control" id="tutanakNo" name="tutanakNo" placeholder="Otomatik Oluşturulacak" />
+                        <div class="form-text text-muted">Boş bırakılırsa sistem otomatik bir işlem numarası oluşturacaktır.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="attachment" class="form-label fw-bold">Dekont / Makbuz Yükle (PDF, PNG, JPG)</label>
+                        <input type="file" class="form-control" id="attachment" name="attachment" accept=".pdf,.png,.jpg,.jpeg" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-success"><i class="bi bi-check-circle-fill me-1"></i>Ödemeyi Onayla</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Budget Revision Request Modal -->
+<div class="modal fade" id="budgetRevisionModal" tabindex="-1" aria-labelledby="budgetRevisionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content card-glass">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold text-dark" id="budgetRevisionModalLabel"><i class="bi bi-pencil-square text-warning me-2"></i>Bütçe Revizyon Talebi Oluştur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <form id="budgetRevisionForm" class="no-loader">
+                <input type="hidden" id="revisionTargetBudgetId" name="TargetBudgetId" />
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Kurum / Cami</label>
+                        <input type="text" class="form-control" id="revisionKurumName" readonly />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Bütçe Yılı</label>
+                        <input type="text" class="form-control" id="revisionBudgetYear" readonly />
+                    </div>
+                    <div class="mb-3">
+                        <label for="revisionType" class="form-label fw-bold">Revizyon Türü</label>
+                        <select class="form-select" id="revisionType" name="RevisionType" required>
+                            <option value="EkOdenek">Ek Ödenek</option>
+                            <option value="IndirimKesinti">İndirim / Kesinti</option>
+                            <option value="EnflasyonDuzeltme">Enflasyon Düzeltmesi</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="revisionRequestedAmount" class="form-label fw-bold">Talep Edilen Ek Tutar (€)</label>
+                        <input type="number" step="0.01" class="form-control" id="revisionRequestedAmount" name="RequestedAmount" placeholder="0.00" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="revisionReason" class="form-label fw-bold">Revizyon Gerekçesi</label>
+                        <textarea class="form-control" id="revisionReason" name="RevisionReason" rows="4" placeholder="Lütfen revizyon talebinin detaylı gerekçesini açıklayın..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-warning text-dark fw-bold"><i class="bi bi-send-fill me-1"></i>Talebi Gönder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Global Broadcast Announcement Modal -->
+<div class="modal fade" id="globalBroadcastModal" tabindex="-1" aria-labelledby="globalBroadcastModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content card-glass">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold text-dark" id="globalBroadcastModalLabel"><i class="bi bi-broadcast text-primary me-2"></i>Sistem Duyurusu Yayınla</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <form id="globalBroadcastForm">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="broadcastTitle" class="form-label small fw-bold text-muted">Duyuru Başlığı</label>
+                        <input type="text" class="form-control" id="broadcastTitle" name="title" value="Sistem Duyurusu" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="broadcastMessage" class="form-label small fw-bold text-muted">Duyuru Mesajı</label>
+                        <textarea class="form-control" id="broadcastMessage" name="message" rows="4" placeholder="Tüm kullanıcılara gösterilecek duyuru mesajını buraya yazın..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Yayınla</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@Html.AntiForgeryToken()
+
+@section Scripts {
+    <script>
+        // Select All Checkboxes logic
+        document.getElementById('selectAllKurums')?.addEventListener('change', function() {
+            document.querySelectorAll('.select-kurum-checkbox').forEach(cb => {
+                cb.checked = this.checked;
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            let activeCheckbox = null;
+            const paymentModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('paymentDetailsModal'));
+            const revisionModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('budgetRevisionModal'));
+
+            // Client-side Pagination State & Functions
+            let currentPage = 1;
+            const rowsPerPage = 10;
+            let filteredRows = [];
+
+            function initPagination() {
+                const tbody = document.querySelector('#maliyeTable tbody');
+                if (!tbody) return;
+                filteredRows = Array.from(tbody.querySelectorAll('tr'));
+                showPage(1);
+            }
+
+            function showPage(page) {
+                const totalPages = Math.ceil(filteredRows.length / rowsPerPage) || 1;
+                if (page < 1) page = 1;
+                if (page > totalPages) page = totalPages;
+                currentPage = page;
+
+                const startIdx = (currentPage - 1) * rowsPerPage;
+                const endIdx = currentPage * rowsPerPage;
+
+                filteredRows.forEach((row, index) => {
+                    if (index >= startIdx && index < endIdx) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                // Update info text
+                const startShow = filteredRows.length === 0 ? 0 : startIdx + 1;
+                const endShow = Math.min(endIdx, filteredRows.length);
+                const startEl = document.getElementById('paginationStart');
+                const endEl = document.getElementById('paginationEnd');
+                const totalEl = document.getElementById('paginationTotal');
+                if (startEl) startEl.innerText = startShow;
+                if (endEl) endEl.innerText = endShow;
+                if (totalEl) totalEl.innerText = filteredRows.length;
+
+                // Render controls
+                const controlsContainer = document.getElementById('paginationControls');
+                if (!controlsContainer) return;
+                controlsContainer.innerHTML = '';
+
+                // Previous button
+                const prevLi = document.createElement('li');
+                prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+                prevLi.innerHTML = `<a class="page-link" href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>`;
+                if (currentPage > 1) {
+                    prevLi.querySelector('a').addEventListener('click', function(e) {
+                        e.preventDefault();
+                        showPage(currentPage - 1);
+                    });
+                }
+                controlsContainer.appendChild(prevLi);
+
+                // Numeric buttons
+                for (let i = 1; i <= totalPages; i++) {
+                    const li = document.createElement('li');
+                    li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+                    li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                    li.querySelector('a').addEventListener('click', function(e) {
+                        e.preventDefault();
+                        showPage(i);
+                    });
+                    controlsContainer.appendChild(li);
+                }
+
+                // Next button
+                const nextLi = document.createElement('li');
+                nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+                nextLi.innerHTML = `<a class="page-link" href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>`;
+                if (currentPage < totalPages) {
+                    nextLi.querySelector('a').addEventListener('click', function(e) {
+                        e.preventDefault();
+                        showPage(currentPage + 1);
+                    });
+                }
+                controlsContainer.appendChild(nextLi);
+            }
+
+            initPagination();
+
+            // Listeyi Filtrele Button handler
+            document.getElementById('btnFilterPage')?.addEventListener('click', function() {
+                const form = document.getElementById('excelExportForm');
+                form.action = '/Maliye/Index';
+                form.method = 'GET';
+                form.submit();
+            });
+
+            // Dismiss ordinary alert handler (without page reload)
+            function setupDismissHandlers() {
+                document.querySelectorAll('.noti-dismiss-btn').forEach(btn => {
+                    // Clone element to purge existing listeners
+                    const newBtn = btn.cloneNode(true);
+                    btn.parentNode.replaceChild(newBtn, btn);
+
+                    newBtn.addEventListener('click', function() {
+                        const id = this.getAttribute('data-alert-id');
+                        if (confirm("Bu bildirim kaydını kapatmak istediğinize emin misiniz?")) {
+                            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                            const formData = new FormData();
+                            formData.append('__RequestVerificationToken', token);
+
+                            fetch('/Maliye/DismissNotification/' + id, {
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    removeNotificationDOM(id);
+                                } else {
+                                    alert("Hata: " + data.message);
+                                }
+                            })
+                            .catch(error => {
+                                alert("Bildirim kapatılırken bir güvenlik veya bağlantı hatası oluştu!");
+                            });
+                        }
+                    });
+                });
+            }
+
+            function removeNotificationDOM(id) {
+                const item = document.getElementById('noti-item-' + id);
+                if (item) {
+                    item.style.transition = 'all 0.4s ease';
+                    item.style.opacity = '0';
+                    item.style.height = '0';
+                    item.style.padding = '0';
+                    setTimeout(() => {
+                        item.remove();
+                        // Update counters
+                        const badgeCountEl = document.getElementById('notificationBadgeCount');
+                        const headerCountEl = document.getElementById('notificationHeaderCount');
+                        let currentCount = 0;
+                        if (headerCountEl) {
+                            const match = headerCountEl.innerText.match(/\d+/);
+                            if (match) {
+                                currentCount = parseInt(match[0]) - 1;
+                                headerCountEl.innerText = `${currentCount} Aktif`;
+                            }
+                        }
+                        if (badgeCountEl) {
+                            if (currentCount <= 0) {
+                                badgeCountEl.remove();
+                            } else {
+                                badgeCountEl.innerText = currentCount;
+                            }
+                        }
+                        // Check if no items left
+                        const listGroup = document.getElementById('notificationListGroup');
+                        if (listGroup && listGroup.querySelectorAll('.list-group-item').length === 0) {
+                            listGroup.innerHTML = `<div class="p-4 text-center text-muted" id="noNotificationsPlaceholder">
+                                <i class="bi bi-bell-slash fs-3 mb-2 d-block text-secondary"></i>
+                                <span class="small">Aktif bildirim bulunmamaktadır.</span>
+                            </div>`;
+                        }
+                    }, 400);
+                }
+            }
+
+            setupDismissHandlers();
+
+            // Link alerts to scroll, highlight and pay modal
+            document.querySelectorAll('.noti-pay-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const periodId = this.getAttribute('data-period-id');
+                    
+                    // Close dropdown
+                    const dropdownElement = document.getElementById('notificationBellBtn');
+                    const dropdown = bootstrap.Dropdown.getOrCreateInstance(dropdownElement);
+                    dropdown.hide();
+
+                    const checkbox = document.getElementById('cb-' + periodId);
+                    if (checkbox) {
+                        const row = checkbox.closest('tr');
+                        if (row) {
+                            // Find page
+                            const rowIndex = filteredRows.indexOf(row);
+                            if (rowIndex !== -1) {
+                                const targetPage = Math.floor(rowIndex / rowsPerPage) + 1;
+                                showPage(targetPage);
+                                
+                                // Scroll and highlight
+                                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                row.classList.add('highlight-row');
+                                setTimeout(() => {
+                                    row.classList.remove('highlight-row');
+                                }, 2000);
+
+                                // Trigger payment modal (if not already paid)
+                                if (!checkbox.checked) {
+                                    checkbox.checked = true;
+                                    checkbox.dispatchEvent(new Event('change'));
+                                }
+                            }
+                        }
+                    } else {
+                        alert("Ödeme dönemi bu listede bulunamadı!");
+                    }
+                });
+            });
+
+            // Budget Revision Modal trigger
+            document.querySelectorAll('.open-revision-modal').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const budgetId = this.getAttribute('data-budget-id');
+                    const kurumName = this.getAttribute('data-kurum-name');
+                    const year = this.getAttribute('data-year');
+                    
+                    document.getElementById('revisionTargetBudgetId').value = budgetId;
+                    document.getElementById('revisionKurumName').value = kurumName;
+                    document.getElementById('revisionBudgetYear').value = year;
+                    document.getElementById('revisionRequestedAmount').value = '';
+                    document.getElementById('revisionReason').value = '';
+                    
+                    revisionModal.show();
+                });
+            });
+
+            // Budget Revision Form submit (no-reload)
+            document.getElementById('budgetRevisionForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const form = this;
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const originalHtml = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Lütfen Bekleyin...';
+                
+                const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                const formData = new FormData();
+                formData.append('__RequestVerificationToken', token);
+                formData.append('TargetBudgetId', document.getElementById('revisionTargetBudgetId').value);
+                formData.append('RequestedAmount', document.getElementById('revisionRequestedAmount').value);
+                formData.append('RevisionReason', document.getElementById('revisionReason').value);
+                formData.append('RevisionType', document.getElementById('revisionType').value);
+
+                fetch('/Maliye/RequestBudgetRevision', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalHtml;
+                    revisionModal.hide();
+                    if (data.success) {
+                        alert(data.message || "Bütçe revizyon talebi başarıyla oluşturuldu.");
+                    } else {
+                        alert("Hata: " + data.message);
+                    }
+                })
+                .catch(error => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalHtml;
+                    alert("Revizyon talebi gönderilirken bir hata oluştu!");
+                });
+            });
+
+            // Checkbox change listener
+            document.querySelectorAll('.maliye-paid-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', function (e) {
+                    const periodId = this.getAttribute('data-period-id');
+                    if (!periodId || periodId === "undefined") {
+                        alert("Sistemsel Hata: Dönem ID parametresi boş veya tanımsız (undefined) geldi!");
+                        this.checked = !this.checked;
+                        return;
+                    }
+
+                    activeCheckbox = this;
+
+                    if (this.checked) {
+                        // Show modal to collect details
+                        document.getElementById('modalPeriodId').value = periodId;
+                        document.getElementById('tutanakNo').value = 'TRX-' + Math.random().toString(36).substring(2, 10).toUpperCase();
+                        document.getElementById('attachment').value = '';
+                        paymentModal.show();
+                    } else {
+                        // Mark as unpaid directly
+                        if (confirm("Bu dönemin ödeme işaretini kaldırmak istediğinize emin misiniz?")) {
+                            submitPaymentStatus(periodId, null, null, null);
+                        } else {
+                            this.checked = true;
+                        }
+                    }
+                });
+            });
+
+            document.getElementById('paymentDetailsForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const form = this;
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const originalHtml = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Lütfen Bekleyin...';
+
+                const periodId = document.getElementById('modalPeriodId').value;
+                const paidFromSource = document.getElementById('paidFromSource').value;
+                const tutanakNo = document.getElementById('tutanakNo').value;
+                const fileInput = document.getElementById('attachment');
+                const file = fileInput.files[0];
+
+                submitPaymentStatus(periodId, paidFromSource, tutanakNo, file, submitBtn, originalHtml);
+            });
+
+            // Prevent checkbox visual toggle mismatch if modal is cancelled
+            document.getElementById('paymentDetailsModal').addEventListener('hidden.bs.modal', function () {
+                if (activeCheckbox && activeCheckbox.checked && !document.getElementById('modalPeriodId').value) {
+                    activeCheckbox.checked = false;
+                }
+            });
+
+            function submitPaymentStatus(periodId, paidFromSource, tutanakNo, file, submitBtn, originalHtml) {
+                const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                const formData = new FormData();
+                formData.append('__RequestVerificationToken', token);
+                if (paidFromSource) formData.append('paidFromSource', paidFromSource);
+                if (tutanakNo) formData.append('tutanakNo', tutanakNo);
+                if (file) formData.append('attachment', file);
+
+                paymentModal.hide();
+
+                fetch('/Maliye/MarkPaid/' + periodId, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalHtml;
+                    }
+                    if (data.success) {
+                        // Dynamic DOM update of period details and styles without reload
+                        updatePeriodDOM(periodId, data);
+                        
+                        // Update stats scoreboard
+                        if (data.stats) {
+                            const statTotal = document.getElementById('statTotalBudget');
+                            const statDitib = document.getElementById('statDitibContribution');
+                            const statPaid = document.getElementById('statTotalPaid');
+                            const statRemaining = document.getElementById('statRemainingBalance');
+                            if (statTotal) statTotal.innerText = data.stats.totalBudget;
+                            if (statDitib) statDitib.innerText = data.stats.totalDitib;
+                            if (statPaid) statPaid.innerText = data.stats.totalPaid;
+                            if (statRemaining) statRemaining.innerText = data.stats.totalRemaining;
+                        }
+
+                        // Remove associated notifications from dropdown if resolved
+                        if (data.resolvedNotificationIds && data.resolvedNotificationIds.length > 0) {
+                            data.resolvedNotificationIds.forEach(notiId => {
+                                // Animate item out of dropdown list
+                                if (typeof window.removeNotificationDOM === 'function') {
+                                    window.removeNotificationDOM(notiId);
+                                }
+                            });
+
+                            // ── PATCH: Force global bell badge counter to re-sync immediately ──
+                            // removeNotificationDOM() only removes the visible list item; it does NOT
+                            // update the badge count if the dropdown was never opened in this session.
+                            // loadGlobalNotifications() re-queries /Maliye/GetOverdueNotifications and
+                            // atomically reconciles the unread badge, header count, and list in one call.
+                            setTimeout(() => {
+                                if (typeof window.loadGlobalNotifications === 'function') {
+                                    window.loadGlobalNotifications();
+                                }
+                            }, 450); // slight delay lets removeNotificationDOM animation complete first
+                        }
+                    } else {
+                        alert("İşlem başarısız: " + data.message);
+                        if (activeCheckbox) activeCheckbox.checked = !activeCheckbox.checked;
+                    }
+                })
+                .catch(error => {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalHtml;
+                    }
+                    alert("Güvenlik tokalaşma veya sunucu hatası oluştu!");
+                    if (activeCheckbox) activeCheckbox.checked = !activeCheckbox.checked;
+                });
+            }
+
+            function updatePeriodDOM(periodId, data) {
+                const container = document.getElementById('period-container-' + periodId);
+                const badge = document.getElementById('period-badge-' + periodId);
+                const details = document.getElementById('period-details-' + periodId);
+                const checkbox = document.getElementById('cb-' + periodId);
+                const label = document.getElementById('cb-label-' + periodId);
+
+                if (data.isPaid) {
+                    if (container) {
+                        container.className = "p-2 border rounded bg-light border-success-subtle text-success";
+                    }
+                    if (badge) {
+                        badge.className = "badge bg-success-subtle text-success-emphasis rounded-pill small";
+                        badge.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i><span>Ödendi</span>';
+                    }
+                    if (checkbox) checkbox.checked = true;
+                    if (label) label.innerText = "Ödendi";
+
+                    let detailsHtml = `<div>Tarih: ${data.paymentDate}</div>`;
+                    detailsHtml += `<div class="text-truncate" title="${data.transactionNo}">No: ${data.transactionNo}</div>`;
+                    if (data.paidFromSource) {
+                        detailsHtml += `<div>Kasa: <span class="fw-semibold text-dark">${data.paidFromSource}</span></div>`;
+                    }
+                    if (data.attachmentPath) {
+                        detailsHtml += `<div class="mt-1">
+                            <a href="${data.attachmentPath}" target="_blank" class="btn btn-xs btn-outline-primary py-0 px-2 fw-semibold" style="font-size: 0.7rem;">
+                                <i class="bi bi-file-earmark-arrow-down-fill me-1"></i>Dekont İndir
+                            </a>
+                        </div>`;
+                    }
+                    if (details) details.innerHTML = detailsHtml;
+                } else {
+                    if (container) {
+                        container.className = "p-2 border rounded bg-white border-warning-subtle text-warning";
+                    }
+                    if (badge) {
+                        badge.className = "badge bg-warning-subtle text-warning-emphasis rounded-pill small";
+                        badge.innerHTML = '<span>Bekliyor</span>';
+                    }
+                    if (checkbox) checkbox.checked = false;
+                    if (label) label.innerText = "Ödeme Girişi Yap";
+                    if (details) details.innerHTML = '';
+                }
+            }
+
+            // Universal Grid Sorting Engine integrated with pagination
+            document.querySelectorAll('.sortable-header').forEach(header => {
+                header.addEventListener('click', function() {
+                    const table = document.getElementById('maliyeTable');
+                    const tbody = table.querySelector('tbody');
+                    const rows = Array.from(tbody.querySelectorAll('tr'));
+                    const index = Array.from(header.parentNode.children).indexOf(header);
+                    const isAsc = header.dataset.sortOrder === 'asc';
+                    const direction = isAsc ? -1 : 1;
+                    header.dataset.sortOrder = isAsc ? 'desc' : 'asc';
+
+                    rows.sort((rowA, rowB) => {
+                        const cellA = rowA.children[index].textContent.trim();
+                        const cellB = rowB.children[index].textContent.trim();
+
+                        const cleanNum = val => {
+                            const cleaned = val.replace(/[^\d,\.-]/g, '').replace('.', '').replace(',', '.');
+                            const parsed = parseFloat(cleaned);
+                            return isNaN(parsed) ? val : parsed;
+                        };
+
+                        const valA = cleanNum(cellA);
+                        const valB = cleanNum(cellB);
+
+                        if (typeof valA === 'number' && typeof valB === 'number') {
+                            return (valA - valB) * direction;
+                        }
+                        return valA.toString().localeCompare(valB.toString()) * direction;
+                    });
+
+                    rows.forEach(row => tbody.appendChild(row));
+                    
+                    // Re-gather sorted rows and re-paginate
+                    filteredRows = rows;
+                    showPage(1);
+                });
+            });
+
+            // Parameter-based auto-scroll and highlight logic for focusPeriodId
+            const urlParams = new URLSearchParams(window.location.search);
+            const focusPeriodId = urlParams.get('focusPeriodId');
+            if (focusPeriodId) {
+                setTimeout(() => {
+                    const checkbox = document.getElementById('cb-' + focusPeriodId);
+                    if (checkbox) {
+                        const row = checkbox.closest('tr');
+                        if (row) {
+                            const rowIndex = filteredRows.indexOf(row);
+                            if (rowIndex !== -1) {
+                                const targetPage = Math.floor(rowIndex / rowsPerPage) + 1;
+                                showPage(targetPage);
+                            }
+                            row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            row.classList.add('highlight-row');
+                            setTimeout(() => {
+                                row.classList.remove('highlight-row');
+                            }, 2000);
+
+                            if (!checkbox.checked) {
+                                checkbox.checked = true;
+                                checkbox.dispatchEvent(new Event('change'));
+                            }
+                        }
+                    }
+                }, 600);
+            }
+            // Global Broadcast Submission
+            const broadcastForm = document.getElementById('globalBroadcastForm');
+            if (broadcastForm) {
+                const broadcastModalEl = document.getElementById('globalBroadcastModal');
+                const broadcastModal = bootstrap.Modal.getOrCreateInstance(broadcastModalEl);
+                
+                broadcastForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const form = this;
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    const originalHtml = submitBtn.innerHTML;
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Lütfen Bekleyin...';
+
+                    const token = form.querySelector('input[name="__RequestVerificationToken"]').value;
+                    const title = document.getElementById('broadcastTitle').value;
+                    const message = document.getElementById('broadcastMessage').value;
+
+                    const formData = new FormData();
+                    formData.append('__RequestVerificationToken', token);
+                    formData.append('title', title);
+                    formData.append('message', message);
+
+                    fetch('/Maliye/CreateGlobalBroadcast', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalHtml;
+                        if (data.success) {
+                            broadcastModal.hide();
+                            form.reset();
+                            document.getElementById('broadcastTitle').value = "Sistem Duyurusu";
+                            alert(data.message);
+                            if (typeof window.loadGlobalNotifications === 'function') {
+                                window.loadGlobalNotifications();
+                            }
+                        } else {
+                            alert("Hata: " + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalHtml;
+                        alert("Duyuru yayınlanırken sunucu hatası oluştu!");
+                    });
+                });
+            }
+        });
+    </script>
+}

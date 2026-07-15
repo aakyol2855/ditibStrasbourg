@@ -112,6 +112,7 @@
                             <th>Şehir &amp; Bölge</th>
                             <th>Dernek Başkanı</th>
                             <th>Dernek İletişim</th>
+                            <th>Finansal Tanımlayıcılar</th>
                             <th>CRM Form Durumu</th>
                             <th style="width: 160px; text-align: right;">İşlemler</th>
                         </tr>
@@ -166,6 +167,15 @@
                                         }
                                     </td>
                                     <td>
+                                        <span class="d-block small"><strong>IBAN:</strong> @(string.IsNullOrEmpty(item.IbanNo) ? "-" : item.IbanNo)</span>
+                                        <span class="d-block small"><strong>SIRET:</strong> @(string.IsNullOrEmpty(item.SiretNo) ? "-" : item.SiretNo)</span>
+                                        <span class="d-block small"><strong>RNA:</strong> @(string.IsNullOrEmpty(item.RnaNo) ? "-" : item.RnaNo)</span>
+                                        @if (!string.IsNullOrEmpty(item.EkonomiNotu))
+                                        {
+                                            <small class="text-muted d-block text-truncate" style="max-width: 200px;" title="@item.EkonomiNotu"><strong>Not:</strong> @item.EkonomiNotu</small>
+                                        }
+                                    </td>
+                                    <td>
                                         @if (!string.IsNullOrEmpty(item.CrmUyelikFormDurumu))
                                         {
                                             <span class="badge bg-info text-dark rounded-pill px-3 py-1">@item.CrmUyelikFormDurumu</span>
@@ -176,18 +186,18 @@
                                         }
                                     </td>
                                     <td class="text-end py-3">
-                                        <div class="d-inline-flex gap-1">
-                                            <button class="btn btn-sm btn-outline-primary" type="button" onclick="toggleDetails(@item.Id)">
-                                                <i class="bi bi-chevron-down me-1"></i>Detay
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <button class="btn btn-outline-primary" type="button" onclick="toggleDetails(@item.Id)">
+                                                <i class="bi bi-chevron-down"></i>
                                             </button>
-                                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary" title="Düzenle">
-                                                <i class="bi bi-pencil"></i>
+                                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-secondary" title="Detaylar & Yönetim">
+                                                <i class="bi bi-eye"></i>
                                             </a>
                                         </div>
                                     </td>
                                 </tr>
                                 <tr id="details-row-@item.Id" style="display: none;">
-                                    <td colspan="7" class="p-0">
+                                    <td colspan="8" class="p-0">
                                         <div id="details-content-@item.Id" class="p-3 bg-light border-bottom">
                                             <div class="text-center">
                                                 <div class="spinner-border text-primary" role="status">
@@ -202,7 +212,7 @@
                         else
                         {
                             <tr>
-                                <td colspan="7" class="text-center py-5 text-muted">
+                                <td colspan="8" class="text-center py-5 text-muted">
                                     <i class="bi bi-folder-x fs-1"></i>
                                     <p class="mt-2 mb-0">Hiçbir dernek kaydı bulunamadı.</p>
                                 </td>

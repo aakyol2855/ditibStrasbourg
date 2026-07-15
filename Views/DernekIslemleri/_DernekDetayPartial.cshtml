@@ -31,6 +31,16 @@
                     Finansal Dönemler <span class="badge bg-secondary">@(Model.FinansalDonemler?.Count ?? 0)</span>
                 </button>
             </li>
+            <li class="nav-item">
+                <button class="nav-link" id="notes-tab-@Model.Id" data-bs-toggle="tab" data-bs-target="#notes-@Model.Id" type="button">
+                    Notlar <span class="badge bg-secondary">@(Model.DernekNotlari?.Count(n => !n.IsDeleted) ?? 0)</span>
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="gorsel-tab-@Model.Id" data-bs-toggle="tab" data-bs-target="#gorsel-@Model.Id" type="button">
+                    Görseller <span class="badge bg-secondary">@(Model.DernekGorselleri?.Count(g => !g.IsDeleted) ?? 0)</span>
+                </button>
+            </li>
         </ul>
 
         <div class="tab-content" id="tabContent-@Model.Id">
@@ -80,7 +90,16 @@
                                     <dd class="col-sm-9">@(Model.Adres ?? "-")</dd>
 
                                     <dt class="col-sm-3 text-muted small">Kuruluş Kanunu</dt>
-                                    <dd class="col-sm-9">@(Model.KurulusKanunu ?? "-")</dd>
+                                    <dd class="col-sm-9">
+                                        @if (!string.IsNullOrEmpty(Model.KurulusKanunu))
+                                        {
+                                            @Model.KurulusKanunu
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small fst-italic">Belirtilmemiş</span>
+                                        }
+                                    </dd>
 
                                     <dt class="col-sm-3 text-muted small">Başkonsolosluk Bölgesi</dt>
                                     <dd class="col-sm-9">@(Model.BaskonsoloslukBolgesi ?? "-")</dd>
@@ -113,7 +132,55 @@
                                     <dd class="col-sm-9">@(Model.FrenchRegistrationName ?? "-")</dd>
 
                                     <dt class="col-sm-3 text-muted small">Cemaat Sayısı</dt>
-                                    <dd class="col-sm-9">@(Model.CemaatCount?.ToString() ?? "-")</dd>
+                                    <dd class="col-sm-9">
+                                        @if (Model.CemaatCount.HasValue)
+                                        {
+                                            @Model.CemaatCount.Value
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small fst-italic">Belirtilmemiş</span>
+                                        }
+                                    </dd>
+
+                                    <dt class="col-sm-3 text-muted small">IBAN Numarası</dt>
+                                    <dd class="col-sm-9">
+                                        @if (!string.IsNullOrEmpty(Model.IbanNo))
+                                        {
+                                            @Model.IbanNo
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small fst-italic">Belirtilmemiş</span>
+                                        }
+                                    </dd>
+
+                                    <dt class="col-sm-3 text-muted small">SIRET Numarası</dt>
+                                    <dd class="col-sm-9">
+                                        @if (!string.IsNullOrEmpty(Model.SiretNo))
+                                        {
+                                            @Model.SiretNo
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small fst-italic">Belirtilmemiş</span>
+                                        }
+                                    </dd>
+
+                                    <dt class="col-sm-3 text-muted small">RNA Numarası</dt>
+                                    <dd class="col-sm-9">
+                                        @if (!string.IsNullOrEmpty(Model.RnaNo))
+                                        {
+                                            @Model.RnaNo
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small fst-italic">Belirtilmemiş</span>
+                                        }
+                                    </dd>
+
+                                    <dt class="col-sm-3 text-muted small">Ekonomi Notu</dt>
+                                    <dd class="col-sm-9">@(string.IsNullOrEmpty(Model.EkonomiNotu) ? "-" : Model.EkonomiNotu)</dd>
 
                                     <dt class="col-sm-3 text-muted small">Coğrafi Konum (Enlem / Boylam)</dt>
                                     <dd class="col-sm-9">
@@ -125,6 +192,27 @@
                                         {
                                             <span class="text-muted fst-italic small">Belirtilmemiş</span>
                                         }
+                                    </dd>
+
+                                    <dt class="col-sm-3 text-muted small">Cami / İbadethane</dt>
+                                    <dd class="col-sm-9">
+                                        <span class="badge @(Model.HasCami ? "bg-success-soft text-success" : "bg-light text-muted")">
+                                            @(Model.HasCami ? "Mevcut" : "Yok")
+                                        </span>
+                                    </dd>
+
+                                    <dt class="col-sm-3 text-muted small">Lojman Bilgisi</dt>
+                                    <dd class="col-sm-9">
+                                        <span class="badge @(Model.HasLojman ? "bg-success-soft text-success" : "bg-light text-muted")">
+                                            @(Model.HasLojman ? $"Mevcut (Kapasite: {Model.LojmanKapasite ?? 0} Kişi)" : "Yok")
+                                        </span>
+                                    </dd>
+
+                                    <dt class="col-sm-3 text-muted small">Müştemilat Bilgisi</dt>
+                                    <dd class="col-sm-9">
+                                        <span class="badge @(Model.HasMustemilat ? "bg-success-soft text-success" : "bg-light text-muted")">
+                                            @(Model.HasMustemilat ? $"Mevcut (Kapasite: {Model.MustemilatKapasite ?? 0} Kişi)" : "Yok")
+                                        </span>
                                     </dd>
                                 </dl>
                             </div>
@@ -238,7 +326,7 @@
                                             <span id="display-ailesayisi-@uye.Id">@uye.AileUyeSayisi</span>
                                             <input type="number" id="edit-ailesayisi-@uye.Id" class="form-control form-control-sm" value="@uye.AileUyeSayisi" style="display:none;" />
                                         </td>
-                                        <td>@uye.KayitTarihi.ToShortDateString()</td>
+                                        <td>@uye.KayitTarihi.ToString("dd.MM.yyyy")</td>
                                         <td>
                                             <button type="button" id="btn-edit-@uye.Id" class="btn btn-xs btn-warning" onclick="toggleEditMember(@uye.Id)">
                                                 <i class="fas fa-edit"></i>
@@ -332,23 +420,73 @@
                             }
                         </tbody>
                     </table>
+                </div>
             </div>
 
             <!-- Yönetim Kurulu Tab Pane -->
             <div class="tab-pane fade" id="board-@Model.Id" role="tabpanel">
-                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-people-fill me-1 text-primary"></i> Yönetim Kurulu Üyeleri</h6>
+                    <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#addBoardMemberCollapse-@Model.Id" aria-expanded="false">
+                        <i class="bi bi-plus-lg me-1"></i>Üye Ekle
+                    </button>
+                </div>
+
+                <!-- Inline Add Form -->
+                <div class="collapse mb-3" id="addBoardMemberCollapse-@Model.Id">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body">
+                            <form asp-action="AddBoardMember" asp-controller="DernekIslemleri" method="post" id="addBoardForm-@Model.Id">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="KurumId" value="@Model.Id" />
+                                <div class="row g-2 align-items-end">
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-bold">Ad Soyad <span class="text-danger">*</span></label>
+                                        <input type="text" name="FullName" class="form-control form-control-sm" required placeholder="örn. Ahmet Yılmaz" />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small fw-bold">İletişim Telefonu</label>
+                                        <input type="text" name="ContactPhone" class="form-control form-control-sm" placeholder="+33 6..." />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small fw-bold">Yönetim Rolü <span class="text-danger">*</span></label>
+                                        <select name="YonetimRolId" class="form-select form-select-sm" required>
+                                            <option value="">Seçiniz...</option>
+                                            @if (ViewBag.YonetimRolleri != null)
+                                            {
+                                                foreach (var rol in (IEnumerable<DitibStasbourg.Models.Ref_YonetimRol>)ViewBag.YonetimRolleri)
+                                                {
+                                                    <option value="@rol.Id">@rol.Ad</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="submit" class="btn btn-sm btn-success w-100"><i class="bi bi-save me-1"></i>Kaydet</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
                     <table class="table table-sm table-striped align-middle">
-                        <thead>
+                        <thead class="table-light">
                             <tr>
                                 <th>Ad Soyad</th>
                                 <th>İletişim Telefonu</th>
                                 <th>Görevi / Yönetim Rolü</th>
+                                <th class="text-center">İşlem</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @if (Model.YonetimKuruluUyeleri != null && Model.YonetimKuruluUyeleri.Any(u => !u.IsDeleted))
+                            @{
+                                var activeMembers = Model.YonetimKuruluUyeleri?.Where(u => !u.IsDeleted).ToList();
+                            }
+                            @if (activeMembers != null && activeMembers.Any())
                             {
-                                foreach (var member in Model.YonetimKuruluUyeleri.Where(u => !u.IsDeleted))
+                                foreach (var member in activeMembers)
                                 {
                                     <tr>
                                         <td><span class="fw-bold text-dark">@member.FullName</span></td>
@@ -356,13 +494,26 @@
                                         <td>
                                             <span class="badge bg-secondary">@(member.YonetimRol?.Ad ?? "Belirtilmemiş")</span>
                                         </td>
+                                        <td class="text-center">
+                                            <form asp-action="DeleteBoardMember" asp-controller="DernekIslemleri" method="post" style="display:inline;"
+                                                  onsubmit="return confirm('@member.FullName adlı üyeyi yönetim kurulundan çıkarmak istediğinizden emin misiniz?');">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@member.Id" />
+                                                <input type="hidden" name="kurumId" value="@Model.Id" />
+                                                <button type="submit" class="btn btn-xs btn-outline-danger">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
                                     </tr>
                                 }
                             }
                             else
                             {
                                 <tr>
-                                    <td colspan="3" class="text-center text-muted py-3">Bu derneğin yönetim kurulu kaydı bulunmuyor.</td>
+                                    <td colspan="4" class="text-center text-muted py-3">
+                                        Bu derneğin yönetim kurulu kaydı bulunmuyor. Yukarıdaki "Üye Ekle" butonunu kullanın.
+                                    </td>
                                 </tr>
                             }
                         </tbody>
@@ -464,6 +615,286 @@
                     </table>
                 </div>
             </div>
+
+            <!-- Notlar Tab Pane -->
+            <div class="tab-pane fade" id="notes-@Model.Id" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-chat-left-text-fill text-primary me-2"></i>Dernek Notları</h6>
+                    <button class="btn btn-sm btn-primary rounded-pill px-3" onclick="toggleAddNoteForm(@Model.Id)">
+                        <i class="bi bi-plus-circle me-1"></i> Yeni Not Ekle
+                    </button>
+                </div>
+
+                <!-- Add Note Form -->
+                <div id="add-note-form-@Model.Id" class="card bg-light border-0 mb-3" style="display:none; border-radius: 0.75rem;">
+                    <div class="card-body">
+                        <form id="noteForm-@Model.Id" onsubmit="event.preventDefault(); submitAddNote(this, @Model.Id);">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="dernekId" value="@Model.Id" />
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Not İçeriği</label>
+                                <textarea name="content" class="form-control" rows="3" required placeholder="Notunuzu buraya yazın..."></textarea>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Hatırlatma / Bitiş Tarihi (İsteğe Bağlı)</label>
+                                    <input type="date" name="bitisTarihi" class="form-control" />
+                                    <small class="text-muted">Bu tarih yaklaştığında sistem bildirim kutusuna otomatik uyarı düşecektir.</small>
+                                </div>
+                                <div class="col-md-6 text-end align-self-end">
+                                    <button type="submit" class="btn btn-sm btn-primary px-3 rounded-pill">
+                                        <i class="bi bi-save me-1"></i> Kaydet
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="list-group list-group-flush" id="notes-list-@Model.Id">
+                    @if (Model.DernekNotlari != null && Model.DernekNotlari.Any(n => !n.IsDeleted))
+                    {
+                        foreach (var note in Model.DernekNotlari.Where(n => !n.IsDeleted).OrderByDescending(n => n.KayitTarihi))
+                        {
+                            <div class="list-group-item py-3 border-0 bg-transparent" id="note-item-@note.Id">
+                                <div class="d-flex w-100 justify-content-between align-items-start">
+                                    <div class="pe-3">
+                                        <p class="mb-1 text-dark text-break">@note.NotIcerigi</p>
+                                        <div class="d-flex flex-wrap gap-3 align-items-center mt-2 small text-muted">
+                                            <span><i class="bi bi-person me-1"></i>@note.EkleyenKullanici</span>
+                                            <span><i class="bi bi-calendar-event me-1"></i>@note.KayitTarihi.ToString("dd.MM.yyyy HH:mm")</span>
+                                            @if (note.BitisTarihi.HasValue)
+                                            {
+                                                <span class="badge bg-warning text-dark rounded-pill">
+                                                    <i class="bi bi-alarm me-1"></i>Hatırlatma: @note.BitisTarihi.Value.ToString("dd.MM.yyyy")
+                                                </span>
+                                            }
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-danger border-0 rounded-circle" onclick="deleteDernekNote(@note.Id, @Model.Id)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-4">Bu dernek için henüz not alınmamış.</div>
+                    }
+                </div>
+            </div>
+
+            <!-- Görseller Tab Pane -->
+            <div class="tab-pane fade" id="gorsel-@Model.Id" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-images text-primary me-2"></i>Dernek Görselleri (Cami, Lojman, Müştemilat)</h6>
+                    <button class="btn btn-sm btn-primary rounded-pill px-3" onclick="toggleAddGorselForm(@Model.Id)">
+                        <i class="bi bi-plus-circle me-1"></i> Yeni Görsel Yükle
+                    </button>
+                </div>
+
+                <!-- Add Visual Form -->
+                <div id="add-gorsel-form-@Model.Id" class="card bg-light border-0 mb-4" style="display:none; border-radius: 0.75rem;">
+                    <div class="card-body">
+                        <form id="gorselForm-@Model.Id" enctype="multipart/form-data" onsubmit="event.preventDefault(); submitAddGorsel(this, @Model.Id);">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="dernekId" value="@Model.Id" />
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Görsel Seçin</label>
+                                    <input type="file" name="file" class="form-control form-control-sm" accept=".jpg,.jpeg,.png" required />
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Görsel Kategorisi</label>
+                                    <select name="type" class="form-select form-select-sm" required>
+                                        <option value="0">Cami</option>
+                                        <option value="1">Lojman</option>
+                                        <option value="2">Müştemilat</option>
+                                        <option value="3">Dış Cephe</option>
+                                        <option value="4">Diğer</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Açıklama</label>
+                                    <input type="text" name="description" class="form-control form-control-sm" placeholder="örn. Lojman giriş kat salonu..." />
+                                </div>
+                                <div class="col-md-12 text-end">
+                                    <button type="submit" class="btn btn-sm btn-primary px-3 rounded-pill">
+                                        <i class="bi bi-cloud-upload me-1"></i> Görseli Yükle
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="row g-3" id="gorseller-grid-@Model.Id">
+                    @if (Model.DernekGorselleri != null && Model.DernekGorselleri.Any(g => !g.IsDeleted))
+                    {
+                        foreach (var gorsel in Model.DernekGorselleri.Where(g => !g.IsDeleted).OrderByDescending(g => g.YuklenmeTarihi))
+                        {
+                            <div class="col-md-4 col-sm-6" id="gorsel-item-@gorsel.Id">
+                                <div class="card h-100 shadow-sm border-0 overflow-hidden" style="border-radius: 0.75rem;">
+                                    <a href="@gorsel.GorselYolu" target="_blank">
+                                        <img src="@gorsel.GorselYolu" class="card-img-top" style="height: 160px; object-fit: cover;" alt="@gorsel.Aciklama" />
+                                    </a>
+                                    <div class="card-body p-2 d-flex flex-column justify-content-between">
+                                        <div>
+                                            <span class="badge bg-secondary mb-1">@gorsel.GorselTipi.ToString()</span>
+                                            <p class="card-text small text-dark mb-1">@(gorsel.Aciklama ?? "Açıklama yok")</p>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mt-2">
+                                            <small class="text-muted small" style="font-size: 0.75rem;">@gorsel.YuklenmeTarihi.ToString("dd.MM.yyyy")</small>
+                                            <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="deleteDernekGorsel(@gorsel.Id, @Model.Id)">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="col-12 text-center text-muted py-4">Bu dernek için henüz görsel yüklenmemiş.</div>
+                    }
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+    if (typeof window.dernekDetayScriptsLoaded === 'undefined') {
+        window.dernekDetayScriptsLoaded = true;
+
+        window.toggleAddNoteForm = function(dernekId) {
+            var form = document.getElementById('add-note-form-' + dernekId);
+            if (form) form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        };
+
+        window.toggleAddGorselForm = function(dernekId) {
+            var form = document.getElementById('add-gorsel-form-' + dernekId);
+            if (form) form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        };
+
+        window.submitAddNote = function(formElement, dernekId) {
+            var formData = new FormData(formElement);
+            fetch('/DernekIslemleri/AddDernekNot', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✓ ' + data.message);
+                    if (typeof reloadDetails === 'function') {
+                        reloadDetails(dernekId);
+                    } else {
+                        window.location.reload();
+                    }
+                } else {
+                    alert('✗ Hata: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('✗ Sunucu bağlantısı başarısız.');
+            });
+        };
+
+        window.deleteDernekNote = function(noteId, dernekId) {
+            if (!confirm('Bu notu silmek istediğinizden emin misiniz?')) return;
+            var formData = new FormData();
+            formData.append('id', noteId);
+            var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            formData.append('__RequestVerificationToken', token);
+
+            fetch('/DernekIslemleri/DeleteDernekNot', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✓ ' + data.message);
+                    if (typeof reloadDetails === 'function') {
+                        reloadDetails(dernekId);
+                    } else {
+                        window.location.reload();
+                    }
+                } else {
+                    alert('✗ Hata: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('✗ Sunucu bağlantısı başarısız.');
+            });
+        };
+
+        window.submitAddGorsel = function(formElement, dernekId) {
+            var grid = document.getElementById('gorseller-grid-' + dernekId);
+            if (grid) {
+                var images = grid.querySelectorAll('[id^="gorsel-item-"]');
+                if (images && images.length >= 5) {
+                    alert('✗ En fazla 5 görsel yükleyebilirsiniz. Yeni yüklemek için lütfen önce eski bir görseli silin.');
+                    return;
+                }
+            }
+            var formData = new FormData(formElement);
+            fetch('/DernekIslemleri/AddDernekGorsel', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✓ ' + data.message);
+                    if (typeof reloadDetails === 'function') {
+                        reloadDetails(dernekId);
+                    } else {
+                        window.location.reload();
+                    }
+                } else {
+                    alert('✗ Hata: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('✗ Sunucu bağlantısı başarısız.');
+            });
+        };
+
+        window.deleteDernekGorsel = function(gorselId, dernekId) {
+            if (!confirm('Bu görseli silmek istediğinizden emin misiniz?')) return;
+            var formData = new FormData();
+            formData.append('id', gorselId);
+            var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            formData.append('__RequestVerificationToken', token);
+
+            fetch('/DernekIslemleri/DeleteDernekGorsel', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✓ ' + data.message);
+                    if (typeof reloadDetails === 'function') {
+                        reloadDetails(dernekId);
+                    } else {
+                        window.location.reload();
+                    }
+                } else {
+                    alert('✗ Hata: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('✗ Sunucu bağlantısı başarısız.');
+            });
+        };
+    }
+</script>

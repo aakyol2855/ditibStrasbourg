@@ -69,18 +69,6 @@
         font-size: 1.5rem;
         margin-bottom: 0.5rem;
     }
-
-    .density-bar {
-        height: 8px;
-        border-radius: 4px;
-        background-color: #e2e8f0;
-    }
-
-    .density-bar-fill {
-        height: 100%;
-        border-radius: 4px;
-        transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    }
 </style>
 
 <!-- Dashboard Top Header -->
@@ -96,10 +84,66 @@
     </div>
 </div>
 
+@if (Model.ImmigrationWarnings?.Any() == true)
+{
+    <div class="alert alert-warning border-0 shadow-sm p-4 mb-4" style="border-radius: 16px; background: rgba(254, 243, 199, 0.95); backdrop-filter: blur(10px); color: #78350f;">
+        <div class="d-flex align-items-start gap-3">
+            <div class="bg-warning bg-opacity-20 text-warning-emphasis p-2 rounded-3">
+                <i class="fa-solid fa-triangle-exclamation fs-4 text-warning"></i>
+            </div>
+            <div class="flex-grow-1">
+                <h5 class="fw-bold mb-1" style="color: #78350f;">Kritik Vize / Pasaport / Oturum İzni Süre Uyarıları</h5>
+                <p class="small mb-3" style="color: #92400e;">Aşağıdaki görevlilerin resmi belgelerinin geçerlilik süreleri 3 aydan az kalmıştır. Lütfen gerekli yenileme prosedürlerini başlatın.</p>
+                
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0 align-middle text-amber-900" style="font-size: 0.85rem; --bs-table-bg: transparent; --bs-table-hover-bg: rgba(217, 119, 6, 0.05);">
+                        <thead>
+                            <tr class="text-amber-800 border-amber-200">
+                                <th class="fw-bold">Görevli Adı Soyadı</th>
+                                <th class="fw-bold">Belge Türü</th>
+                                <th class="fw-bold">Geçerlilik Bitiş Tarihi</th>
+                                <th class="fw-bold">Kalan Gün</th>
+                                <th class="fw-bold">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var warning in Model.ImmigrationWarnings)
+                            {
+                                <tr style="border-bottom: 1px solid rgba(217, 119, 6, 0.15);">
+                                    <td class="fw-bold">@warning.AdSoyad</td>
+                                    <td>
+                                        <span class="badge bg-warning bg-opacity-25 text-warning-emphasis fw-bold">@warning.WarningType</span>
+                                    </td>
+                                    <td>@warning.ExpirationDate.ToString("dd.MM.yyyy")</td>
+                                    <td>
+                                        @if (warning.RemainingDays <= 0)
+                                        {
+                                            <span class="text-danger fw-bold"><i class="fa-solid fa-circle-exclamation me-1"></i> Süresi Doldu!</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="fw-bold">@warning.RemainingDays Gün</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <a asp-controller="Gorevli" asp-action="Edit" asp-route-id="@warning.GorevliId" class="btn btn-xs btn-amber px-2 py-1 fw-bold text-decoration-none" style="font-size: 0.75rem; background: #d97706; color: #fff; border-radius: 4px; border: none;">
+                                            <i class="fa-solid fa-pen me-1"></i> Düzenle
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 <!-- Dynamic Top Metric Grid -->
 <div class="row g-4 mb-4">
     <!-- Associations Counter Card -->
-    <div class="col-xl-3 col-md-6">
+    <div class="col-xl col-md-6">
         <a asp-controller="DernekIslemleri" asp-action="Index" class="text-decoration-none">
             <div class="executive-card p-4 h-100 d-flex align-items-center justify-content-between">
                 <div>
@@ -115,14 +159,14 @@
     </div>
 
     <!-- Active Staff Counter Card -->
-    <div class="col-xl-3 col-md-6">
+    <div class="col-xl col-md-6">
         <a asp-controller="Gorevli" asp-action="Index" class="text-decoration-none">
             <div class="executive-card p-4 h-100 d-flex align-items-center justify-content-between">
                 <div>
                     <span class="text-muted fw-semibold small uppercase tracking-wider d-block mb-1">Toplam Görevli Havuzu</span>
                     <h3 class="fw-bold mb-0 text-slate-900">@Model.TotalGorevli</h3>
                     <span class="text-success small fw-semibold">
-                        <i class="fa-solid fa-circle me-1" style="font-size: 8px;"></i> @Model.ActiveGorevli Aktif Görevde
+                        <i class="fa-solid fa-circle me-1" style="font-size: 8px;"></i> @Model.ActiveGorevli Hack Aktif Görevde
                     </span>
                 </div>
                 <div class="metric-icon-wrapper bg-success bg-opacity-10 text-success">
@@ -133,7 +177,7 @@
     </div>
 
     <!-- Assignments Counter Card -->
-    <div class="col-xl-3 col-md-6">
+    <div class="col-xl col-md-6">
         <a asp-controller="Gorevlendirme" asp-action="Index" class="text-decoration-none">
             <div class="executive-card p-4 h-100 d-flex align-items-center justify-content-between">
                 <div>
@@ -151,7 +195,7 @@
     </div>
 
     <!-- Assignments This Year Counter Card -->
-    <div class="col-xl-3 col-md-6">
+    <div class="col-xl col-md-6">
         <a asp-controller="Gorevlendirme" asp-action="Index" class="text-decoration-none">
             <div class="executive-card p-4 h-100 d-flex align-items-center justify-content-between">
                 <div>
@@ -163,6 +207,28 @@
                 </div>
                 <div class="metric-icon-wrapper bg-info bg-opacity-10 text-info">
                     <i class="fa-solid fa-chart-bar fs-4"></i>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-xl col-md-6">
+        <a href="#consolidatedVacancySection" class="text-decoration-none" onclick="toggleVacancyView('unstaffed')">
+            <div class="executive-card p-4 h-100 d-flex align-items-center justify-content-between border-danger-subtle bg-danger-subtle bg-opacity-10">
+                <div>
+                    <span class="text-muted fw-semibold small uppercase tracking-wider d-block mb-1">Kadro Açığı Olan Camiler</span>
+                    <h3 class="fw-bold mb-0 text-danger">@Model.GorevlisiOlmayanKurumlar.Count</h3>
+                    <span class="text-danger small fw-semibold"><i class="fa-solid fa-triangle-exclamation me-1"></i>Açıkları İncele</span>
+                    @if (Model.ExpiringAssignmentsCount > 0)
+                    {
+                        <div class="mt-2 small text-muted">
+                            <i class="bi bi-exclamation-triangle-fill text-warning me-1"></i>
+                            <span class="text-warning fw-bold">@Model.ExpiringAssignmentsCount Kurumun</span> Görev Süresi Azalıyor
+                        </div>
+                    }
+                </div>
+                <div class="metric-icon-wrapper bg-danger bg-opacity-10 text-danger">
+                    <i class="fa-solid fa-house-circle-exclamation fs-4"></i>
                 </div>
             </div>
         </a>
@@ -181,6 +247,47 @@
             </div>
             <div class="p-0 border-top">
                 @await Component.InvokeAsync("Map")
+            </div>
+        </div>
+
+        <!-- Vacancy & Placement Warning Grid -->
+        <div class="executive-card p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h5 class="mb-0 fw-bold text-slate-800"><i class="fa-solid fa-triangle-exclamation text-warning me-2"></i>Kurumsal Kadro Boşluk Analizi</h5>
+                    <p class="text-muted mb-0 small">Kadro açığı bulunan veya görevlendirme süresi dolmak üzere olan kurumların detaylı listesi.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="/DernekIslemleri/ExportExcel?missingStaffOnly=true" class="btn btn-outline-success btn-sm">
+                        <i class="fa-solid fa-file-excel me-1"></i>Kadro Açığı Raporu (Excel)
+                    </a>
+                </div>
+            </div>
+
+            <!-- Toggle Buttons -->
+            <div class="d-flex border-bottom pb-2 mb-3">
+                <button type="button" class="btn btn-sm btn-outline-primary active me-2 px-3 py-2 rounded-pill shadow-sm" id="btnShowUnstaffed" onclick="toggleVacancyView('unstaffed')">
+                    <i class="fa-solid fa-hotel me-1"></i>Görevlisi Olmayan Kurumlar (@Model.GorevlisiOlmayanKurumlar.Count)
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-warning px-3 py-2 rounded-pill shadow-sm" id="btnShowExpiring" onclick="toggleVacancyView('expiring')">
+                    <i class="fa-solid fa-clock me-1"></i>Görev Süresi Dolanlar (@Model.SuresiBitenGorevlendirmeler.Count)
+                </button>
+            </div>
+
+            <!-- Content Area (Consolidated Dynamic Grid) -->
+            <div id="consolidatedVacancySection">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle small mb-0" id="vacancyTable">
+                        <thead class="table-light">
+                            <tr id="vacancyTableHeader">
+                                <!-- Dynamic Headers -->
+                            </tr>
+                        </thead>
+                        <tbody id="vacancyTableBody">
+                            <!-- Dynamic Content -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -251,32 +358,6 @@
 
     <!-- Right Column: Regional Density, Sacrificial Ledger & Quick Commands -->
     <div class="col-lg-4">
-        <!-- Regional Staff Density Widget -->
-        <div class="executive-card p-4 mb-4">
-            <h5 class="mb-3 fw-bold text-slate-800"><i class="fa-solid fa-users-rectangle text-primary me-2"></i>Bölgesel Personel Dağılımı</h5>
-            <div class="list-group list-group-flush">
-                @foreach (var region in Model.RegionalDensities)
-                {
-                    var totalAssignedInRegion = region.ActiveCount;
-                    var totalUnassignedPool = region.UnassignedCount;
-                    var totalRegionPool = totalAssignedInRegion + totalUnassignedPool;
-                    var percentageAssigned = totalRegionPool > 0 ? (double)totalAssignedInRegion / totalRegionPool * 100 : 0;
-
-                    <div class="list-group-item px-0 border-0 mb-3">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="fw-bold text-slate-800">Bölge @region.Region</span>
-                            <span class="small text-muted">
-                                <strong>@totalAssignedInRegion</strong> Aktif / @totalUnassignedPool Havuz
-                            </span>
-                        </div>
-                        <div class="density-bar">
-                            <div class="density-bar-fill bg-primary" style="width: @(percentageAssigned)%;"></div>
-                        </div>
-                    </div>
-                }
-            </div>
-        </div>
-
         <!-- Sacrificial Ledger Accountability Widget -->
         <div class="executive-card p-4 mb-4">
             <h5 class="mb-3 fw-bold text-slate-800"><i class="fa-solid fa-calculator text-primary me-2"></i>Kurban Hisse ve Ödemeler</h5>
@@ -456,5 +537,144 @@
                 }
             });
         }
+    });
+
+    const unstaffedKurumsData = @Html.Raw(Json.Serialize(Model.GorevlisiOlmayanKurumlar.Select(k => new {
+        id = k.Id,
+        isim = k.Isim,
+        adres = k.Adres,
+        bolge = k.Bolge,
+        iletisimNumarasi = k.IletisimNumarasi,
+        maili = k.Maili
+    })));
+
+    const expiringGorevlendirmesData = @Html.Raw(Json.Serialize(Model.SuresiBitenGorevlendirmeler.Select(g => new {
+        gorevliId = g.GorevliId,
+        kurumId = g.KurumId,
+        gorevliAdSoyad = g.Gorevli != null ? g.Gorevli.AdSoyad : "Bilinmiyor",
+        gorevliEmail = g.Gorevli != null ? g.Gorevli.Email ?? "" : "",
+        kurumIsim = g.Kurum != null ? g.Kurum.Isim ?? "Bilinmiyor" : "Bilinmiyor",
+        kurumBolge = g.Kurum != null ? g.Kurum.Bolge ?? "" : "",
+        tarihFormatted = g.Tarih.ToString("dd.MM.yyyy"),
+        bitisTarihiFormatted = g.BitisTarihi != null ? g.BitisTarihi.Value.ToString("dd.MM.yyyy") : "",
+        remainingDays = g.BitisTarihi.HasValue ? (g.BitisTarihi.Value - DateTime.Today).Days : 0
+    })));
+
+    function renderVacancyGrid(view) {
+        const headerRow = document.getElementById('vacancyTableHeader');
+        const tbody = document.getElementById('vacancyTableBody');
+        if (!headerRow || !tbody) return;
+
+        headerRow.innerHTML = '';
+        tbody.innerHTML = '';
+
+        if (view === 'unstaffed') {
+            headerRow.innerHTML = `
+                <th>Kurum Adı</th>
+                <th>Bölge</th>
+                <th>Telefon / E-posta</th>
+                <th>Durum</th>
+                <th class="text-end">İşlem</th>
+            `;
+
+            if (unstaffedKurumsData && unstaffedKurumsData.length > 0) {
+                unstaffedKurumsData.forEach(kurum => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>
+                            <div class="fw-bold text-slate-900">${kurum.isim || ''}</div>
+                            <span class="text-muted small">${kurum.adres || ''}</span>
+                        </td>
+                        <td><span class="badge bg-secondary-subtle text-secondary px-2 py-1">Bolge ${kurum.bolge || ''}</span></td>
+                        <td>
+                            <div>${kurum.iletisimNumarasi || ''}</div>
+                            <div class="text-muted small">${kurum.maili || ''}</div>
+                        </td>
+                        <td><span class="badge bg-danger bg-opacity-10 text-danger px-2 py-1"><i class="fa-solid fa-user-slash me-1"></i>Görevli Ataması Yok</span></td>
+                        <td class="text-end">
+                            <a href="/Gorevlendirme?targetKurumId=${kurum.id}" class="btn btn-xs btn-outline-primary py-1 px-2" style="font-size: 0.75rem;"><i class="fa-solid fa-user-plus me-1"></i>Atama Yap</a>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } else {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">
+                            <i class="fa-solid fa-circle-check text-success fs-4 mb-2 d-block"></i>
+                            Tüm kurumlarımızda görevli atanmış durumdadır.
+                        </td>
+                    </tr>
+                `;
+            }
+        } else {
+            headerRow.innerHTML = `
+                <th>Görevli Ad Soyad</th>
+                <th>Atandığı Kurum</th>
+                <th>Başlangıç / Bitiş</th>
+                <th>Durum</th>
+                <th class="text-end">İşlem</th>
+            `;
+
+            if (expiringGorevlendirmesData && expiringGorevlendirmesData.length > 0) {
+                expiringGorevlendirmesData.forEach(g => {
+                    const tr = document.createElement('tr');
+                    const badgeClass = g.remainingDays <= 30 ? "bg-danger bg-opacity-10 text-danger" : "bg-warning bg-opacity-10 text-warning-emphasis";
+                    
+                    tr.innerHTML = `
+                        <td>
+                            <div class="fw-bold text-slate-900">${g.gorevliAdSoyad}</div>
+                            <span class="text-muted small">${g.gorevliEmail}</span>
+                        </td>
+                        <td>
+                            <div class="fw-bold text-slate-800">${g.kurumIsim}</div>
+                            <span class="text-muted small">Bölge: ${g.kurumBolge}</span>
+                        </td>
+                        <td>
+                            <div>${g.tarihFormatted}</div>
+                            <div class="text-muted small">${g.bitisTarihiFormatted}</div>
+                        </td>
+                        <td>
+                            <span class="badge ${badgeClass} px-2 py-1">
+                                <i class="fa-solid fa-clock me-1"></i>Görev Süresi Azalıyor (${g.remainingDays} Gün Kaldı)
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <a href="/Gorevlendirme?targetKurumId=${g.kurumId}" class="btn btn-xs btn-outline-warning py-1 px-2" style="font-size: 0.75rem;"><i class="fa-solid fa-arrows-rotate me-1"></i>Yenile / Uzat</a>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } else {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">
+                            <i class="fa-solid fa-circle-check text-success fs-4 mb-2 d-block"></i>
+                            Süresi dolmak üzere olan görevlendirme bulunmamaktadır.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+    }
+
+    function toggleVacancyView(view) {
+        const btnUnstaffed = document.getElementById('btnShowUnstaffed');
+        const btnExpiring = document.getElementById('btnShowExpiring');
+
+        if (view === 'unstaffed') {
+            btnUnstaffed.classList.add('active');
+            btnExpiring.classList.remove('active');
+        } else {
+            btnUnstaffed.classList.remove('active');
+            btnExpiring.classList.add('active');
+        }
+
+        renderVacancyGrid(view);
+    }
+
+    // Initialize initial view
+    document.addEventListener("DOMContentLoaded", function() {
+        renderVacancyGrid('unstaffed');
     });
 </script>

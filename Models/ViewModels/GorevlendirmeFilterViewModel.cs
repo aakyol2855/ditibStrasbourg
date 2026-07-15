@@ -15,5 +15,9 @@ namespace DitibStasbourg.Models.ViewModels
         public string? Bolge { get; set; }
         public string? Dernek { get; set; }
         public string? Gorevli { get; set; }
+
+        // Sorting support (passed via URL query string)
+        public string? SortBy { get; set; }       // e.g. "Gorevli", "Kurum", "BaslangicTarihi", "BitisTarihi"
+        public bool IsDescending { get; set; } = true;
     }
 }

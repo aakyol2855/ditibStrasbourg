@@ -3,7 +3,9 @@
 @{
     ViewData["Title"] = "Dernek Düzenle - " + Model.Isim;
 }
-
+@section Styles {
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+}
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
@@ -20,7 +22,7 @@
         <input type="hidden" asp-for="Id" />
         <input type="hidden" asp-for="Tip" />
 
-        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
         <div class="row">
             <!-- Temel Bilgiler -->
@@ -31,7 +33,7 @@
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <label asp-for="Isim" class="form-label fw-bold small text-muted">Dernek Adı</label>
+                            <label asp-for="Isim" class="form-label fw-bold small text-muted">Dernek / Kurum Adı <span class="text-danger">*</span></label>
                             <input asp-for="Isim" class="form-control" required />
                             <span asp-validation-for="Isim" class="text-danger"></span>
                         </div>
@@ -82,6 +84,24 @@
                             <label asp-for="Maili" class="form-label fw-bold small text-muted">Dernek E-posta</label>
                             <input asp-for="Maili" class="form-control" type="email" placeholder="example@domain.com" />
                             <span asp-validation-for="Maili" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="IbanNo" class="form-label fw-bold small text-muted">IBAN No <span class="text-danger">*</span></label>
+                            <input asp-for="IbanNo" class="form-control" placeholder="FR76..." required />
+                            <span asp-validation-for="IbanNo" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="SiretNo" class="form-label fw-bold small text-muted">SIRET No <span class="text-danger">*</span></label>
+                            <input asp-for="SiretNo" class="form-control" placeholder="14 haneli numara" required />
+                            <span asp-validation-for="SiretNo" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="RnaNo" class="form-label fw-bold small text-muted">RNA No <span class="text-danger">*</span></label>
+                            <input asp-for="RnaNo" class="form-control" placeholder="W..." required />
+                            <span asp-validation-for="RnaNo" class="text-danger"></span>
                         </div>
                     </div>
                 </div>
@@ -169,10 +189,38 @@
                                  <span asp-validation-for="FrenchRegistrationName" class="text-danger"></span>
                              </div>
                              <div class="col-md-4 mb-3">
-                                 <label asp-for="CemaatCount" class="form-label fw-bold small text-muted">Cemaat Sayısı</label>
-                                 <input asp-for="CemaatCount" class="form-control" type="number" min="0" placeholder="örn. 150" />
-                                 <span asp-validation-for="CemaatCount" class="text-danger"></span>
-                             </div>
+                                  <label asp-for="CemaatCount" class="form-label fw-bold small text-muted">Cemaat Sayısı</label>
+                                  <input asp-for="CemaatCount" class="form-control" type="number" min="0" placeholder="örn. 150" />
+                                  <span asp-validation-for="CemaatCount" class="text-danger"></span>
+                              </div>
+                              <div class="col-md-4 mb-3">
+                                  <div class="form-check mt-4">
+                                      <input asp-for="HasCami" class="form-check-input" type="checkbox" id="HasCami" />
+                                      <label asp-for="HasCami" class="form-check-label fw-bold small text-muted">Cami var mı?</label>
+                                  </div>
+                              </div>
+                              <div class="col-md-4 mb-3">
+                                  <div class="form-check mt-4">
+                                      <input asp-for="HasLojman" class="form-check-input" type="checkbox" id="HasLojman" />
+                                      <label asp-for="HasLojman" class="form-check-label fw-bold small text-muted">Lojman var mı?</label>
+                                  </div>
+                              </div>
+                              <div class="col-md-4 mb-3">
+                                  <label asp-for="LojmanKapasite" class="form-label fw-bold small text-muted">Lojman Kapasitesi (Kişi)</label>
+                                  <input asp-for="LojmanKapasite" class="form-control" type="number" min="0" placeholder="örn. 4" />
+                                  <span asp-validation-for="LojmanKapasite" class="text-danger"></span>
+                              </div>
+                              <div class="col-md-4 mb-3">
+                                  <div class="form-check mt-4">
+                                      <input asp-for="HasMustemilat" class="form-check-input" type="checkbox" id="HasMustemilat" />
+                                      <label asp-for="HasMustemilat" class="form-check-label fw-bold small text-muted">Müştemilat var mı?</label>
+                                  </div>
+                              </div>
+                              <div class="col-md-4 mb-3">
+                                  <label asp-for="MustemilatKapasite" class="form-label fw-bold small text-muted">Müştemilat Kapasitesi (Kişi)</label>
+                                  <input asp-for="MustemilatKapasite" class="form-control" type="number" min="0" placeholder="örn. 2" />
+                                  <span asp-validation-for="MustemilatKapasite" class="text-danger"></span>
+                              </div>
                              <div class="col-md-4 mb-3">
                                  <label asp-for="Latitude" class="form-label fw-bold small text-muted">Enlem (Latitude)</label>
                                  <input asp-for="Latitude" class="form-control" type="number" step="any" placeholder="örn. 48.5661" />
@@ -265,7 +313,7 @@
  
  @section Scripts {
      @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-     
+     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
      <script>
          $(document).ready(function() {
              $('.select2-city').select2({

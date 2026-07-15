@@ -2,25 +2,23 @@ using System.Text.Json;
 using DitibStasbourg.Data;
 using DitibStasbourg.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace DitibStasbourg.Data
 {
     public static class DocumentationInitializer
     {
-        public static async Task SeedHelpTopicsAsync(ApplicationDbContext context)
+        public static async Task SeedHelpTopicsAsync(ApplicationDbContext context, ILogger? logger = null)
         {
-            // If we have content, skip seeding unless it's a fresh run or we want to sync
-            // For production, we usually only seed if empty, but for decoupling, we sync new items
-            
             var jsonPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "data", "initial_docs.json");
             if (!File.Exists(jsonPath)) return;
 
             try
             {
                 var jsonContent = await File.ReadAllTextAsync(jsonPath);
-                var topics = JsonSerializer.Deserialize<List<HelpTopic>>(jsonContent, new JsonSerializerOptions 
-                { 
-                    PropertyNameCaseInsensitive = true 
+                var topics = JsonSerializer.Deserialize<List<HelpTopic>>(jsonContent, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
                 });
 
                 if (topics == null) return;
@@ -50,7 +48,7 @@ namespace DitibStasbourg.Data
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error seeding documentation: {ex.Message}");
+                logger?.LogError(ex, "Dokümantasyon seed işlemi sırasında hata oluştu");
             }
         }
     }

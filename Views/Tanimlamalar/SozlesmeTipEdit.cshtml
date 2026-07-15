@@ -16,6 +16,11 @@
                 <input asp-for="Ad" class="form-control" />
                 <span asp-validation-for="Ad" class="text-danger"></span>
             </div>
+            <div class="form-group form-check mb-3">
+                <input asp-for="IsLocalContract" class="form-check-input" type="checkbox" />
+                <label asp-for="IsLocalContract" class="form-check-label"></label>
+                <span asp-validation-for="IsLocalContract" class="text-danger"></span>
+            </div>
             <div class="form-group">
                 <input type="submit" value="Kaydet" class="btn btn-primary" />
                 <a asp-action="SozlesmeTipList" class="btn btn-secondary">Listeye Dön</a>

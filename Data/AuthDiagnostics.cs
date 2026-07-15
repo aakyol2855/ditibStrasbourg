@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace DitibStasbourg.Data;
 
@@ -8,51 +9,48 @@ public static class AuthDiagnostics
     public static async Task RunDiagnostics(IServiceProvider serviceProvider)
     {
         var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+        var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
         var email = "AAKYOL28@OUTLOOK.COM";
-        
-        Console.WriteLine("============= AUTH DIAGNOSTICS START =============");
-        
+
+        logger.LogInformation("============= AUTH DIAGNOSTICS START =============");
+
         var userByEmail = await userManager.FindByEmailAsync(email);
-        Console.WriteLine($"FindByEmailAsync('{email}'): {(userByEmail != null ? "FOUND" : "NULL")}");
+        logger.LogInformation("FindByEmailAsync('{Email}'): {Result}", email, userByEmail != null ? "FOUND" : "NULL");
 
         var userByName = await userManager.FindByNameAsync(email);
-        Console.WriteLine($"FindByNameAsync('{email}'): {(userByName != null ? "FOUND" : "NULL")}");
+        logger.LogInformation("FindByNameAsync('{Email}'): {Result}", email, userByName != null ? "FOUND" : "NULL");
 
-        // Raw SQL check if possible or simplified
         if (userByEmail != null)
         {
-            PrintUserDetails(userByEmail, "Found By Email");
+            PrintUserDetails(logger, userByEmail, "Found By Email");
         }
-        
+
         if (userByName != null && (userByEmail == null || userByName.Id != userByEmail.Id))
         {
-            PrintUserDetails(userByName, "Found By Name");
+            PrintUserDetails(logger, userByName, "Found By Name");
         }
-        
-        // Check Password
+
         if (userByEmail != null)
         {
             var isPasswordValid = await userManager.CheckPasswordAsync(userByEmail, "Admin123!");
-            Console.WriteLine($"CheckPasswordAsync('Admin123!'): {isPasswordValid}");
+            logger.LogInformation("CheckPasswordAsync('Admin123!'): {IsValid}", isPasswordValid);
         }
 
-        Console.WriteLine("============= AUTH DIAGNOSTICS END =============");
+        logger.LogInformation("============= AUTH DIAGNOSTICS END =============");
     }
 
-    private static void PrintUserDetails(IdentityUser user, string source)
+    private static void PrintUserDetails(ILogger logger, IdentityUser user, string source)
     {
-        Console.WriteLine($"--- User Details ({source}) ---");
-        Console.WriteLine($"Id: {user.Id}");
-        Console.WriteLine($"UserName: '{user.UserName}'");
-        Console.WriteLine($"NormalizedUserName: '{user.NormalizedUserName}'");
-        Console.WriteLine($"Email: '{user.Email}'");
-        Console.WriteLine($"NormalizedEmail: '{user.NormalizedEmail}'");
-        Console.WriteLine($"EmailConfirmed: {user.EmailConfirmed}");
-        Console.WriteLine($"PasswordHash: {user.PasswordHash}");
-        Console.WriteLine($"SecurityStamp: {user.SecurityStamp}");
-        Console.WriteLine($"ConcurrencyStamp: {user.ConcurrencyStamp}");
-        Console.WriteLine($"LockoutEnabled: {user.LockoutEnabled}");
-        Console.WriteLine($"LockoutEnd: {user.LockoutEnd}");
-        Console.WriteLine("-----------------------------------");
+        logger.LogInformation("--- User Details ({Source}) --- Id={Id} UserName='{UserName}' NormalizedUserName='{NormUserName}' Email='{Email}' NormalizedEmail='{NormEmail}' EmailConfirmed={EmailConfirmed} SecurityStamp={SecurityStamp} LockoutEnabled={LockoutEnabled} LockoutEnd={LockoutEnd}",
+            source,
+            user.Id,
+            user.UserName,
+            user.NormalizedUserName,
+            user.Email,
+            user.NormalizedEmail,
+            user.EmailConfirmed,
+            user.SecurityStamp,
+            user.LockoutEnabled,
+            user.LockoutEnd);
     }
 }

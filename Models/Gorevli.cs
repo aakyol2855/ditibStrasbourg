@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using DitibStasbourg.Models.Attributes;
+using DitibStasbourg.Models.Enums;
 
 namespace DitibStasbourg.Models
 {
@@ -48,6 +49,16 @@ namespace DitibStasbourg.Models
         [ExportColumn("TC Kimlik No", Order = 5, IncludeInQuickExport = false)]
         public string? TCKimlikNo { get; set; }
 
+        [Display(Name = "Fransız Kimlik / Oturum Kartı No (NSS / Titre de Séjour)")]
+        [StringLength(50)]
+        [ExportColumn("Fransız Kimlik No", Order = 6, IncludeInQuickExport = false)]
+        public string? FrenchNationalId { get; set; }
+
+        [Display(Name = "Sicil No")]
+        [StringLength(20)]
+        [ExportColumn("Sicil No", Order = 20, IncludeInQuickExport = false)]
+        public string? SicilNo { get; set; }
+
         [Display(Name = "Baba Adı")]
         [ExportColumn("Baba Adı", Order = 10, IncludeInQuickExport = false)]
         public string? BabaAdi { get; set; }
@@ -64,6 +75,15 @@ namespace DitibStasbourg.Models
         [DataType(DataType.Date)]
         [ExportColumn("Doğum Tarihi", Order = 13, Format = "dd.MM.yyyy", IncludeInQuickExport = false)]
         public DateTime? DogumTarihi { get; set; }
+
+        [Display(Name = "Memleketi")]
+        [StringLength(100)]
+        [ExportColumn("Memleketi", Order = 21, IncludeInQuickExport = false)]
+        public string? Memleketi { get; set; }
+
+        [Display(Name = "Medeni Durum")]
+        [ExportColumn("Medeni Durum", Order = 22, IncludeInQuickExport = false)]
+        public MedeniDurum? EsDurumu { get; set; }
 
         // Contact
         [Display(Name = "Cep Telefonu")]
@@ -92,6 +112,20 @@ namespace DitibStasbourg.Models
         [Display(Name = "Mezuniyet Bölüm")]
         [ExportColumn("Mezuniyet Bölüm", Order = 15, IncludeInQuickExport = false)]
         public string? MezuniyetBolum { get; set; }
+
+        [Display(Name = "Mezun Olunan Üniversite")]
+        [StringLength(200)]
+        [ExportColumn("Üniversite", Order = 33, IncludeInQuickExport = false)]
+        public string? Universite { get; set; }
+
+        [Display(Name = "Not Ortalaması (AGNO)")]
+        [Range(0, 4)]
+        public decimal? Agno { get; set; }
+
+        [Display(Name = "Bilinen Diller")]
+        [StringLength(300)]
+        [ExportColumn("Diller", Order = 34, IncludeInQuickExport = false)]
+        public string? Diller { get; set; }
 
         [Display(Name = "Hafızlık Durumu")]
         public int? HafizlikDurumuId { get; set; }
@@ -143,6 +177,49 @@ namespace DitibStasbourg.Models
         [ExportColumn("Diyanet Giriş Tarihi", Order = 19, Format = "dd.MM.yyyy", IncludeInQuickExport = false)]
         public DateTime? DiyanetGirisTarihi { get; set; }
 
+        [Display(Name = "Fransa Giriş / Sözleşme Tarihi")]
+        [DataType(DataType.Date)]
+        [ExportColumn("Fransa Giriş Tarihi", Order = 20, Format = "dd.MM.yyyy", IncludeInQuickExport = false)]
+        public DateTime? FransaGirisTarihi { get; set; }
+
+        // DİBBYS Pasaport & Vize
+        [Display(Name = "Pasaport Türü")]
+        [ExportColumn("Pasaport Türü", Order = 23, IncludeInQuickExport = false)]
+        public PasaportTuru? PasaportTuru { get; set; }
+
+        [Display(Name = "Pasaport No")]
+        [StringLength(20)]
+        [ExportColumn("Pasaport No", Order = 24, IncludeInQuickExport = false)]
+        public string? PasaportNo { get; set; }
+
+        [Display(Name = "Görev Uzatma Bitiş Tarihi")]
+        [DataType(DataType.Date)]
+        [ExportColumn("Görev Uzatma Bitiş", Order = 25, Format = "dd.MM.yyyy", IncludeInQuickExport = false)]
+        public DateTime? GorevUzatmaBitisTarihi { get; set; }
+
+        [Display(Name = "Vize Bitiş Tarihi")]
+        [DataType(DataType.Date)]
+        [ExportColumn("Vize Bitiş Tarihi", Order = 26, Format = "dd.MM.yyyy", IncludeInQuickExport = false)]
+        public DateTime? VisaExpirationDate { get; set; }
+
+        [Display(Name = "Pasaport Geçerlilik Tarihi")]
+        [DataType(DataType.Date)]
+        [ExportColumn("Pasaport Geçerlilik Tarihi", Order = 27, Format = "dd.MM.yyyy", IncludeInQuickExport = false)]
+        public DateTime? PassportExpirationDate { get; set; }
+
+        [Display(Name = "Fransa Oturum Kartı Bitiş Tarihi")]
+        [DataType(DataType.Date)]
+        [ExportColumn("Fransa Oturum Kartı Bitiş", Order = 28, Format = "dd.MM.yyyy", IncludeInQuickExport = false)]
+        public DateTime? ResidencePermitExpirationDate { get; set; }
+
+        [Display(Name = "Eğitim Kurs Belgeleri")]
+        [StringLength(2000)]
+        public string? EgitimKursBelgeleri { get; set; }
+
+        // Linked Identity User (for GorevliUser portal login)
+        [Display(Name = "Bağlı Kullanıcı ID")]
+        public string? LinkedUserId { get; set; }
+
         // Other
         [Display(Name = "Fotoğraf Yolu")]
         public string? FotografYolu { get; set; }
@@ -158,12 +235,32 @@ namespace DitibStasbourg.Models
         public ICollection<GorevGecmisi> GorevGecmisleri { get; set; } = new List<GorevGecmisi>();
         public ICollection<GorevliNot> GorevliNotlari { get; set; } = new List<GorevliNot>();
 
+        // DİBBYS Navigation Collections
+        public ICollection<GorevliIzin> Izinler { get; set; } = new List<GorevliIzin>();
+        public ICollection<GorevliFaaliyetRaporu> FaaliyetRaporlari { get; set; } = new List<GorevliFaaliyetRaporu>();
+
+        // Belge Arşivi (Oturum Kartı, Laiklik Belgesi, Dil Belgesi vb.)
+        public ICollection<GorevliBelge> Belgeler { get; set; } = new List<GorevliBelge>();
+
         [System.ComponentModel.DataAnnotations.Schema.NotMapped]
         [Display(Name = "Görevde mi?")]
         public bool isActive => Gorevlendirmeler.Any(g => 
                       DateTime.Now.Date >= g.Tarih.Date && 
                       (!g.BitisTarihi.HasValue || DateTime.Now.Date <= g.BitisTarihi.Value.Date));
+
+        [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+        public bool RequiresImmigrationAttention => 
+            (VisaExpirationDate.HasValue && VisaExpirationDate.Value <= DateTime.Now.AddMonths(3)) ||
+            (PassportExpirationDate.HasValue && PassportExpirationDate.Value <= DateTime.Now.AddMonths(3)) ||
+            (ResidencePermitExpirationDate.HasValue && ResidencePermitExpirationDate.Value <= DateTime.Now.AddMonths(3));
         
+        [Display(Name = "Merkez Personeli mi?")]
+        public bool IsMerkezPersoneli { get; set; } = false;
+
+        [Display(Name = "Merkez Görev Alanı")]
+        [StringLength(100)]
+        public string? MerkezGorevAlani { get; set; }
+
         [Display(Name = "Eski Durum (Deprecated)")]
         public GorevliDurum Durum { get; set; } = GorevliDurum.Notr;
 
@@ -171,6 +268,22 @@ namespace DitibStasbourg.Models
         public bool IsDeleted { get; set; } = false;
 
         public DateTime? DeletedAt { get; set; }
+
+        [NotMapped]
+        [ExportColumn("Aktif Görev Yeri", Order = 29, IncludeInQuickExport = false)]
+        public string? ExportAktifGorevYeri { get; set; }
+
+        [NotMapped]
+        [ExportColumn("Önceki Görev Yerleri", Order = 30, IncludeInQuickExport = false)]
+        public string? ExportOncekiGorevYerleri { get; set; }
+
+        [NotMapped]
+        [ExportColumn("Mevcut İzin Bilgileri", Order = 31, IncludeInQuickExport = false)]
+        public string? ExportMevcutIzinBilgileri { get; set; }
+
+        [NotMapped]
+        [ExportColumn("Sistem Notları", Order = 32, IncludeInQuickExport = false)]
+        public string? ExportSistemNotlari { get; set; }
     }
 
     public enum GorevliDurum

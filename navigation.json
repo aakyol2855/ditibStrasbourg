@@ -22,6 +22,20 @@
       "RequiredClaim": "Gorevli-Index"
     },
     {
+      "Title": "Görevlendirmeler",
+      "Icon": "bi bi-briefcase",
+      "Controller": "Gorevlendirme",
+      "Action": "Index",
+      "RequiredClaim": "Gorevlendirme-Index"
+    },
+    {
+      "Title": "İzin İşlemleri",
+      "Icon": "bi bi-calendar-range",
+      "Controller": "Izin",
+      "Action": "Index",
+      "RequiredClaim": ""
+    },
+    {
       "Title": "Kurban Bağış",
       "Icon": "bi bi-heart-fill",
       "Controller": "Kurban",
@@ -34,6 +48,13 @@
       "Controller": "Help",
       "Action": "Index",
       "RequiredClaim": ""
+    },
+    {
+      "Title": "Maliye Yönetimi",
+      "Icon": "bi bi-cash-coin",
+      "Controller": "Maliye",
+      "Action": "Index",
+      "RequiredClaim": "maliyeRead"
     }
   ],
   "AdminMenu": [

@@ -16,6 +16,88 @@
             @await Html.PartialAsync("_DernekDetayPartial", Model)
         </div>
     </div>
+
+    <!-- Resmi Evrak / Doküman Arşivi (DMS) -->
+    <div class="card shadow-sm border-0 mt-4">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+            <h5 class="mb-0"><i class="bi bi-folder-fill me-2 text-warning"></i>Resmi Evrak / Doküman Arşivi</h5>
+            <button type="button" class="btn btn-sm btn-light fw-bold" data-bs-toggle="collapse" data-bs-target="#uploadCollapse" aria-expanded="false" aria-controls="uploadCollapse">
+                <i class="bi bi-plus-lg me-1"></i>Yeni Belge Yükle
+            </button>
+        </div>
+        <div class="card-body bg-light">
+            <!-- Upload Form Collapse -->
+            <div class="collapse mb-4" id="uploadCollapse">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body bg-white">
+                        <form id="dmsUploadForm" enctype="multipart/form-data">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="kurumId" value="@Model.Id" />
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold small text-muted">Belge Adı <span class="text-danger">*</span></label>
+                                    <input type="text" name="documentName" class="form-control" required placeholder="örn. 2026 Tüzük Revizyonu" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold small text-muted">Belge Kategorisi <span class="text-danger">*</span></label>
+                                    <select name="category" class="form-select" required>
+                                        <option value="">Seçiniz...</option>
+                                        <option value="Tüzük">Tüzük</option>
+                                        <option value="Valilik Tescil">Valilik Tescil</option>
+                                        <option value="SIRET/RNA">SIRET / RNA</option>
+                                        <option value="Sözleşme">Sözleşme</option>
+                                        <option value="Diğer">Diğer</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold small text-muted">Geçerlilik Bitiş Tarihi (Opsiyonel)</label>
+                                    <input type="date" name="expirationDate" class="form-control" />
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold small text-muted">Açıklama / Notlar</label>
+                                    <input type="text" name="description" class="form-control" placeholder="Belgeye dair kısa not..." />
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="form-label fw-bold small text-muted">Dosya Seç (PDF, JPEG, JPG) <span class="text-danger">*</span></label>
+                                    <input type="file" name="file" class="form-control" required accept=".pdf,.jpeg,.jpg" />
+                                </div>
+                                <div class="col-md-3 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary w-100 fw-bold">
+                                        <i class="bi bi-cloud-arrow-up-fill me-2"></i>Yükle
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Documents Table -->
+            <div class="table-responsive bg-white rounded shadow-sm">
+                <table class="table table-hover table-striped align-middle mb-0" id="dmsDocumentsTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Belge Adı</th>
+                            <th>Kategori</th>
+                            <th>Açıklama</th>
+                            <th>Boyut (KB)</th>
+                            <th>Geçerlilik Bitiş</th>
+                            <th>Yükleyen / Tarih</th>
+                            <th style="width: 120px;" class="text-center">İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dmsDocumentsBody">
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">
+                                <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                                Belgeler yükleniyor...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
@@ -163,5 +245,102 @@
                 alert('✗ Sunucu bağlantısı başarısız.');
             });
         }
+
+        // DMS Logic
+        function loadDocuments() {
+            var kurumId = '@Model.Id';
+            fetch('/DernekIslemleri/GetDocuments?kurumId=' + kurumId)
+            .then(response => response.json())
+            .then(docs => {
+                var tbody = $('#dmsDocumentsBody');
+                tbody.empty();
+                if (docs.length === 0) {
+                    tbody.append('<tr><td colspan="7" class="text-center py-4 text-muted"><i class="bi bi-info-circle me-1"></i>Henüz resmi evrak yüklenmemiş.</td></tr>');
+                    return;
+                }
+                $.each(docs, function(i, doc) {
+                    var expBadge = '-';
+                    if (doc.expirationDate) {
+                        var badgeClass = doc.isExpiringSoon ? 'bg-danger text-white' : 'bg-success text-white';
+                        expBadge = '<span class="badge ' + badgeClass + '">' + doc.expirationDate + '</span>';
+                    }
+                    var fileLink = '<a href="' + doc.filePath + '" target="_blank" class="fw-bold text-decoration-none"><i class="bi bi-file-earmark-pdf-fill text-danger me-1"></i>' + doc.documentName + '</a>';
+                    if (doc.filePath.toLowerCase().endsWith('.jpg') || doc.filePath.toLowerCase().endsWith('.jpeg')) {
+                        fileLink = '<a href="' + doc.filePath + '" target="_blank" class="fw-bold text-decoration-none"><i class="bi bi-file-earmark-image text-primary me-1"></i>' + doc.documentName + '</a>';
+                    }
+
+                    var deleteBtn = '<button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteDocument(' + doc.id + ')"><i class="bi bi-trash"></i></button>';
+
+                    tbody.append('<tr>' +
+                        '<td>' + fileLink + '</td>' +
+                        '<td><span class="badge bg-secondary">' + doc.category + '</span></td>' +
+                        '<td>' + (doc.description || '-') + '</td>' +
+                        '<td>' + (doc.fileSizeKb || '0') + ' KB</td>' +
+                        '<td>' + expBadge + '</td>' +
+                        '<td><small class="text-muted">' + (doc.uploadedBy || 'System') + '<br>' + doc.uploadedAt + '</small></td>' +
+                        '<td class="text-center">' + deleteBtn + '</td>' +
+                        '</tr>');
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching documents:', error);
+                $('#dmsDocumentsBody').html('<tr><td colspan="7" class="text-center py-4 text-danger"><i class="bi bi-exclamation-triangle me-1"></i>Belgeler yüklenirken hata oluştu.</td></tr>');
+            });
+        }
+
+        function deleteDocument(docId) {
+            if (!confirm('Bu belgeyi silmek ve arşivden kaldırmak istediğinizden emin misiniz?')) return;
+            
+            var formData = new FormData();
+            formData.append('documentId', docId);
+            var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            formData.append('__RequestVerificationToken', token);
+
+            fetch('/DernekIslemleri/DeleteDocument', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    loadDocuments();
+                } else {
+                    alert('✗ Belge silinemedi: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting document:', error);
+                alert('✗ Sunucu bağlantısı başarısız.');
+            });
+        }
+
+        $(document).ready(function() {
+            loadDocuments();
+
+            $('#dmsUploadForm').submit(function(e) {
+                e.preventDefault();
+                var formData = new FormData(this);
+                
+                fetch('/DernekIslemleri/UploadDocument', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('✓ ' + data.message);
+                        $('#dmsUploadForm')[0].reset();
+                        $('#uploadCollapse').collapse('hide');
+                        loadDocuments();
+                    } else {
+                        alert('✗ ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error uploading document:', error);
+                    alert('✗ Sunucu bağlantısı başarısız.');
+                });
+            });
+        });
     </script>
 }

@@ -45,6 +45,20 @@
                         }
                     </div>
 
+                    <div class="card bg-light border-primary mb-3 text-start">
+                        <div class="card-body py-2 px-3">
+                            <h6 class="card-title mb-2 text-primary fw-bold"><i class="bi bi-calendar-check-fill me-1"></i>İzin Durum Özeti</h6>
+                            <ul class="list-unstyled mb-0 small">
+                                <li class="mb-1"><strong>Kazanılan Hak:</strong> <span class="float-end">@ViewBag.TotalAccrued Gün</span></li>
+                                <li class="mb-1"><strong>Kullanılan:</strong> <span class="float-end">@ViewBag.TotalUsed Gün</span></li>
+                                <li class="border-top pt-1 mt-1 text-primary"><strong>Kalan Bakiye:</strong> <span class="float-end fw-bold">@ViewBag.NetBalance Gün</span></li>
+                            </ul>
+                            <div class="text-center mt-2">
+                                <a href="@Url.Action("Index", "Izin", new { gorevliId = Model.Id })" class="btn btn-sm btn-outline-primary w-100">İzin Defterine Git</a>
+                            </div>
+                        </div>
+                    </div>
+
                     <hr />
                     
                     <div class="text-start">
@@ -75,6 +89,9 @@
                          <li class="nav-item" role="presentation">
                             <button class="nav-link" id="notes-tab" data-bs-toggle="tab" data-bs-target="#notes" type="button" role="tab" aria-controls="notes" aria-selected="false">Notlar</button>
                         </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="belgeler-tab" data-bs-toggle="tab" data-bs-target="#belgeler" type="button" role="tab" aria-controls="belgeler" aria-selected="false">Resmi Belgeler</button>
+                        </li>
                     </ul>
                 </div>
                 <div class="card-body">
@@ -93,7 +110,7 @@
                              </div>
                               <div class="row mb-3">
                                  <div class="col-sm-4 text-muted">Doğum Yeri / Tarihi</div>
-                                 <div class="col-sm-8">@(string.IsNullOrEmpty(Model.DogumYeri) ? "-" : Model.DogumYeri) / @(Model.DogumTarihi.HasValue ? Model.DogumTarihi.Value.ToShortDateString() : "-")</div>
+                                 <div class="col-sm-8">@(string.IsNullOrEmpty(Model.DogumYeri) ? "-" : Model.DogumYeri) / @(Model.DogumTarihi.HasValue ? Model.DogumTarihi.Value.ToString("dd.MM.yyyy") : "-")</div>
                              </div>
                              <div class="row mb-3">
                                  <div class="col-sm-4 text-muted">Kan Grubu</div>
@@ -115,6 +132,18 @@
                                  <div class="col-sm-8">@(string.IsNullOrEmpty(Model.MezuniyetOkul) ? "-" : Model.MezuniyetOkul) / @(string.IsNullOrEmpty(Model.MezuniyetBolum) ? "-" : Model.MezuniyetBolum)</div>
                              </div>
                              <div class="row mb-3">
+                                 <div class="col-sm-4 text-muted">Mezun Olunan Üniversite</div>
+                                 <div class="col-sm-8">@(string.IsNullOrEmpty(Model.Universite) ? "-" : Model.Universite)</div>
+                             </div>
+                             <div class="row mb-3">
+                                 <div class="col-sm-4 text-muted">Not Ortalaması (AGNO)</div>
+                                 <div class="col-sm-8">@(Model.Agno.HasValue ? Model.Agno.Value.ToString("0.00") : "-")</div>
+                             </div>
+                             <div class="row mb-3">
+                                 <div class="col-sm-4 text-muted">Bilinen Diller</div>
+                                 <div class="col-sm-8">@(string.IsNullOrEmpty(Model.Diller) ? "-" : Model.Diller)</div>
+                             </div>
+                             <div class="row mb-3">
                                  <div class="col-sm-4 text-muted">Hafızlık</div>
                                  <div class="col-sm-8">@(Model.HafizlikDurumu?.Ad ?? "-")</div>
                              </div>
@@ -128,11 +157,11 @@
                              </div>
                              <div class="row mb-3">
                                  <div class="col-sm-4 text-muted">İlk Göreve Başlama</div>
-                                 <div class="col-sm-8">@(Model.IlkGoreveBaslamaTarihi.HasValue ? Model.IlkGoreveBaslamaTarihi.Value.ToShortDateString() : "-")</div>
+                                 <div class="col-sm-8">@(Model.IlkGoreveBaslamaTarihi.HasValue ? Model.IlkGoreveBaslamaTarihi.Value.ToString("dd.MM.yyyy") : "-")</div>
                              </div>
                               <div class="row mb-3">
                                  <div class="col-sm-4 text-muted">Diyanet Giriş</div>
-                                 <div class="col-sm-8">@(Model.DiyanetGirisTarihi.HasValue ? Model.DiyanetGirisTarihi.Value.ToShortDateString() : "-")</div>
+                                 <div class="col-sm-8">@(Model.DiyanetGirisTarihi.HasValue ? Model.DiyanetGirisTarihi.Value.ToString("dd.MM.yyyy") : "-")</div>
                              </div>
                          </div>
 
@@ -158,8 +187,8 @@
                                                 {
                                                     <tr>
                                                         <td>@item.Kurum?.Isim</td>
-                                                        <td>@item.Tarih.ToShortDateString()</td>
-                                                        <td>@(item.BitisTarihi.HasValue ? item.BitisTarihi.Value.ToShortDateString() : "-")</td>
+                                                        <td>@item.Tarih.ToString("dd.MM.yyyy")</td>
+                                                        <td>@(item.BitisTarihi.HasValue ? item.BitisTarihi.Value.ToString("dd.MM.yyyy") : "-")</td>
                                                         <td><span class="badge bg-primary">Resmi Görevlendirme</span></td>
                                                     </tr>
                                                 }
@@ -170,8 +199,8 @@
                                                 {
                                                      <tr>
                                                         <td>@item.Kurum?.Isim</td>
-                                                        <td>@item.BaslangicTarihi.ToShortDateString()</td>
-                                                        <td>@(item.BitisTarihi.HasValue ? item.BitisTarihi.Value.ToShortDateString() : "-")</td>
+                                                        <td>@item.BaslangicTarihi.ToString("dd.MM.yyyy")</td>
+                                                        <td>@(item.BitisTarihi.HasValue ? item.BitisTarihi.Value.ToString("dd.MM.yyyy") : "-")</td>
                                                         <td><span class="badge bg-secondary">Geçmiş Kayıt</span></td>
                                                     </tr>
                                                 }
@@ -201,7 +230,7 @@
                                         <div class="list-group-item list-group-item-action flex-column align-items-start">
                                             <div class="d-flex w-100 justify-content-between">
                                                 <h6 class="mb-1">Not</h6>
-                                                <small class="text-muted">@note.Tarih.ToShortDateString()</small>
+                                                <small class="text-muted">@note.Tarih.ToString("dd.MM.yyyy")</small>
                                             </div>
                                             <p class="mb-1">@note.NotIcerik</p>
                                             <small class="text-muted">Ekleyen: Sistem Yöneticisi</small>
@@ -213,6 +242,138 @@
                             {
                                 <p class="text-muted">Henüz not eklenmemiş.</p>
                             }
+                         </div>
+                        <!-- Resmi Belgeler Tab -->
+                        <div class="tab-pane fade" id="belgeler" role="tabpanel" aria-labelledby="belgeler-tab">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                 <h5 class="card-title text-muted mb-0"><i class="bi bi-folder-fill text-warning me-2"></i>Resmi Belgeler ve Sertifikalar</h5>
+                                 <button class="btn btn-sm btn-primary rounded-pill px-3" type="button" data-bs-toggle="collapse" data-bs-target="#uploadDocCollapse" aria-expanded="false">
+                                     <i class="bi bi-plus-circle me-1"></i> Yeni Belge Yükle
+                                 </button>
+                            </div>
+
+                            <!-- Upload Form Collapse -->
+                            <div class="collapse mb-4" id="uploadDocCollapse">
+                                <div class="card border-0 bg-light shadow-sm">
+                                    <div class="card-body">
+                                        <form id="gorevliDocForm" enctype="multipart/form-data" onsubmit="event.preventDefault(); submitGorevliDoc(this);">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="gorevliId" value="@Model.Id" />
+                                            <div class="row g-3">
+                                                <div class="col-md-4">
+                                                    <label class="form-label small fw-bold">Belge Tipi</label>
+                                                    <select name="type" class="form-select form-select-sm" required>
+                                                        <option value="">Seçiniz...</option>
+                                                        <option value="0">Oturum Kartı</option>
+                                                        <option value="1">Dil Belgesi</option>
+                                                        <option value="2">Laiklik Belgesi</option>
+                                                        <option value="3">Pasaport</option>
+                                                        <option value="4">Vize</option>
+                                                        <option value="5">Sözleşme</option>
+                                                        <option value="6">Diploma / Mezuniyet</option>
+                                                        <option value="7">Diğer</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label small fw-bold">Seri / Belge No</label>
+                                                    <input type="text" name="seriNo" class="form-control form-control-sm" placeholder="örn. A12B3456" />
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label small fw-bold">Geçerlilik Bitiş Tarihi (Opsiyonel)</label>
+                                                    <input type="date" name="expirationDate" class="form-control form-control-sm" />
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label small fw-bold">Açıklama</label>
+                                                    <input type="text" name="description" class="form-control form-control-sm" placeholder="Kısa açıklama..." />
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label small fw-bold">Dosya Seç (PDF, JPEG, JPG, PNG)</label>
+                                                    <input type="file" name="file" class="form-control form-control-sm" required accept=".pdf,.jpg,.jpeg,.png" />
+                                                </div>
+                                                <div class="col-md-12 text-end">
+                                                    <button type="submit" class="btn btn-sm btn-primary px-3 rounded-pill">
+                                                        <i class="bi bi-cloud-upload me-1"></i> Yükle
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Documents Table -->
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped align-middle small mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Belge Tipi</th>
+                                            <th>Seri / Belge No</th>
+                                            <th>Açıklama</th>
+                                            <th>Geçerlilik Bitiş</th>
+                                            <th>Yükleyen / Tarih</th>
+                                            <th class="text-center" style="width: 80px;">İşlem</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (Model.Belgeler != null && Model.Belgeler.Any(b => !b.IsDeleted))
+                                        {
+                                            foreach (var doc in Model.Belgeler.Where(b => !b.IsDeleted).OrderByDescending(b => b.YuklenmeTarihi))
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @if (doc.DosyaYolu.ToLower().EndsWith(".pdf"))
+                                                        {
+                                                            <a href="@doc.DosyaYolu" target="_blank" class="fw-bold text-decoration-none">
+                                                                <i class="bi bi-file-earmark-pdf-fill text-danger me-1"></i>@doc.BelgeTipi.ToString()
+                                                            </a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <a href="@doc.DosyaYolu" target="_blank" class="fw-bold text-decoration-none">
+                                                                <i class="bi bi-file-earmark-image-fill text-primary me-1"></i>@doc.BelgeTipi.ToString()
+                                                            </a>
+                                                        }
+                                                    </td>
+                                                    <td>@(doc.SeriNo ?? "-")</td>
+                                                    <td>@(doc.Aciklama ?? "-")</td>
+                                                    <td>
+                                                        @if (doc.GecerlilikTarihi.HasValue)
+                                                        {
+                                                            var isExpiringSoon = doc.GecerlilikTarihi.Value <= DateTime.Today.AddMonths(3);
+                                                            var isExpired = doc.GecerlilikTarihi.Value < DateTime.Today;
+                                                            var badgeClass = isExpired ? "bg-danger text-white" : (isExpiringSoon ? "bg-warning text-dark" : "bg-success text-white");
+                                                            <span class="badge @badgeClass rounded-pill">
+                                                                @doc.GecerlilikTarihi.Value.ToString("dd.MM.yyyy")
+                                                            </span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span>-</span>
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        <small class="text-muted">
+                                                            @doc.YukleyenKullanici <br />
+                                                            @doc.YuklenmeTarihi.ToString("dd.MM.yyyy HH:mm")
+                                                        </small>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2 rounded-circle" onclick="deleteGorevliDoc(@doc.Id)">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="6" class="text-center text-muted py-4">Bu görevli için henüz resmi belge yüklenmemiş.</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -220,3 +381,54 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        function submitGorevliDoc(formElement) {
+            var formData = new FormData(formElement);
+            fetch('/Gorevli/UploadGorevliDocument', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✓ ' + data.message);
+                    window.location.reload();
+                } else {
+                    alert('✗ Hata: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error uploading document:', error);
+                alert('✗ Sunucu bağlantısı başarısız.');
+            });
+        }
+
+        function deleteGorevliDoc(docId) {
+            if (!confirm('Bu belgeyi silmek istediğinizden emin misiniz?')) return;
+            var formData = new FormData();
+            formData.append('id', docId);
+            var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            formData.append('__RequestVerificationToken', token);
+
+            fetch('/Gorevli/DeleteGorevliDocument', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✓ ' + data.message);
+                    window.location.reload();
+                } else {
+                    alert('✗ Hata: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting document:', error);
+                alert('✗ Sunucu bağlantısı başarısız.');
+            });
+        }
+    </script>
+}

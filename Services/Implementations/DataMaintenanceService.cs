@@ -116,6 +116,26 @@ namespace DitibStasbourg.Services.Implementations
                     }
                 }
             }
+            
+            // Append Audit Log warnings
+            var auditWarnings = await _context.SystemAuditLogs
+                .AsNoTracking()
+                .Where(l => l.LogType == "MükerrerTespiti_Uyarı" && (l.Message.Contains(module)))
+                .ToListAsync();
+
+            foreach(var warning in auditWarnings)
+            {
+                duplicates.Add(new DuplicateEntryViewModel
+                {
+                    Id = warning.Id,
+                    Name = "Akıllı Tespit Uyarısı",
+                    Phone = "-",
+                    TargetModule = module,
+                    TimeGapSeconds = null,
+                    Details = warning.Message ?? string.Empty,
+                    CreatedAt = warning.Timestamp
+                });
+            }
 
             return duplicates;
         }
@@ -255,7 +275,10 @@ namespace DitibStasbourg.Services.Implementations
                                 DernekBaskaniIletisim = GetVal(row, "İletişim numarası", "Telefon", "PhoneNumber"),
                                 BaskonsoloslukBolgesi = GetVal(row, "Maili / Başkan mail", "Email", "EmailAddress"),
                                 Tip = KurumTip.Dernek,
-                                AktifMi = true
+                                AktifMi = true,
+                                IbanNo = GetVal(row, "IBAN No", "IBAN", "IBAN Numarası") ?? string.Empty,
+                                SiretNo = GetVal(row, "SIRET No", "SIRET", "SIRET Numarası") ?? string.Empty,
+                                RnaNo = GetVal(row, "RNA No", "RNA", "RNA Numarası") ?? string.Empty
                             };
                             kurumlar.Add(kurum);
                         }

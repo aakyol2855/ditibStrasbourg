@@ -3,13 +3,15 @@
 @{
     ViewData["Title"] = "Yeni Dernek Ekle";
 }
-
+@section Styles {
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+}
 <div class="container">
     <h1>Yeni Dernek Ekle</h1>
     <hr />
 
-    <form asp-action="Create" method="post">
-        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+    <form asp-action="Create" method="post" id="createForm">
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
         <div class="row">
             <!-- Temel Bilgiler -->
@@ -20,7 +22,7 @@
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <label asp-for="Isim" class="form-label"></label>
+                            <label asp-for="Isim" class="form-label">Dernek / Kurum Adı <span class="text-danger">*</span></label>
                             <input asp-for="Isim" class="form-control" required />
                             <span asp-validation-for="Isim" class="text-danger"></span>
                         </div>
@@ -71,6 +73,24 @@
                             <label asp-for="Maili" class="form-label"></label>
                             <input asp-for="Maili" class="form-control" type="email" placeholder="example@domain.com" />
                             <span asp-validation-for="Maili" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="IbanNo" class="form-label">IBAN No <span class="text-danger">*</span></label>
+                            <input asp-for="IbanNo" class="form-control" placeholder="FR76..." required />
+                            <span asp-validation-for="IbanNo" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="SiretNo" class="form-label">SIRET No <span class="text-danger">*</span></label>
+                            <input asp-for="SiretNo" class="form-control" placeholder="14 haneli numara" required />
+                            <span asp-validation-for="SiretNo" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="RnaNo" class="form-label">RNA No <span class="text-danger">*</span></label>
+                            <input asp-for="RnaNo" class="form-control" placeholder="W..." required />
+                            <span asp-validation-for="RnaNo" class="text-danger"></span>
                         </div>
                     </div>
                 </div>
@@ -162,6 +182,34 @@
                                 <span asp-validation-for="CemaatCount" class="text-danger"></span>
                             </div>
                             <div class="col-md-4 mb-3">
+                                <div class="form-check mt-4">
+                                    <input asp-for="HasCami" class="form-check-input" type="checkbox" id="HasCami" />
+                                    <label asp-for="HasCami" class="form-check-label fw-bold">Cami var mı?</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check mt-4">
+                                    <input asp-for="HasLojman" class="form-check-input" type="checkbox" id="HasLojman" />
+                                    <label asp-for="HasLojman" class="form-check-label fw-bold">Lojman var mı?</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="LojmanKapasite" class="form-label">Lojman Kapasitesi (Kişi)</label>
+                                <input asp-for="LojmanKapasite" class="form-control" type="number" min="0" placeholder="örn. 4" />
+                                <span asp-validation-for="LojmanKapasite" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check mt-4">
+                                    <input asp-for="HasMustemilat" class="form-check-input" type="checkbox" id="HasMustemilat" />
+                                    <label asp-for="HasMustemilat" class="form-check-label fw-bold">Müştemilat var mı?</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="MustemilatKapasite" class="form-label">Müştemilat Kapasitesi (Kişi)</label>
+                                <input asp-for="MustemilatKapasite" class="form-control" type="number" min="0" placeholder="örn. 2" />
+                                <span asp-validation-for="MustemilatKapasite" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
                                 <label asp-for="Latitude" class="form-label">Enlem (Latitude)</label>
                                 <input asp-for="Latitude" class="form-control" type="number" step="any" placeholder="örn. 48.5661" />
                                 <span asp-validation-for="Latitude" class="text-danger"></span>
@@ -197,6 +245,35 @@
                                     </tr>
                                 </thead>
                                 <tbody id="board-members-body">
+                                    @if (Model != null && Model.YonetimKuruluUyeleri != null)
+                                    {
+                                        for (int i = 0; i < Model.YonetimKuruluUyeleri.Count; i++)
+                                        {
+                                            var member = Model.YonetimKuruluUyeleri.ElementAt(i);
+                                            <tr>
+                                                <td>
+                                                    <input name="YonetimKuruluUyeleri[@i].FullName" class="form-control" required value="@member.FullName" placeholder="örn. Ahmet Yılmaz" />
+                                                </td>
+                                                <td>
+                                                    <input name="YonetimKuruluUyeleri[@i].ContactPhone" class="form-control" value="@member.ContactPhone" placeholder="örn. +33 6..." />
+                                                </td>
+                                                <td>
+                                                    <select name="YonetimKuruluUyeleri[@i].YonetimRolId" class="form-select" required>
+                                                        @if (ViewBag.YonetimRolleri != null)
+                                                        {
+                                                            foreach (var role in ViewBag.YonetimRolleri)
+                                                            {
+                                                                <option value="@role.Id" selected="@(role.Id == member.YonetimRolId ? "selected" : null)">@role.Ad</option>
+                                                            }
+                                                        }
+                                                    </select>
+                                                </td>
+                                                <td class="text-center">
+                                                    <button type="button" class="btn btn-danger btn-sm btn-remove-member"><i class="fas fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
                                 </tbody>
                             </table>
                         </div>
@@ -208,8 +285,12 @@
             </div>
         </div>
 
+        <div id="duplicateWarningBanner" class="alert alert-warning d-none" role="alert">
+            <strong>⚠️ DİKKAT:</strong> Girmekte olduğunuz bilgilere benzer kayıtlar sistemde mevcut. Eğer eminseniz işleme devam edebilirsiniz, sistem yöneticiye doğrulama bildirimi gönderecektir.
+        </div>
+
         <div class="text-center mt-3">
-            <button type="submit" class="btn btn-primary btn-lg px-5">
+            <button type="submit" class="btn btn-primary btn-lg px-5" id="btnSubmit">
                 <i class="fas fa-save me-2"></i>Kaydet
             </button>
             <a asp-action="Index" class="btn btn-secondary btn-lg">
@@ -221,7 +302,7 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         $(document).ready(function() {
             // Initialize Select2 for city selection with tags support (allows new entries)
@@ -232,7 +313,7 @@
             });
 
             var rolesJson = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.YonetimRolleri));
-            var memberIndex = 0;
+            var memberIndex = $('#board-members-body tr').length;
 
             function toggleNoMembersAlert() {
                 if ($('#board-members-body tr').length === 0) {
@@ -280,6 +361,48 @@
             });
 
             toggleNoMembersAlert();
+
+            $('#createForm').on('submit', function (e) {
+                if ($(this).data('duplicate-checked')) return;
+                e.preventDefault();
+
+                var $btn = $('#btnSubmit');
+                $btn.prop('disabled', true);
+                $('#duplicateWarningBanner').addClass('d-none');
+
+                var formData = {
+                    Isim: $('#Isim').val(),
+                    Adres: $('#Adres').val(),
+                    SiretNo: $('#SiretNo').val(),
+                    RnaNo: $('#RnaNo').val(),
+                    IbanNo: $('#IbanNo').val()
+                };
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/DernekIslemleri/CheckDuplicate',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    success: function (res) {
+                        if (res.isDuplicate) {
+                            if (res.type === 'absolute') {
+                                alert(res.message);
+                                $btn.prop('disabled', false);
+                            } else {
+                                $('#duplicateWarningBanner').removeClass('d-none');
+                                $btn.html('<i class="fas fa-save me-2"></i>Eminim, Kaydet');
+                                $btn.prop('disabled', false);
+                                $('#createForm').data('duplicate-checked', true);
+                            }
+                        } else {
+                            $('#createForm').data('duplicate-checked', true).submit();
+                        }
+                    },
+                    error: function () {
+                        $('#createForm').data('duplicate-checked', true).submit();
+                    }
+                });
+            });
         });
     </script>
 }

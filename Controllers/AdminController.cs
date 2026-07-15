@@ -66,31 +66,7 @@ namespace DitibStasbourg.Controllers
             return RedirectToAction(nameof(DataMaintenance));
         }
 
-        [HttpPost]
-        [Authorize(Roles = "SuperAdmin")] // Belt-and-suspenders: action-level guard
-        public async Task<IActionResult> PurgeTestData()
-        {
-            var username = User.Identity?.Name ?? "System_Daemon";
-            await TestDataInitializer.PurgeMockDataAsync(_context, _cache);
-            await _auditLogService.LogAsync(
-                "Warning",
-                username,
-                "Veritabanındaki mock test verileri temizlendi.",
-                HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1",
-                "AdminController");
-            TempData["Success"] = "Mock test verileri başarıyla temizlendi.";
-            return RedirectToAction(nameof(DataMaintenance));
-        }
 
-        [HttpPost]
-        public async Task<IActionResult> SeedTestData()
-        {
-            var username = User.Identity?.Name ?? "System_Deamon";
-            await TestDataInitializer.SeedMockDataAsync(_context);
-            await _auditLogService.LogAsync("Information", username, "Veritabanına mock test verileri yüklendi.", HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1", "AdminController");
-            TempData["Success"] = "Mock test verileri başarıyla oluşturuldu.";
-            return RedirectToAction("Index", "Home");
-        }
 
         public async Task<IActionResult> SystemLog()
         {
@@ -194,6 +170,17 @@ namespace DitibStasbourg.Controllers
                         var assignments = await _context.Gorevlendirme.Where(g => ids.Contains(g.GorevliId)).ToListAsync();
                         _context.Gorevlendirme.RemoveRange(assignments);
 
+                        // FK safety: nullify YazanKisiId on GorevliNotlari to avoid FK_GorevliNotlari_AspNetUsers_YazanKisiId conflict
+                        var orphanNotes = await _context.GorevliNotlari
+                            .IgnoreQueryFilters()
+                            .Where(n => ids.Contains(n.GorevliId))
+                            .ToListAsync();
+                        foreach (var note in orphanNotes)
+                        {
+                            note.YazanKisiId = null;
+                        }
+                        await _context.SaveChangesAsync();
+
                         var gorevli = await _context.Gorevli.Where(g => ids.Contains(g.Id)).ToListAsync();
                         _context.Gorevli.RemoveRange(gorevli);
                         await _context.SaveChangesAsync();
@@ -248,14 +235,15 @@ namespace DitibStasbourg.Controllers
             var hissedarDupes = await _maintenanceService.GetDuplicateEntriesAsync("Hissedar");
             var gorevliDupes = await _maintenanceService.GetDuplicateEntriesAsync("Gorevli");
             var dernekDupes = await _maintenanceService.GetDuplicateEntriesAsync("Dernek");
+            var kurbanDupes = await _maintenanceService.GetDuplicateEntriesAsync("Kurban");
 
             var viewModel = new DataMaintenanceViewModel
             {
                 HissedarDuplicatesCount = hissedarDupes.Count(),
                 GorevliDuplicatesCount = gorevliDupes.Count(),
                 DernekDuplicatesCount = dernekDupes.Count(),
-                TotalPotentialBottlenecks = hissedarDupes.Count() + gorevliDupes.Count() + dernekDupes.Count(),
-                FlaggedDuplicates = hissedarDupes.Concat(gorevliDupes).Concat(dernekDupes).ToList()
+                TotalPotentialBottlenecks = hissedarDupes.Count() + gorevliDupes.Count() + dernekDupes.Count() + kurbanDupes.Count(),
+                FlaggedDuplicates = hissedarDupes.Concat(gorevliDupes).Concat(dernekDupes).Concat(kurbanDupes).ToList()
             };
 
             return View(viewModel);
@@ -550,6 +538,93 @@ namespace DitibStasbourg.Controllers
                     await transaction.RollbackAsync();
                     TempData["Error"] = $"Hata oluştu: {ex.Message}";
                 }
+            }
+
+            return RedirectToAction(nameof(TrashBin));
+        }
+
+        /// <summary>
+        /// Permanently hard-deletes a single soft-deleted record from the Trash Bin.
+        /// Protected by mandatory confirmation modal in TrashBin.cshtml.
+        /// </summary>
+        [HttpPost]
+        [Route("Admin/TrashBin/HardDelete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> HardDeleteFromTrashBin(string type, int id)
+        {
+            if (!User.IsInRole("SuperAdmin")) return Forbid();
+
+            var username = User.Identity?.Name ?? "System_Daemon";
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                bool found = false;
+                string label = string.Empty;
+
+                if (string.Equals(type, "Association", StringComparison.OrdinalIgnoreCase))
+                {
+                    var entity = await _context.Kurum.IgnoreQueryFilters().FirstOrDefaultAsync(k => k.Id == id && k.IsDeleted);
+                    if (entity != null)
+                    {
+                        label = entity.Isim;
+                        _context.Kurum.Remove(entity);
+                        found = true;
+                    }
+                }
+                else if (string.Equals(type, "Personnel", StringComparison.OrdinalIgnoreCase))
+                {
+                    var entity = await _context.Gorevli.IgnoreQueryFilters().FirstOrDefaultAsync(g => g.Id == id && g.IsDeleted);
+                    if (entity != null)
+                    {
+                        label = entity.AdSoyad;
+                        // FK safety: nullify note author references before removal
+                        var notes = await _context.GorevliNotlari.IgnoreQueryFilters().Where(n => n.GorevliId == id).ToListAsync();
+                        foreach (var note in notes) { note.YazanKisiId = null; }
+                        await _context.SaveChangesAsync();
+
+                        var assignments = await _context.Gorevlendirme.IgnoreQueryFilters().Where(g => g.GorevliId == id).ToListAsync();
+                        _context.Gorevlendirme.RemoveRange(assignments);
+                        _context.GorevliNotlari.RemoveRange(notes);
+                        _context.Gorevli.Remove(entity);
+                        found = true;
+                    }
+                }
+                else if (string.Equals(type, "Assignment", StringComparison.OrdinalIgnoreCase))
+                {
+                    var entity = await _context.Gorevlendirme.IgnoreQueryFilters().FirstOrDefaultAsync(a => a.Id == id && a.IsDeleted);
+                    if (entity != null)
+                    {
+                        label = $"Görevlendirme #{entity.Id}";
+                        _context.Gorevlendirme.Remove(entity);
+                        found = true;
+                    }
+                }
+
+                if (found)
+                {
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    if (_cache is MemoryCache concreteCache) concreteCache.Clear();
+
+                    await _auditLogService.LogAsync(
+                        "Warning", username,
+                        $"KESİN SİLME (Hard Delete): {type} — {label} (ID: {id}) kalıcı olarak silindi.",
+                        HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1",
+                        "AdminController");
+
+                    TempData["Success"] = $"Kayıt ({label}) veritabanından kalıcı olarak silindi.";
+                }
+                else
+                {
+                    TempData["Error"] = "Kayıt bulunamadı veya zaten silinmiş.";
+                }
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                TempData["Error"] = $"Kalıcı silme işlemi başarısız: {ex.Message}";
             }
 
             return RedirectToAction(nameof(TrashBin));

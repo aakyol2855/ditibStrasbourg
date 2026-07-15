@@ -327,6 +327,51 @@
                 </div>
             </div>
 
+            <!-- NEW: Leave, FransaGiris & SözlesmeBaslangıç Filters -->
+            <div class="row g-3 mt-1">
+                <div class="col-md-3">
+                    <label class="form-label text-white">Fransa Giriş — Başlangıç</label>
+                    <input type="date" name="FransaGirisBaslangic" class="form-control form-control-sm"
+                           value="@(filter.FransaGirisBaslangic?.ToString("yyyy-MM-dd"))" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-white">Fransa Giriş — Bitiş</label>
+                    <input type="date" name="FransaGirisBitis" class="form-control form-control-sm"
+                           value="@(filter.FransaGirisBitis?.ToString("yyyy-MM-dd"))" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-white">Sözleşme Başlangıcı (Min)</label>
+                    <input type="date" name="SozlesmeBaslangicMin" class="form-control form-control-sm"
+                           value="@(filter.SozlesmeBaslangicMin?.ToString("yyyy-MM-dd"))" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-white">Sözleşme Başlangıcı (Max)</label>
+                    <input type="date" name="SozlesmeBaslangicMax" class="form-control form-control-sm"
+                           value="@(filter.SozlesmeBaslangicMax?.ToString("yyyy-MM-dd"))" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-white">İzin Durumu</label>
+                    <select name="HasLeave" class="form-select form-select-sm">
+                        <option value="">Tümü</option>
+                        @if (filter.HasLeave == true)
+                        {
+                            <option value="true" selected>Onaylı İzni Var</option>
+                            <option value="false">Onaylı İzni Yok</option>
+                        }
+                        else if (filter.HasLeave == false)
+                        {
+                            <option value="true">Onaylı İzni Var</option>
+                            <option value="false" selected>Onaylı İzni Yok</option>
+                        }
+                        else
+                        {
+                            <option value="true">Onaylı İzni Var</option>
+                            <option value="false">Onaylı İzni Yok</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
             <!-- Column Selection Section (Collapsible) -->
             <div class="ep-trigger" onclick="toggleExportSection()">
                 <div class="d-flex align-items-center gap-2">
@@ -385,17 +430,17 @@
             <input type="checkbox" id="selectAllGorevli" class="form-check-input" style="cursor: pointer;" />
         </div>
         <div class="col-md-3">
-            <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]" class="text-decoration-none text-dark">Ad Soyad <i class="fas fa-sort"></i></a>
+            <a href="javascript:void(0)" onclick="changeSortOrder('@ViewData["NameSortParm"]')" class="text-decoration-none text-dark">Ad Soyad <i class="fas fa-sort"></i></a>
         </div>
         <div class="col-md-2">
-            <a asp-action="Index" asp-route-sortOrder="@ViewData["StatusSortParm"]" class="text-decoration-none text-dark">Referans Durumu <i class="fas fa-sort"></i></a>
+            <a href="javascript:void(0)" onclick="changeSortOrder('@ViewData["StatusSortParm"]')" class="text-decoration-none text-dark">Referans Durumu <i class="fas fa-sort"></i></a>
         </div>
         <div class="col-md-2">Son Görev</div>
         <div class="col-md-2">
-            <a asp-action="Index" asp-route-sortOrder="@ViewData["DateSortParm"]" class="text-decoration-none text-dark">Tarihler <i class="fas fa-sort"></i></a>
+            <a href="javascript:void(0)" onclick="changeSortOrder('@ViewData["DateSortParm"]')" class="text-decoration-none text-dark">Tarihler <i class="fas fa-sort"></i></a>
         </div>
         <div class="col-md-1 text-center">
-            <a asp-action="Index" asp-route-sortOrder="@ViewData["ActiveSortParm"]" class="text-decoration-none text-dark">Aktif mi? <i class="fas fa-sort"></i></a>
+            <a href="javascript:void(0)" onclick="changeSortOrder('@ViewData["ActiveSortParm"]')" class="text-decoration-none text-dark">Aktif mi? <i class="fas fa-sort"></i></a>
         </div>
         <div class="col-md-1 text-end" style="flex-grow: 1;">İşlemler</div>
     </div>
@@ -412,7 +457,7 @@
                 <h2 class="accordion-header" id="heading-@item.Id">
                     <div class="d-flex align-items-center bg-white">
                         <div class="px-3 text-center" style="width: 50px; flex-shrink: 0;">
-                            <input type="checkbox" class="gorevli-select form-check-input" data-id="@item.Id" style="cursor: pointer;" />
+                            <input type="checkbox" class="form-check-input core-checkbox gorevli-select" value="@item.Id" data-id="@item.Id" />
                         </div>
                         <button class="accordion-button collapsed py-3 flex-grow-1" style="background: transparent !important; box-shadow: none;" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@item.Id" aria-expanded="false" aria-controls="collapse-@item.Id">
                             <div class="container-fluid p-0">
@@ -436,7 +481,19 @@
                                         }
                                         else
                                         {
-                                            <span class="badge bg-secondary">Tanımsız</span>
+                                            var activeAssg = item.Gorevlendirmeler.FirstOrDefault(g => !g.IsDeleted && DateTime.Now.Date >= g.Tarih.Date && (!g.BitisTarihi.HasValue || DateTime.Now.Date <= g.BitisTarihi.Value.Date));
+                                            if (activeAssg != null)
+                                            {
+                                                <span class="badge bg-success">Aktif Görevde</span>
+                                            }
+                                            else if (item.Gorevlendirmeler.Any(g => !g.IsDeleted))
+                                            {
+                                                <span class="badge bg-warning text-dark">Pasif (Süresi Bitti)</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger">Atama Bekliyor</span>
+                                            }
                                         }
                                         @if (item.SozlesmeTip != null)
                                         {
@@ -446,12 +503,12 @@
                                     <div class="col-md-2 small text-muted">@lastPlace</div>
                                     <div class="col-md-2 small text-muted">
                                         @if(earliestStart.HasValue) {
-                                            <div><small>Baş:</small> @earliestStart.Value.ToShortDateString()</div>
+                                            <div><small>Baş:</small> @earliestStart.Value.ToString("dd.MM.yyyy")</div>
                                         } else {
                                             <div><small>Baş:</small> -</div>
                                         }
                                         @if(latestEnd.HasValue) {
-                                            <div><small>Bit:</small> @latestEnd.Value.ToShortDateString()</div>
+                                            <div><small>Bit:</small> @latestEnd.Value.ToString("dd.MM.yyyy")</div>
                                         }
                                     </div>
                                     <div class="col-md-1 text-center">
@@ -469,9 +526,11 @@
                 <div id="collapse-@item.Id" class="accordion-collapse collapse" aria-labelledby="heading-@item.Id" data-bs-parent="#accordionGorevli">
                     <div class="accordion-body bg-white border-top">
                         <div class="d-flex justify-content-end mb-3">
-                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning me-2">Düzenle</a>
-                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info me-2">Detay</a>
-                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Sil</a>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning" title="Düzenle"><i class="bi bi-pencil-square"></i></a>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info text-white" title="Detay"><i class="bi bi-eye"></i></a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger" title="Sil"><i class="bi bi-trash"></i></a>
+                            </div>
                         </div>
                         
                         <h5 class="border-bottom pb-2">Görev Geçmişi</h5>
@@ -490,7 +549,7 @@
                                         {
                                             <tr>
                                                 <td>@gorev.Kurum?.Isim</td>
-                                                <td>@gorev.Tarih.ToShortDateString()</td>
+                                                <td>@gorev.Tarih.ToString("dd.MM.yyyy")</td>
                                             </tr>
                                         }
                                     </tbody>
@@ -590,7 +649,7 @@
             <i class="bi bi-gear-fill me-1"></i>Sütun Seç &amp; İndir
         </button>
         
-        <button type="button" class="btn btn-sm btn-danger rounded-pill px-3" onclick="triggerBulkDelete()">
+        <button type="button" class="btn btn-sm btn-danger rounded-pill px-3" onclick="executeBulkGorevliDelete()">
             <i class="bi bi-trash-fill me-1"></i>Seçilenleri Güvenli Sil
         </button>
         
@@ -600,462 +659,6 @@
     </div>
 </div>
 
-<script>
-    function submitQuickExport() {
-        var form = document.getElementById('filterForm');
-        if (!form) return;
-        
-        var originalAction = form.action;
-        var originalMethod = form.method;
-        form.action = '@Url.Action("ExportToExcel", "Gorevli")';
-        form.method = 'POST';
-        
-        var tempElements = [];
-        
-        var selectedIds = window.selectedEntityIds || [];
-        selectedIds.forEach(function(id) {
-            var input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'SelectedIds';
-            input.value = id;
-            form.appendChild(input);
-            tempElements.push(input);
-        });
-        
-        form.submit();
-        
-        form.action = originalAction;
-        form.method = originalMethod;
-        tempElements.forEach(function(el) {
-            form.removeChild(el);
-        });
-    }
 
-    function submitCustomExport() {
-        var checkedColumns = document.querySelectorAll('#ep-col-grid input:checked');
-        if (checkedColumns.length === 0) {
-            alert('Lütfen en az bir sütun seçin.');
-            return;
-        }
-        
-        var form = document.getElementById('filterForm');
-        if (!form) return;
-        
-        var originalAction = form.action;
-        var originalMethod = form.method;
-        form.action = '@Url.Action("CustomExport", "Gorevli")';
-        form.method = 'POST';
-        
-        var tempElements = [];
-        
-        var selectedIds = window.selectedEntityIds || [];
-        selectedIds.forEach(function(id) {
-            var input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'SelectedIds';
-            input.value = id;
-            form.appendChild(input);
-            tempElements.push(input);
-        });
-        
-        checkedColumns.forEach(function(box) {
-            var input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'columns';
-            input.value = box.value;
-            form.appendChild(input);
-            tempElements.push(input);
-        });
-        
-        form.submit();
-        
-        form.action = originalAction;
-        form.method = originalMethod;
-        tempElements.forEach(function(el) {
-            form.removeChild(el);
-        });
-    }
 
-    function changePage(pageNum) {
-        var form = document.getElementById('filterForm');
-        if (form) {
-            var pageInput = document.createElement('input');
-            pageInput.type = 'hidden';
-            pageInput.name = 'PageNumber';
-            pageInput.value = pageNum;
-            form.appendChild(pageInput);
-            
-            var pageSizeSelect = document.querySelector('select[name="PageSize"]');
-            if (pageSizeSelect) {
-                var pageSizeInput = document.createElement('input');
-                pageSizeInput.type = 'hidden';
-                pageSizeInput.name = 'PageSize';
-                pageSizeInput.value = pageSizeSelect.value;
-                form.appendChild(pageSizeInput);
-            }
-            
-            form.submit();
-        } else {
-             window.location.href = '?PageNumber=' + pageNum;
-        }
-    }
 
-    function changePageSize(size) {
-        var form = document.getElementById('filterForm');
-        if (form) {
-            var pageSizeInput = document.createElement('input');
-            pageSizeInput.type = 'hidden';
-            pageSizeInput.name = 'PageSize';
-            pageSizeInput.value = size;
-            form.appendChild(pageSizeInput);
-
-            var pageInput = document.createElement('input');
-            pageInput.type = 'hidden';
-            pageInput.name = 'PageNumber';
-            pageInput.value = 1;
-            form.appendChild(pageInput);
-
-            form.submit();
-        } else {
-            window.location.href = '?PageSize=' + size + '&PageNumber=1';
-        }
-    }
-
-    // Note Management Functions
-    function addNote(gorevliId) {
-        const form = document.getElementById(`note-form-${gorevliId}`);
-        const textarea = document.getElementById(`note-input-${gorevliId}`);
-        const formData = new FormData(form);
-        formData.append('gorevliId', gorevliId);
-        
-        fetch('/Gorevli/AddNote', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                textarea.value = '';
-                location.reload();
-            } else {
-                alert('Not eklenirken hata oluştu: ' + (data.message || 'Bilinmeyen hata'));
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Bir hata oluştu.');
-        });
-    }
-    
-    function deleteNote(notId, gorevliId) {
-        if (!confirm('Bu notu silmek istediğinizden emin misiniz?')) return;
-        
-        const formData = new FormData();
-        formData.append('id', notId);
-        formData.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]').value);
-        
-        fetch('/Gorevli/DeleteNote', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Not silinirken hata oluştu: ' + (data.message || 'Bilinmeyen hata'));
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Bir hata oluştu.');
-        });
-    }
-</script>
-
-@section Scripts {
-    <!-- Select2 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <!-- Select2 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
-    <script>
-        var colsLoaded = false;
-        
-        function toggleExportSection() {
-            var content = document.getElementById('exportSectionContent');
-            var chevron = document.querySelector('.ep-trigger .ep-chevron-icon i');
-            if (content.classList.contains('show')) {
-                content.classList.remove('show');
-                chevron.className = 'bi bi-chevron-down';
-            } else {
-                content.classList.add('show');
-                chevron.className = 'bi bi-chevron-up';
-                if (!colsLoaded) {
-                    fetchColumns();
-                }
-            }
-        }
-        
-        function fetchColumns() {
-            var grid = document.getElementById('ep-col-grid');
-            fetch('/Export/Columns?module=Gorevli')
-                .then(r => r.json())
-                .then(cols => {
-                    grid.innerHTML = '';
-                    cols.forEach(col => {
-                        var wrap = document.createElement('div');
-                        wrap.className = 'ep-checkbox-item' + (col.includeInQuickExport ? ' active' : '');
-                        
-                        var cb = document.createElement('input');
-                        cb.type = 'checkbox';
-                        cb.id = 'ep-col-' + col.propertyName;
-                        cb.value = col.propertyName;
-                        cb.checked = col.includeInQuickExport;
-                        cb.addEventListener('change', function() {
-                            wrap.classList.toggle('active', cb.checked);
-                            updateSelectedColumnsCount();
-                        });
-                        
-                        var lbl = document.createElement('label');
-                        lbl.htmlFor = cb.id;
-                        lbl.textContent = col.displayName;
-                        lbl.title = col.displayName;
-                        
-                        wrap.appendChild(cb);
-                        wrap.appendChild(lbl);
-                        grid.appendChild(wrap);
-                    });
-                    colsLoaded = true;
-                    updateSelectedColumnsCount();
-                })
-                .catch(err => {
-                    grid.innerHTML = '<div class="text-danger small"><i class="bi bi-exclamation-triangle-fill me-1"></i>Sütunlar yüklenemedi.</div>';
-                });
-        }
-        
-        function updateSelectedColumnsCount() {
-            var count = document.querySelectorAll('#ep-col-grid input:checked').length;
-            document.getElementById('ep-selected-cols-count').textContent = count + ' sütun seçili';
-        }
-        
-        function toggleAllColumns() {
-            var boxes = document.querySelectorAll('#ep-col-grid input[type="checkbox"]');
-            var allChecked = true;
-            boxes.forEach(b => { if (!b.checked) allChecked = false; });
-            boxes.forEach(b => {
-                b.checked = !allChecked;
-                var wrap = b.closest('.ep-checkbox-item');
-                if (wrap) wrap.classList.toggle('active', !allChecked);
-            });
-            updateSelectedColumnsCount();
-        }
-
-        $(document).ready(function() {
-            // Initialize Select2 for staff search with AJAX
-            $('#staffSearch').select2({
-                ajax: {
-                    url: '@Url.Action("SearchStaff", "Gorevli")',
-                    dataType: 'json',
-                    delay: 250,
-                    data: function (params) {
-                        return {
-                            term: params.term
-                        };
-                    },
-                    processResults: function (data) {
-                        return {
-                            results: data
-                        };
-                    },
-                    cache: true
-                },
-                placeholder: 'İsim, soyad veya e-posta ile arayın...',
-                minimumInputLength: 3,
-                allowClear: true,
-                width: '100%'
-            });
-
-            // Restore Selected staff search options if present in filter model
-            @if (filter.StaffIds != null && filter.StaffIds.Any())
-            {
-                foreach (var id in filter.StaffIds)
-                {
-                    <text>
-                    // Add existing selected staff options
-                    fetch('/Gorevli/GetGorevliName?id=' + @id)
-                        .then(r => r.json())
-                        .then(data => {
-                            var option = new Option(data.text, data.id, true, true);
-                            $('#staffSearch').append(option).trigger('change');
-                        });
-                    </text>
-                }
-            }
-        });
-
-        // Checkbox state tracker with robust sessionStorage persistence
-        (function() {
-            window.selectedEntityIds = [];
-
-            try {
-                var stored = sessionStorage.getItem('selectedGorevliIds');
-                if (stored) {
-                    window.selectedEntityIds = JSON.parse(stored);
-                }
-            } catch (e) {
-                console.error(e);
-            }
-
-            function syncCheckboxesUI() {
-                var rowCheckboxes = document.querySelectorAll('.gorevli-select');
-                var allChecked = rowCheckboxes.length > 0;
-                var noneChecked = true;
-
-                rowCheckboxes.forEach(function(cb) {
-                    var id = parseInt(cb.getAttribute('data-id'));
-                    var isChecked = window.selectedEntityIds.includes(id);
-                    cb.checked = isChecked;
-                    if (isChecked) {
-                        noneChecked = false;
-                    } else {
-                        allChecked = false;
-                    }
-                });
-
-                var selectAll = document.getElementById('selectAllGorevli');
-                if (selectAll) {
-                    selectAll.checked = allChecked && rowCheckboxes.length > 0;
-                    selectAll.indeterminate = (!allChecked && !noneChecked);
-                }
-
-                var bar = document.getElementById('contextual-action-bar');
-                var badge = document.getElementById('selected-badge');
-                if (bar) {
-                    if (window.selectedEntityIds.length > 0) {
-                        bar.classList.add('show');
-                        if (badge) {
-                            badge.textContent = window.selectedEntityIds.length + ' Görevli Seçildi';
-                        }
-                    } else {
-                        bar.classList.remove('show');
-                    }
-                }
-
-                // Update rows badge in the export section
-                var rowsBadge = document.getElementById('ep-selected-rows-badge');
-                var rowsCount = document.getElementById('ep-selected-rows-count');
-                if (rowsBadge && rowsCount) {
-                    if (window.selectedEntityIds.length > 0) {
-                        rowsBadge.style.display = 'inline-flex';
-                        rowsCount.textContent = window.selectedEntityIds.length;
-                    } else {
-                        rowsBadge.style.display = 'none';
-                    }
-                }
-            }
-
-            document.addEventListener('DOMContentLoaded', function() {
-                syncCheckboxesUI();
-
-                var selectAll = document.getElementById('selectAllGorevli');
-                var rowCheckboxes = document.querySelectorAll('.gorevli-select');
-
-                if (selectAll) {
-                    selectAll.addEventListener('change', function() {
-                        var checked = selectAll.checked;
-                        rowCheckboxes.forEach(function(cb) {
-                            var id = parseInt(cb.getAttribute('data-id'));
-                            cb.checked = checked;
-                            if (checked) {
-                                if (!window.selectedEntityIds.includes(id)) {
-                                    window.selectedEntityIds.push(id);
-                                }
-                            } else {
-                                var idx = window.selectedEntityIds.indexOf(id);
-                                if (idx > -1) {
-                                    window.selectedEntityIds.splice(idx, 1);
-                                }
-                            }
-                        });
-                        sessionStorage.setItem('selectedGorevliIds', JSON.stringify(window.selectedEntityIds));
-                        syncCheckboxesUI();
-                    });
-                }
-
-                rowCheckboxes.forEach(function(cb) {
-                    cb.addEventListener('change', function() {
-                        var id = parseInt(cb.getAttribute('data-id'));
-                        if (cb.checked) {
-                            if (!window.selectedEntityIds.includes(id)) {
-                                window.selectedEntityIds.push(id);
-                            }
-                        } else {
-                            var idx = window.selectedEntityIds.indexOf(id);
-                            if (idx > -1) {
-                                window.selectedEntityIds.splice(idx, 1);
-                            }
-                        }
-                        sessionStorage.setItem('selectedGorevliIds', JSON.stringify(window.selectedEntityIds));
-                        syncCheckboxesUI();
-                    });
-                });
-            });
-
-            window.syncCheckboxesUI = syncCheckboxesUI;
-        })();
-
-        function clearAllSelections() {
-            window.selectedEntityIds = [];
-            sessionStorage.setItem('selectedGorevliIds', JSON.stringify([]));
-            if (typeof window.syncCheckboxesUI === 'function') {
-                window.syncCheckboxesUI();
-            }
-        }
-
-        function toggleExportPanelFromFloatingBar() {
-            var content = document.getElementById('exportSectionContent');
-            if (content) {
-                if (!content.classList.contains('show')) {
-                    toggleExportSection();
-                }
-                content.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        }
-
-        function triggerBulkExcelQuick() {
-            submitQuickExport();
-        }
-
-        function triggerBulkDelete() {
-            var ids = window.selectedEntityIds || [];
-            if (ids.length === 0) return;
-            if (!confirm(ids.length + ' adet seçilen görevliyi sistemden silmek istediğinize emin misiniz?')) return;
-
-            var token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
-            
-            fetch('/Gorevli/BulkDelete', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'RequestVerificationToken': token
-                },
-                body: JSON.stringify(ids)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('✓ ' + data.count + ' görevli silindi!');
-                    clearAllSelections();
-                    location.reload();
-                } else {
-                    alert('✗ Hata: ' + (data.message || 'Silme işlemi gerçekleştirilemedi.'));
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('✗ Sunucu bağlantısı başarısız.');
-            });
-        }
-    </script>
-}

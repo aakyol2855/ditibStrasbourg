@@ -19,16 +19,23 @@ namespace DitibStasbourg.Services.Security
         public Task<AuthorizationPolicy?> GetFallbackPolicyAsync() => 
             FallbackPolicyProvider.GetFallbackPolicyAsync();
 
-        public Task<AuthorizationPolicy?> GetPolicyAsync(string policyName)
+        public async Task<AuthorizationPolicy?> GetPolicyAsync(string policyName)
         {
-            // If the policy name matches our convention, create it dynamically
-            // (You can also add a prefix like "Permission_" if you want to be explicit,
-            // but simply treating all unknown policies as permission checks works too)
-            
+            var fallbackPolicy = await FallbackPolicyProvider.GetPolicyAsync(policyName);
+            if (fallbackPolicy != null)
+            {
+                return fallbackPolicy;
+            }
+
             var policy = new AuthorizationPolicyBuilder();
-            policy.RequireClaim("Permission", policyName);
+            policy.RequireAssertion(context =>
+                context.User.IsInRole("SuperAdmin") || 
+                context.User.IsInRole("Admin") || 
+                context.User.HasClaim("Permission", policyName) ||
+                context.User.HasClaim(policyName, "true")
+            );
             
-            return Task.FromResult<AuthorizationPolicy?>(policy.Build());
+            return policy.Build();
         }
     }
 }

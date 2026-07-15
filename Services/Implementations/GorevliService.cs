@@ -5,6 +5,7 @@ using DitibStasbourg.Models.ViewModels;
 using DitibStasbourg.Services.Base;
 using DitibStasbourg.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using ClosedXML.Excel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
@@ -14,13 +15,16 @@ namespace DitibStasbourg.Services.Implementations
     public class GorevliService : BaseService<Gorevli>, IGorevliService
     {
         private readonly IMemoryCache _cache;
+        private readonly ISystemAuditLogService _auditService;
 
         public GorevliService(
             ApplicationDbContext context,
             ILogger<GorevliService> logger,
-            IMemoryCache cache) : base(context, logger)
+            IMemoryCache cache,
+            ISystemAuditLogService auditService) : base(context, logger)
         {
             _cache = cache;
+            _auditService = auditService;
         }
 
         public async Task<List<object>> SearchStaffAsync(string term)
@@ -142,17 +146,50 @@ namespace DitibStasbourg.Services.Implementations
              if (!string.IsNullOrEmpty(filter.CepTelefonu))
                 query = query.Where(s => s.CepTelefonu != null && s.CepTelefonu.Contains(filter.CepTelefonu));
 
+            // Fransa Giriş Tarihi range filter
+            if (filter.FransaGirisBaslangic.HasValue)
+                query = query.Where(s => s.FransaGirisTarihi.HasValue && s.FransaGirisTarihi.Value >= filter.FransaGirisBaslangic.Value);
+
+            if (filter.FransaGirisBitis.HasValue)
+                query = query.Where(s => s.FransaGirisTarihi.HasValue && s.FransaGirisTarihi.Value <= filter.FransaGirisBitis.Value);
+
+            // Sözleşme Başlangıcı range filter (maps to earliest active assignment start)
+            if (filter.SozlesmeBaslangicMin.HasValue)
+                query = query.Where(s => s.Gorevlendirmeler.Any(g => g.Tarih >= filter.SozlesmeBaslangicMin.Value));
+
+            if (filter.SozlesmeBaslangicMax.HasValue)
+                query = query.Where(s => s.Gorevlendirmeler.Any(g => g.Tarih <= filter.SozlesmeBaslangicMax.Value));
+
+            // Leave status filter
+            if (filter.HasLeave.HasValue)
+            {
+                if (filter.HasLeave.Value)
+                    query = query.Where(s => s.Izinler != null && s.Izinler.Any(i => !i.IsDeleted && i.OnayDurumu == DitibStasbourg.Models.Enums.OnayDurumu.Onaylandi));
+                else
+                    query = query.Where(s => s.Izinler == null || !s.Izinler.Any(i => !i.IsDeleted && i.OnayDurumu == DitibStasbourg.Models.Enums.OnayDurumu.Onaylandi));
+            }
+
             switch (filter.SortOrder)
             {
-                case "name_desc": return query.OrderByDescending(s => s.Ad);
-                case "Status": return query.OrderBy(s => s.GorevliDurumBilgisi != null ? s.GorevliDurumBilgisi.Sira : 999);
-                case "status_desc": return query.OrderByDescending(s => s.GorevliDurumBilgisi != null ? s.GorevliDurumBilgisi.Sira : 999);
-                case "Active": return query.OrderByDescending(s => s.Gorevlendirmeler.Any(g => g.Tarih <= DateTime.Now && (g.BitisTarihi == null || g.BitisTarihi >= DateTime.Now))).ThenBy(s => s.Ad);
-                case "active_desc": return query.OrderBy(s => s.Gorevlendirmeler.Any(g => g.Tarih <= DateTime.Now && (g.BitisTarihi == null || g.BitisTarihi >= DateTime.Now))).ThenBy(s => s.Ad);
-                case "name_asc": return query.OrderBy(s => s.Ad);
+                case "name_desc":
+                    return query.OrderByDescending(s => s.Ad).ThenByDescending(s => s.Soyad);
+                case "name_asc":
+                    return query.OrderBy(s => s.Ad).ThenBy(s => s.Soyad);
+                case "Status":
+                    return query.OrderBy(s => s.GorevliDurumBilgisi != null ? s.GorevliDurumBilgisi.Sira : 999).ThenBy(s => s.Ad).ThenBy(s => s.Soyad);
+                case "status_desc":
+                    return query.OrderByDescending(s => s.GorevliDurumBilgisi != null ? s.GorevliDurumBilgisi.Sira : 999).ThenBy(s => s.Ad).ThenBy(s => s.Soyad);
+                case "Active":
+                    return query.OrderByDescending(s => s.Gorevlendirmeler.Any(g => !g.IsDeleted && DateTime.Now.Date >= g.Tarih.Date && (!g.BitisTarihi.HasValue || DateTime.Now.Date <= g.BitisTarihi.Value.Date))).ThenBy(s => s.Ad).ThenBy(s => s.Soyad);
+                case "active_desc":
+                    return query.OrderBy(s => s.Gorevlendirmeler.Any(g => !g.IsDeleted && DateTime.Now.Date >= g.Tarih.Date && (!g.BitisTarihi.HasValue || DateTime.Now.Date <= g.BitisTarihi.Value.Date))).ThenBy(s => s.Ad).ThenBy(s => s.Soyad);
+                case "Date":
+                    return query.OrderBy(s => s.Gorevlendirmeler.Where(g => !g.IsDeleted).OrderBy(g => g.Tarih).FirstOrDefault() != null ? s.Gorevlendirmeler.Where(g => !g.IsDeleted).OrderBy(g => g.Tarih).FirstOrDefault().Tarih : DateTime.MaxValue).ThenBy(s => s.Ad).ThenBy(s => s.Soyad);
+                case "date_desc":
+                    return query.OrderByDescending(s => s.Gorevlendirmeler.Where(g => !g.IsDeleted).OrderBy(g => g.Tarih).FirstOrDefault() != null ? s.Gorevlendirmeler.Where(g => !g.IsDeleted).OrderBy(g => g.Tarih).FirstOrDefault().Tarih : DateTime.MinValue).ThenByDescending(s => s.Ad).ThenByDescending(s => s.Soyad);
                 default:
                     // Default: active personnel first, then alphabetical
-                    return query.OrderByDescending(s => s.Gorevlendirmeler.Any(g => g.Tarih <= DateTime.Now && (g.BitisTarihi == null || g.BitisTarihi >= DateTime.Now))).ThenBy(s => s.Ad);
+                    return query.OrderByDescending(s => s.Gorevlendirmeler.Any(g => !g.IsDeleted && DateTime.Now.Date >= g.Tarih.Date && (!g.BitisTarihi.HasValue || DateTime.Now.Date <= g.BitisTarihi.Value.Date))).ThenBy(s => s.Ad).ThenBy(s => s.Soyad);
             }
         }
 
@@ -183,6 +220,7 @@ namespace DitibStasbourg.Services.Implementations
                 .Include(g => g.KadroTuru)
                 .Include(g => g.AskerlikDurumu)
                 .Include(g => g.KanGrubu)
+                .Include(g => g.Belgeler)
                 .FirstOrDefaultAsync(m => m.Id == id);
         }
 
@@ -214,6 +252,79 @@ namespace DitibStasbourg.Services.Implementations
         public async Task<byte[]> ExportToExcelAsync(GorevliFilterViewModel filter)
         {
             var query = BuildFilterQuery(filter);
+            var gorevliler = await query.ToListAsync();
+
+            using var workbook = new XLWorkbook();
+            var worksheet = workbook.Worksheets.Add("Görevliler");
+            
+            // Headers
+            worksheet.Cell(1, 1).Value = "Ad";
+            worksheet.Cell(1, 2).Value = "Soyad";
+            worksheet.Cell(1, 3).Value = "Email";
+            worksheet.Cell(1, 4).Value = "Cinsiyet";
+            worksheet.Cell(1, 5).Value = "Ünvan";
+            worksheet.Cell(1, 6).Value = "Görevli Durumu";
+            worksheet.Cell(1, 7).Value = "Sözleşme Tipi";
+            worksheet.Cell(1, 8).Value = "TC Kimlik No";
+            worksheet.Cell(1, 9).Value = "Cep Telefonu";
+            worksheet.Cell(1, 10).Value = "Eğitim Durumu";
+            worksheet.Cell(1, 11).Value = "Hafızlık";
+            worksheet.Cell(1, 12).Value = "Son Görev Yeri";
+            worksheet.Cell(1, 13).Value = "İlk Görev Tarihi";
+            worksheet.Cell(1, 14).Value = "Son Bitiş Tarihi";
+            worksheet.Cell(1, 15).Value = "Aktif mi?";
+            
+            var headerRange = worksheet.Range(1, 1, 1, 15);
+            headerRange.Style.Font.Bold = true;
+            headerRange.Style.Fill.BackgroundColor = XLColor.LightGray;
+            
+            int row = 2;
+            foreach (var gorevli in gorevliler)
+            {
+                var lastAssignment = gorevli.Gorevlendirmeler.OrderByDescending(g => g.Tarih).FirstOrDefault();
+                var earliestStart = gorevli.Gorevlendirmeler.OrderBy(g => g.Tarih).FirstOrDefault()?.Tarih;
+                var latestEnd = gorevli.Gorevlendirmeler.OrderByDescending(g => g.BitisTarihi).FirstOrDefault()?.BitisTarihi;
+                
+                worksheet.Cell(row, 1).Value = gorevli.Ad;
+                worksheet.Cell(row, 2).Value = gorevli.Soyad;
+                worksheet.Cell(row, 3).Value = gorevli.Email ?? "";
+                worksheet.Cell(row, 4).Value = gorevli.Cinsiyet == "E" ? "Erkek" : gorevli.Cinsiyet == "K" ? "Kadın" : "";
+                worksheet.Cell(row, 5).Value = gorevli.Unvan?.Ad ?? "";
+                worksheet.Cell(row, 6).Value = gorevli.GorevliDurumBilgisi?.Ad ?? "";
+                worksheet.Cell(row, 7).Value = gorevli.SozlesmeTip?.Ad ?? "";
+                worksheet.Cell(row, 8).Value = gorevli.TCKimlikNo ?? "";
+                worksheet.Cell(row, 9).Value = gorevli.CepTelefonu ?? "";
+                worksheet.Cell(row, 10).Value = gorevli.EgitimDurumu?.Ad ?? "";
+                worksheet.Cell(row, 11).Value = gorevli.HafizlikDurumu?.Ad ?? "";
+                worksheet.Cell(row, 12).Value = lastAssignment?.Kurum?.Isim ?? "-";
+                worksheet.Cell(row, 13).Value = earliestStart?.ToShortDateString() ?? "-";
+                worksheet.Cell(row, 14).Value = latestEnd?.ToShortDateString() ?? "-";
+                worksheet.Cell(row, 15).Value = gorevli.isActive ? "Evet" : "Hayır";
+                
+                row++;
+            }
+            
+            worksheet.Columns().AdjustToContents();
+            
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            return stream.ToArray();
+        }
+
+        public async Task<byte[]> ExportSelectedToExcelAsync(List<int> ids)
+        {
+            if (ids == null) ids = new List<int>();
+            
+            var query = dbSet
+                .Include(g => g.GorevliDurumBilgisi)
+                .Include(g => g.SozlesmeTip)
+                .Include(g => g.Unvan)
+                .Include(g => g.EgitimDurumu)
+                .Include(g => g.HafizlikDurumu)
+                .Include(g => g.Gorevlendirmeler)
+                    .ThenInclude(gr => gr.Kurum)
+                .Where(g => ids.Contains(g.Id));
+
             var gorevliler = await query.ToListAsync();
 
             using var workbook = new XLWorkbook();
@@ -436,20 +547,25 @@ namespace DitibStasbourg.Services.Implementations
                                 continue;
                             }
 
-                            var tc = GetCellValue(row, "tc", "tc kimlik no", "tckimlikno", "tc no");
+                            var tc = GetCellValue(row, "tc", "tc kimlik no", "tckimlikno", "tc no")?.Trim();
+                            
+                            if (string.IsNullOrWhiteSpace(tc))
+                            {
+                                errors.Add($"Satır {row.RowNumber()}: TC Kimlik No eksik veya boş, kayıt engellendi.");
+                                errorCount++;
+                                continue;
+                            }
+
                             var email = GetCellValue(row, "email", "e-posta", "eposta", "e-mail");
 
                             // Explicit database lookup constraint
                             bool existsInDb = false;
                             string duplicateDetail = "";
 
-                            if (!string.IsNullOrEmpty(tc))
+                            existsInDb = await _context.Gorevli.AnyAsync(g => g.TCKimlikNo == tc && !g.IsDeleted);
+                            if (existsInDb)
                             {
-                                existsInDb = await _context.Gorevli.AnyAsync(g => g.TCKimlikNo == tc);
-                                if (existsInDb)
-                                {
-                                    duplicateDetail = $"TC Kimlik Numarası ({tc}) zaten veritabanında mevcut.";
-                                }
+                                duplicateDetail = $"TC Kimlik Numarası ({tc}) zaten veritabanında mevcut.";
                             }
                             else
                             {
@@ -533,7 +649,7 @@ namespace DitibStasbourg.Services.Implementations
             {
                 try
                 {
-                    // 1. Soft-delete Gorevlendirmeler and GorevlendirmeNotlari
+                    // 1. Soft-delete Gorevlendirmeler and related notes
                     var activeAssignments = await _context.Gorevlendirme
                         .Where(g => g.GorevliId == gorevliId)
                         .ToListAsync();
@@ -541,6 +657,7 @@ namespace DitibStasbourg.Services.Implementations
                     foreach (var g in activeAssignments)
                     {
                         g.IsDeleted = true;
+                        g.DeletedAt = DateTime.UtcNow;
                         _context.Entry(g).State = EntityState.Modified;
 
                         var gNotlar = await _context.GorevlendirmeNotlari
@@ -563,8 +680,26 @@ namespace DitibStasbourg.Services.Implementations
                         _context.Entry(n).State = EntityState.Modified;
                     }
 
-                    // 3. Soft-delete Gorevli
+                    // 3. Soft-delete KurumKasaOdenekler (Budgets)
+                    var budgets = await _context.KurumKasaOdenekler
+                        .Where(b => b.TargetGorevliId == gorevliId)
+                        .ToListAsync();
+                    foreach (var b in budgets)
+                    {
+                        b.IsDeleted = true;
+                        b.DeletedAt = DateTime.UtcNow;
+                        _context.Entry(b).State = EntityState.Modified;
+                    }
+
+                    // 4. Clean up related OverdueNotifications
+                    var notifications = await _context.OverdueNotifications
+                        .Where(n => n.RelatedGorevliId == gorevliId)
+                        .ToListAsync();
+                    _context.OverdueNotifications.RemoveRange(notifications);
+
+                    // 5. Soft-delete Gorevli
                     entityToDelete.IsDeleted = true;
+                    entityToDelete.DeletedAt = DateTime.UtcNow;
                     _context.Entry(entityToDelete).State = EntityState.Modified;
 
                     await _context.SaveChangesAsync();
@@ -576,6 +711,81 @@ namespace DitibStasbourg.Services.Implementations
                     throw;
                 }
             }
+        }
+
+        // NEW: Begin a transaction for rotation wizard
+        public async Task<IDbContextTransaction> BeginTransactionAsync()
+        {
+            return await _context.Database.BeginTransactionAsync();
+        }
+
+        // NEW: Deactivate any current active assignment for a personnel
+        public async Task DeactivateCurrentAssignmentAsync(int gorevliId)
+        {
+            var current = await _context.Gorevlendirme
+                .Where(g => g.GorevliId == gorevliId && g.IsActive)
+                .FirstOrDefaultAsync();
+            if (current != null)
+            {
+                current.IsActive = false;
+                current.BitisTarihi = DateTime.UtcNow;
+                _context.Entry(current).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        // NEW: Create a fresh assignment row and activate it
+        public async Task CreateAssignmentAsync(int gorevliId, int kurumId)
+        {
+            var newAssign = new Gorevlendirme
+            {
+                GorevliId = gorevliId,
+                KurumId = kurumId,
+                Tarih = DateTime.UtcNow,
+                IsActive = true,
+                BaslangicTarihi = DateTime.UtcNow
+            };
+            _context.Gorevlendirme.Add(newAssign);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<int> GetTotalUsedLeavesAsync(int gorevliId)
+        {
+            return await _context.GorevliIzinler
+                .AsNoTracking()
+                .Where(i => i.GorevliId == gorevliId && i.IzinTuru == Models.Enums.IzinTuru.YillikIzin && i.OnayDurumu == Models.Enums.OnayDurumu.Onaylandi && !i.IsDeleted)
+                .SumAsync(i => i.ToplamGun);
+        }
+
+        public async Task<List<Gorevli>> CheckDuplicateMatchesAsync(string ad, string soyad, string tcKimlikNo, string eposta)
+        {
+            return await _context.Gorevli
+                .AsNoTracking()
+                .Where(g => !g.IsDeleted && (g.Ad == ad && g.Soyad == soyad || g.TCKimlikNo == tcKimlikNo || g.Email == eposta))
+                .ToListAsync();
+        }
+
+        public async Task<GorevliNot?> GetNoteByIdAsync(int noteId)
+        {
+            return await _context.GorevliNotlari.FindAsync(noteId);
+        }
+
+        public async Task UpdateNoteAsync(GorevliNot note)
+        {
+            _context.Update(note);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<(string? Phone, string? Email)?> GetContactInfoAsync(int gorevliId)
+        {
+            var result = await _context.Gorevli
+                .AsNoTracking()
+                .Where(g => g.Id == gorevliId && !g.IsDeleted)
+                .Select(g => new { g.CepTelefonu, g.Email })
+                .FirstOrDefaultAsync();
+
+            if (result == null) return null;
+            return (result.CepTelefonu, result.Email);
         }
     }
 }

@@ -177,15 +177,24 @@
                             {
                                 @foreach (var item in Model.FlaggedDuplicates)
                                 {
-                                    <tr>
+                                    <tr class="@(item.Name == "Akıllı Tespit Uyarısı" ? "table-warning" : "")">
                                         <td>
                                             <input type="checkbox" class="dupe-checkbox form-check-input" value="@item.Id" data-module="@item.TargetModule" />
                                         </td>
                                         <td>
                                             <div class="fw-semibold text-slate-800">@item.Name</div>
-                                            <span class="badge @(item.TargetModule == "Hissedar" ? "bg-warning text-dark" : item.TargetModule == "Gorevli" ? "bg-info text-dark" : "bg-success") btn-xs">
-                                                @item.TargetModule
-                                            </span>
+                                            @if (item.Name == "Akıllı Tespit Uyarısı")
+                                            {
+                                                <span class="badge bg-warning text-dark btn-xs border border-dark">
+                                                    <i class="bi bi-exclamation-triangle-fill"></i> @item.TargetModule Sistemi Uyarısı
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge @(item.TargetModule == "Hissedar" ? "bg-warning text-dark" : item.TargetModule == "Gorevli" ? "bg-info text-dark" : item.TargetModule == "Kurban" ? "bg-primary" : "bg-success") btn-xs">
+                                                    @item.TargetModule
+                                                </span>
+                                            }
                                         </td>
                                         <td>
                                             @if (item.TimeGapSeconds.HasValue)
@@ -271,6 +280,36 @@
     </div>
 </div>
 
+<!-- Akıllı Bakım & Mükerrer Temizleme Güvenlik Duvarı Modali -->
+<div class="modal fade" id="maintenanceConfirmModal" tabindex="-1" aria-labelledby="maintenanceConfirmModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title fw-bold" id="maintenanceConfirmModalLabel">
+                    <i class="bi bi-shield-lock-fill me-2"></i> VERİ TEMİZLEME GÜVENLİK ONAYI
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body py-4">
+                <div class="alert alert-warning border-2 fw-semibold mb-3">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    Seçilen kayıtlar sistemden güvenli/kalıcı olarak silinecek veya birleştirilecektir.
+                </div>
+                <p class="text-muted small mb-1">Yapılacak işlem açıklaması:</p>
+                <p class="fw-bold text-dark fs-6" id="maintenanceActionDesc">—</p>
+                <p class="text-muted small">Bu işlemi onaylamak için lütfen aşağıdaki kutuya <strong>"SİL"</strong> yazınız.</p>
+                <input type="text" id="maintenanceConfirmInput" class="form-control" placeholder='Onaylamak için "SİL" yazın' autocomplete="off" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal Et</button>
+                <button type="button" id="maintenanceConfirmSubmitBtn" class="btn btn-danger fw-bold" disabled>
+                    <i class="bi bi-trash-fill me-1"></i> Evet, İşlemi Tamamla
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
 <script>
     let selectedFile = null;
@@ -312,24 +351,52 @@
         }
     });
 
-    async function purgeModuleDuplicates(module) {
-        if (!confirm(`${module} modülündeki mükerrer kayıtları temizlemek istediğinizden emin misiniz?`)) return;
+    let pendingAction = null;
 
-        try {
-            const response = await fetch(`/Admin/PurgeDuplicates?module=${module}`, {
-                method: 'POST'
-            });
-            const result = await response.json();
-            if (result.success) {
-                alert(`${result.count} adet mükerrer kayıt sistemden başarıyla temizlendi.`);
-                location.reload();
-            } else {
-                alert('Mükerrer temizleme işlemi sırasında bir hata oluştu.');
-            }
-        } catch (e) {
-            console.error(e);
-            alert('Sunucuyla bağlantı kurulamadı.');
+    // Monitor confirmation input
+    document.getElementById('maintenanceConfirmInput').addEventListener('input', function() {
+        const submitBtn = document.getElementById('maintenanceConfirmSubmitBtn');
+        submitBtn.disabled = this.value.trim().toUpperCase() !== 'SİL';
+    });
+
+    // Handle modal confirmation submit
+    document.getElementById('maintenanceConfirmSubmitBtn').addEventListener('click', async function() {
+        if (typeof pendingAction === 'function') {
+            this.disabled = true;
+            await pendingAction();
+            this.disabled = false;
+            const modalEl = document.getElementById('maintenanceConfirmModal');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
         }
+    });
+
+    async function purgeModuleDuplicates(module) {
+        document.getElementById('maintenanceActionDesc').textContent = 
+            `"${module}" modülündeki tüm mükerrer kayıtlar otomatik olarak temizlenecektir.`;
+        document.getElementById('maintenanceConfirmInput').value = '';
+        document.getElementById('maintenanceConfirmSubmitBtn').disabled = true;
+
+        pendingAction = async function() {
+            try {
+                const response = await fetch(`/Admin/PurgeDuplicates?module=${module}`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert(`${result.count} adet mükerrer kayıt sistemden başarıyla temizlendi.`);
+                    location.reload();
+                } else {
+                    alert('Mükerrer temizleme işlemi sırasında bir hata oluştu.');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Sunucuyla bağlantı kurulamadı.');
+            }
+        };
+
+        const modal = new bootstrap.Modal(document.getElementById('maintenanceConfirmModal'));
+        modal.show();
     }
 
     function startExcelImport() {
@@ -445,52 +512,60 @@
         const checkedBoxes = document.querySelectorAll('.dupe-checkbox:checked');
         if (checkedBoxes.length === 0) return;
 
-        if (!confirm(`Seçilen ${checkedBoxes.length} kaydı güvenli bir şekilde silmek istediğinize emin misiniz?`)) return;
+        document.getElementById('maintenanceActionDesc').textContent = 
+            `Seçilen ${checkedBoxes.length} adet mükerrer kayıt güvenli şekilde silinecektir.`;
+        document.getElementById('maintenanceConfirmInput').value = '';
+        document.getElementById('maintenanceConfirmSubmitBtn').disabled = true;
 
-        // Group ids by module
-        const groups = {};
-        checkedBoxes.forEach(cb => {
-            const mod = cb.getAttribute('data-module');
-            const id = parseInt(cb.value);
-            if (!groups[mod]) {
-                groups[mod] = [];
-            }
-            groups[mod].push(id);
-        });
-
-        let successCount = 0;
-        let errors = [];
-
-        for (const module in groups) {
-            const ids = groups[module];
-            try {
-                const response = await fetch(`/Admin/BatchDelete?module=${module}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(ids)
-                });
-                const result = await response.json();
-                if (result.success) {
-                    successCount += ids.length;
-                } else {
-                    errors.push(`${module}: ${result.message}`);
+        pendingAction = async function() {
+            // Group ids by module
+            const groups = {};
+            checkedBoxes.forEach(cb => {
+                const mod = cb.getAttribute('data-module');
+                const id = parseInt(cb.value);
+                if (!groups[mod]) {
+                    groups[mod] = [];
                 }
-            } catch (e) {
-                console.error(e);
-                errors.push(`${module} modülünde sunucu hatası.`);
+                groups[mod].push(id);
+            });
+
+            let successCount = 0;
+            let errors = [];
+
+            for (const module in groups) {
+                const ids = groups[module];
+                try {
+                    const response = await fetch(`/Admin/BatchDelete?module=${module}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(ids)
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        successCount += ids.length;
+                    } else {
+                        errors.push(`${module}: ${result.message}`);
+                    }
+                } catch (e) {
+                    console.error(e);
+                    errors.push(`${module} modülünde sunucu hatası.`);
+                }
             }
-        }
 
-        if (errors.length > 0) {
-            alert('Bazı silme işlemleri başarısız oldu:\n' + errors.join('\n'));
-        }
+            if (errors.length > 0) {
+                alert('Bazı silme işlemleri başarısız oldu:\n' + errors.join('\n'));
+            }
 
-        if (successCount > 0) {
-            alert(`${successCount} adet seçilmiş mükerrer kayıt güvenli şekilde silindi.`);
-            location.reload();
-        }
+            if (successCount > 0) {
+                alert(`${successCount} adet seçilmiş mükerrer kayıt güvenli şekilde silindi.`);
+                location.reload();
+            }
+        };
+
+        const modal = new bootstrap.Modal(document.getElementById('maintenanceConfirmModal'));
+        modal.show();
     }
 </script>
 }

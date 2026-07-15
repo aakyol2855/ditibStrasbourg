@@ -34,6 +34,9 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<Ref_KurumTuru> Ref_KurumTurus { get; set; }
     public DbSet<GorevGecmisi> GorevGecmisleri { get; set; }
     public DbSet<GorevliNot> GorevliNotlari { get; set; }
+        public DbSet<KurumButce> KurumButceler { get; set; }
+        public DbSet<KurumButcePeriod> KurumButcePeriods { get; set; }
+        public DbSet<KurumHavuzTakibi> KurumHavuzTakibiSet { get; set; }
     public DbSet<GorevlendirmeNot> GorevlendirmeNotlari { get; set; }
     
     public DbSet<Ref_Unvan> Ref_Unvans { get; set; }
@@ -57,10 +60,26 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<HelpTopic> HelpTopics { get; set; }
     public DbSet<Kurbanlik> Kurbanliklar { get; set; }
     public DbSet<Hissedar> Hissedarlar { get; set; }
+    public DbSet<KurbanCampaignRecord> KurbanCampaignRecords { get; set; }
     public DbSet<DashboardPreference> DashboardPreferences { get; set; }
     public DbSet<SystemAuditLog> SystemAuditLogs { get; set; }
     public DbSet<Ref_YonetimRol> Ref_YonetimRols { get; set; }
     public DbSet<KurumYonetimKuruluUyesi> KurumYonetimKuruluUyeleri { get; set; }
+
+    // DİBBYS Alsace Subsystem Tables
+    public DbSet<GorevliIzin> GorevliIzinler { get; set; }
+    public DbSet<KurumKasaOdenek> KurumKasaOdenekler { get; set; }
+    public DbSet<GorevliFaaliyetRaporu> GorevliFaaliyetRaporlari { get; set; }
+
+    // Enterprise Gap-Fill Subsystems
+    public DbSet<KurumDocument> KurumDocuments { get; set; }
+    public DbSet<BudgetRevision> BudgetRevisions { get; set; }
+    public DbSet<OverdueNotification> OverdueNotifications { get; set; }
+
+    // Schema Extension — Dernek & Görevli
+    public DbSet<DernekNot> DernekNotlari { get; set; }
+    public DbSet<DernekGorsel> DernekGorselleri { get; set; }
+    public DbSet<GorevliBelge> GorevliBelgeleri { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -74,6 +93,12 @@ public class ApplicationDbContext : IdentityDbContext
         builder.Entity<KurumYonetimKuruluUyesi>().HasQueryFilter(m => !m.IsDeleted);
         builder.Entity<GorevliNot>().HasQueryFilter(n => !n.IsDeleted);
         builder.Entity<GorevlendirmeNot>().HasQueryFilter(n => !n.IsDeleted);
+        builder.Entity<GorevliIzin>().HasQueryFilter(i => !i.IsDeleted);
+        builder.Entity<KurumKasaOdenek>().HasQueryFilter(o => !o.IsDeleted);
+        builder.Entity<GorevliFaaliyetRaporu>().HasQueryFilter(f => !f.IsDeleted);
+        builder.Entity<DernekNot>().HasQueryFilter(n => !n.IsDeleted);
+        builder.Entity<DernekGorsel>().HasQueryFilter(g => !g.IsDeleted);
+        builder.Entity<GorevliBelge>().HasQueryFilter(b => !b.IsDeleted);
 
         // Configure Lookups
         builder.Entity<LookupType>()
@@ -93,26 +118,7 @@ public class ApplicationDbContext : IdentityDbContext
             .HasForeignKey(g => g.YerineGelecekGorevliId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Seed Users (Personnel)
-        builder.Entity<Gorevli>().HasData(
-            new Gorevli { Id = 1, Ad = "Ahmet", Soyad = "Yılmaz", Email = "ahmet.yilmaz@example.com" },
-            new Gorevli { Id = 2, Ad = "Mehmet", Soyad = "Demir", Email = "mehmet.demir@example.com" },
-            new Gorevli { Id = 3, Ad = "Ayşe", Soyad = "Kaya", Email = "ayse.kaya@example.com" }
-        );
 
-        // Seed Institutions
-        builder.Entity<Kurum>().HasData(
-            new Kurum { Id = 1, Isim = "Strasbourg Yunus Emre Camii", Adres = "12 Rue de la Musau", Sehir = "Strasbourg", Tip = KurumTip.Cami, Latitude = 48.5661, Longitude = 7.7786 },
-            new Kurum { Id = 2, Isim = "Bischheim Fatih Camii", Adres = "3 Rue des Écoles", Sehir = "Bischheim", Tip = KurumTip.Cami, Latitude = 48.6143, Longitude = 7.7491 },
-            new Kurum { Id = 3, Isim = "Strasbourg Türk Kültür Derneği", Adres = "5 Place Kléber", Sehir = "Strasbourg", Tip = KurumTip.Dernek, Latitude = 48.5830, Longitude = 7.7478 }
-        );
-
-        // Seed Assignments
-        builder.Entity<Gorevlendirme>().HasData(
-            new Gorevlendirme { Id = 1, GorevliId = 1, KurumId = 1, Tarih = new DateTime(2023, 1, 1) },
-            new Gorevlendirme { Id = 2, GorevliId = 2, KurumId = 2, Tarih = new DateTime(2023, 2, 1) },
-            new Gorevlendirme { Id = 3, GorevliId = 3, KurumId = 3, Tarih = new DateTime(2023, 3, 1) }
-        );
 
         // Configure Explicit Relationships
         builder.Entity<GorevGecmisi>()
@@ -174,6 +180,134 @@ public class ApplicationDbContext : IdentityDbContext
             new Ref_YonetimRol { Id = 3, Ad = "Muhasip", IsDeleted = false },
             new Ref_YonetimRol { Id = 4, Ad = "Üye", IsDeleted = false }
         );
+
+        // DİBBYS Entity Configurations
+        builder.Entity<KurumKasaOdenek>(entity =>
+        {
+            entity.Property(e => e.Amount).HasColumnType("decimal(18,2)");
+
+            entity.HasOne(e => e.Kurum)
+                .WithMany()
+                .HasForeignKey(e => e.KurumId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.TargetGorevli)
+                .WithMany()
+                .HasForeignKey(e => e.TargetGorevliId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        builder.Entity<GorevliIzin>(entity =>
+        {
+            entity.HasOne(e => e.Gorevli)
+                .WithMany(g => g.Izinler)
+                .HasForeignKey(e => e.GorevliId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        builder.Entity<GorevliFaaliyetRaporu>(entity =>
+        {
+            entity.HasOne(e => e.Gorevli)
+                .WithMany(g => g.FaaliyetRaporlari)
+                .HasForeignKey(e => e.GorevliId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Kurum)
+                .WithMany()
+                .HasForeignKey(e => e.KurumId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        builder.Entity<Gorevli>(entity =>
+        {
+            entity.HasIndex(e => e.SicilNo)
+                .IsUnique()
+                .HasFilter("[SicilNo] IS NOT NULL")
+                .HasDatabaseName("IX_Gorevli_SicilNo");
+        });
+
+        // Enterprise Gap-Fill: Document Management System
+        builder.Entity<KurumDocument>(entity =>
+        {
+            entity.HasQueryFilter(d => !d.IsDeleted);
+            entity.HasOne(d => d.Kurum)
+                .WithMany(k => k.Documents)
+                .HasForeignKey(d => d.KurumId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(d => new { d.KurumId, d.Category })
+                .HasDatabaseName("IX_KurumDocument_KurumCategory");
+        });
+
+        // Enterprise Gap-Fill: Budget Revision Workflow
+        builder.Entity<BudgetRevision>(entity =>
+        {
+            entity.HasOne(r => r.KurumButce)
+                .WithMany(b => b.Revisions)
+                .HasForeignKey(r => r.KurumButceId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Enterprise Gap-Fill: Overdue Notification Engine
+        builder.Entity<OverdueNotification>(entity =>
+        {
+            entity.HasOne(n => n.RelatedKurum)
+                .WithMany()
+                .HasForeignKey(n => n.RelatedKurumId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(n => n.RelatedGorevli)
+                .WithMany()
+                .HasForeignKey(n => n.RelatedGorevliId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(n => n.RelatedBudgetPeriod)
+                .WithMany()
+                .HasForeignKey(n => n.RelatedBudgetPeriodId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(n => n.RelatedDernekNot)
+                .WithMany()
+                .HasForeignKey(n => n.RelatedDernekNotId)
+                .OnDelete(DeleteBehavior.SetNull);
+            entity.HasOne(n => n.RelatedGorevliBelge)
+                .WithMany()
+                .HasForeignKey(n => n.RelatedGorevliBelgeId)
+                .OnDelete(DeleteBehavior.SetNull);
+            entity.HasIndex(n => new { n.IsRead, n.Severity })
+                .HasDatabaseName("IX_Notification_ReadSeverity");
+        });
+        // Schema Extension: DernekNot
+        builder.Entity<DernekNot>(entity =>
+        {
+            entity.HasOne(n => n.Dernek)
+                .WithMany(k => k.DernekNotlari)
+                .HasForeignKey(n => n.DernekId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Schema Extension: DernekGorsel
+        builder.Entity<DernekGorsel>(entity =>
+        {
+            entity.HasOne(g => g.Dernek)
+                .WithMany(k => k.DernekGorselleri)
+                .HasForeignKey(g => g.DernekId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Schema Extension: GorevliBelge
+        builder.Entity<GorevliBelge>(entity =>
+        {
+            entity.HasOne(b => b.Gorevli)
+                .WithMany(g => g.Belgeler)
+                .HasForeignKey(b => b.GorevliId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.Property(b => b.BelgeTipi)
+                .HasConversion<string>();
+            entity.HasIndex(b => new { b.GorevliId, b.BelgeTipi })
+                .HasDatabaseName("IX_GorevliBelge_GorevliBelgeTipi");
+        });
+
+        // Gorevli decimal fields
+        builder.Entity<Gorevli>()
+            .Property(g => g.Agno)
+            .HasColumnType("decimal(3,2)");
     }
 
     public override int SaveChanges()

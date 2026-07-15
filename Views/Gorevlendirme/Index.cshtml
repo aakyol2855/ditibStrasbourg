@@ -5,16 +5,148 @@
     ViewData["Title"] = "Görevlendirmeler";
     var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
     var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+
+    // Sort helpers for header link generation
+    string currentSortBy   = ViewData["CurrentSortBy"] as string ?? "";
+    bool   isDesc          = (bool)(ViewData["IsDescending"] ?? true);
+    string SortIcon(string col) {
+        if (!string.Equals(currentSortBy, col, StringComparison.OrdinalIgnoreCase))
+            return "fas fa-sort";
+        return isDesc ? "fas fa-sort-down" : "fas fa-sort-up";
+    }
 }
 
+@section Styles {
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+}
 <style>
     .accordion-button:not(.collapsed) { background-color: #e7f1ff; }
+
+    /* ── Floating Action Bar ── */
+    .grvl-action-bar {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translate(-50%, 120px);
+        z-index: 1050;
+        background: rgba(15, 23, 42, 0.95);
+        backdrop-filter: blur(12px) saturate(1.5);
+        -webkit-backdrop-filter: blur(12px) saturate(1.5);
+        border: 1px solid rgba(255,255,255,0.15);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+        border-radius: 50px;
+        padding: 10px 24px;
+        opacity: 0;
+        visibility: hidden;
+        transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.3s, visibility 0.3s;
+    }
+    .grvl-action-bar.show {
+        transform: translate(-50%, 0);
+        opacity: 1;
+        visibility: visible;
+    }
+    .grvl-h-divider {
+        width: 1px; height: 24px;
+        background: rgba(255,255,255,0.15);
+    }
+    /* Sort link style */
+    .sort-link { text-decoration: none; color: inherit; }
+    .sort-link:hover { color: #0d6efd; }
 </style>
 
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
     <h1 class="fw-bold mb-0">Görevlendirmeler <help-icon topic-id="2" title="Görevlendirme Sistemi"></help-icon></h1>
-    <a asp-action="Create" class="btn btn-primary"><i class="fas fa-plus"></i> Yeni Ekle</a>
+    <div class="d-flex gap-2">
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#newAssignmentModal">
+            <i class="fas fa-user-plus me-1"></i> Yeni Görevlendirme Ataması Oluştur
+        </button>
+        <a asp-action="Create" class="btn btn-outline-primary"><i class="fas fa-plus"></i> Gelişmiş Form</a>
+    </div>
 </div>
+
+<!-- ===== NEW ASSIGNMENT MODAL ===== -->
+<div class="modal fade" id="newAssignmentModal" tabindex="-1" aria-labelledby="newAssignmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #1e40af, #3b82f6); color: white; border-bottom: none;">
+                <h5 class="modal-title fw-bold" id="newAssignmentModalLabel">
+                    <i class="fa-solid fa-user-plus me-2"></i>Yeni Görevlendirme Ataması Oluştur
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="quickAssignmentForm" asp-action="Create" asp-controller="Gorevlendirme" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Görevli <span class="text-danger">*</span></label>
+                            <select name="GorevliId" id="quickGorevliId" class="form-select" required>
+                                <option value="">-- Görevli Seçin --</option>
+                                @if (ViewBag.GorevlilerWithStatus != null)
+                                {
+                                    foreach (var item in (IEnumerable<dynamic>)ViewBag.GorevlilerWithStatus)
+                                    {
+                                        <option value="@item.Id">@item.Label</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Atanacak Kurum <span class="text-danger">*</span></label>
+                            <select name="KurumId" id="quickKurumId" class="form-select" required
+                                    asp-items="@(new SelectList(ViewBag.Kurumlar, "Id", "Isim"))">
+                                <option value="">-- Kurum Seçin --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Başlangıç Tarihi <span class="text-danger">*</span></label>
+                            <input type="date" name="Tarih" class="form-control" required
+                                   value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Bitiş Tarihi <span class="text-muted small">(opsiyonel)</span></label>
+                            <input type="date" name="BitisTarihi" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Yerine Gelecek Görevli <span class="text-muted small">(opsiyonel)</span></label>
+                            <select name="YerineGelecekGorevliId" class="form-select"
+                                    asp-items="@(new SelectList(ViewBag.Gorevliler, "Id", "AdSoyad"))">
+                                <option value="">-- Seçin --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Yerine Geliş Planlanan Tarih <span class="text-muted small">(opsiyonel)</span></label>
+                            <input type="date" name="YerineGelisPlanlananTarih" class="form-control" />
+                        </div>
+                    </div>
+
+                    <!-- Overlap / validation error banner (hidden until server returns a conflict) -->
+                    <div id="assignmentErrorBanner" class="alert alert-danger mt-3 mb-0 d-none" role="alert" style="border-radius: 8px;">
+                        <i class="fa-solid fa-circle-exclamation me-2"></i>
+                        <span id="assignmentErrorText"></span>
+                    </div>
+
+                    @if (ViewBag.AutoOpenNewAssignment == true)
+                    {
+                        <div class="alert alert-info mt-3 mb-0 d-flex align-items-center gap-2 py-2" style="border-radius: 8px;">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <span class="small">Dashboard'dan yönlendirildiniz — hedef kurum aşağıda otomatik seçilmiştir.</span>
+                        </div>
+                    }
+                </form>
+            </div>
+            <div class="modal-footer border-0 pt-0 pb-4 px-4">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Vazgeç
+                </button>
+                <button type="button" id="quickAssignmentSubmitBtn" class="btn btn-success px-4">
+                    <i class="fa-solid fa-check me-1"></i>Atamayı Kaydet
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ===== END NEW ASSIGNMENT MODAL ===== -->
 
 @{
     var filter = ViewData["Filter"] as DitibStasbourg.Models.ViewModels.GorevlendirmeFilterViewModel ?? new DitibStasbourg.Models.ViewModels.GorevlendirmeFilterViewModel();
@@ -67,6 +199,7 @@
                         </div>
                         <div class="col-md-12 text-end">
                             <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Filtrele</button>
+                            <button type="button" id="btnExportExcel" class="btn btn-success"><i class="fas fa-file-excel"></i> Excel'e Aktar</button>
                             <a asp-action="Index" class="btn btn-secondary"><i class="fas fa-redo"></i> Temizle</a>
                         </div>
                     </div>
@@ -80,11 +213,22 @@
     <strong>@Model.TotalCount</strong> görevlendirme bulundu.
 </div>
 
-<div class="row mb-3 bg-light py-2 rounded d-none d-md-flex">
-    <div class="col-md-3 fw-bold">Görevli</div>
-    <div class="col-md-3">Kurum</div>
-    <div class="col-md-2">Tarih</div>
-    <div class="col-md-2">Bitiş Tarihi</div>
+<div class="row mb-3 bg-light py-2 rounded d-none d-md-flex align-items-center">
+    <div style="width:46px; flex-shrink:0;" class="text-center">
+        <input type="checkbox" id="selectAllGorevlendirme" class="form-check-input" style="cursor:pointer;" />
+    </div>
+    <div class="col fw-bold">
+        <a class="sort-link" href="@Url.Action("Index", new { SortBy = "gorevli", IsDescending = !(currentSortBy=="gorevli" && isDesc), GorevliId = ((DitibStasbourg.Models.ViewModels.GorevlendirmeFilterViewModel)ViewData["Filter"]!).GorevliId, KurumId = ((DitibStasbourg.Models.ViewModels.GorevlendirmeFilterViewModel)ViewData["Filter"]!).KurumId, DurumFilter = ((DitibStasbourg.Models.ViewModels.GorevlendirmeFilterViewModel)ViewData["Filter"]!).DurumFilter })">Görevli <i class="@SortIcon("gorevli")"></i></a>
+    </div>
+    <div class="col">
+        <a class="sort-link" href="@Url.Action("Index", new { SortBy = "kurum", IsDescending = !(currentSortBy=="kurum" && isDesc), GorevliId = ((DitibStasbourg.Models.ViewModels.GorevlendirmeFilterViewModel)ViewData["Filter"]!).GorevliId, KurumId = ((DitibStasbourg.Models.ViewModels.GorevlendirmeFilterViewModel)ViewData["Filter"]!).KurumId, DurumFilter = ((DitibStasbourg.Models.ViewModels.GorevlendirmeFilterViewModel)ViewData["Filter"]!).DurumFilter })">Kurum <i class="@SortIcon("kurum")"></i></a>
+    </div>
+    <div class="col">
+        <a class="sort-link" href="@Url.Action("Index", new { SortBy = "baslangic", IsDescending = !(currentSortBy=="baslangic" && isDesc), GorevliId = ((DitibStasbourg.Models.ViewModels.GorevlendirmeFilterViewModel)ViewData["Filter"]!).GorevliId, KurumId = ((DitibStasbourg.Models.ViewModels.GorevlendirmeFilterViewModel)ViewData["Filter"]!).KurumId, DurumFilter = ((DitibStasbourg.Models.ViewModels.GorevlendirmeFilterViewModel)ViewData["Filter"]!).DurumFilter })">Başlangıç <i class="@SortIcon("baslangic")"></i></a>
+    </div>
+    <div class="col">
+        <a class="sort-link" href="@Url.Action("Index", new { SortBy = "bitis", IsDescending = !(currentSortBy=="bitis" && isDesc), GorevliId = ((DitibStasbourg.Models.ViewModels.GorevlendirmeFilterViewModel)ViewData["Filter"]!).GorevliId, KurumId = ((DitibStasbourg.Models.ViewModels.GorevlendirmeFilterViewModel)ViewData["Filter"]!).KurumId, DurumFilter = ((DitibStasbourg.Models.ViewModels.GorevlendirmeFilterViewModel)ViewData["Filter"]!).DurumFilter })">Bitiş <i class="@SortIcon("bitis")"></i></a>
+    </div>
     <div class="col-md-2 text-end">İşlemler</div>
 </div>
 
@@ -92,45 +236,52 @@
     @foreach(var item in Model) {
         var isActive = item.Tarih <= DateTime.Today && (item.BitisTarihi == null || item.BitisTarihi >= DateTime.Today);
         
-        <div class="accordion-item mb-2 shadow-sm border-0" style="border-left: 5px solid @(isActive ? "#28a745" : "#6c757d") !important;">
+        <div class="accordion-item mb-2 shadow-sm border-0" style="border-left: 5px solid @(isActive ? "#28a745" : "#6c757d") !important; border-radius:0.5rem; overflow:hidden;">
             <h2 class="accordion-header" id="heading-@item.Id">
-                <button class="accordion-button collapsed py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@item.Id">
-                    <div class="container-fluid p-0">
-                        <div class="row align-items-center">
-                            <div class="col-md-3 fw-bold">
-                                @item.Gorevli.AdSoyad
-                                @if ((item.Gorevli.GorevliNotlari != null && item.Gorevli.GorevliNotlari.Any()) || (item.GorevlendirmeNotlari != null && item.GorevlendirmeNotlari.Any()))
-                                {
-                                    <i class="fas fa-sticky-note text-warning ms-2" title="Not Mevcut"></i>
-                                }
-                            </div>
-                            <div class="col-md-3 small text-muted">
-                                @item.Kurum.Isim
-                                <br/><small>@item.Kurum.Sehir</small>
-                            </div>
-                            <div class="col-md-2 small">
-                                @item.Tarih.ToShortDateString()
-                            </div>
-                            <div class="col-md-2 small">
-                                @(item.BitisTarihi?.ToShortDateString() ?? "Devam Ediyor")
-                            </div>
-                            <div class="col-md-2">
-                                @if (isActive) {
-                                    <span class="badge bg-success">Aktif</span>
-                                } else {
-                                    <span class="badge bg-secondary">Pasif</span>
-                                }
+                <div class="d-flex align-items-center bg-white">
+                    <div class="px-3 text-center" style="width:46px; flex-shrink:0;">
+                        <input type="checkbox" class="form-check-input row-checkbox" data-id="@item.Id" value="@item.Id" style="cursor:pointer;" />
+                    </div>
+                    <button class="accordion-button collapsed py-3 flex-grow-1" style="background:transparent !important; box-shadow:none;" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@item.Id">
+                        <div class="container-fluid p-0">
+                            <div class="row align-items-center">
+                                <div class="col fw-bold">
+                                    @item.Gorevli.AdSoyad
+                                    @if ((item.Gorevli.GorevliNotlari != null && item.Gorevli.GorevliNotlari.Any()) || (item.GorevlendirmeNotlari != null && item.GorevlendirmeNotlari.Any()))
+                                    {
+                                        <i class="fas fa-sticky-note text-warning ms-2" title="Not Mevcut"></i>
+                                    }
+                                </div>
+                                <div class="col small text-muted">
+                                    @item.Kurum.Isim
+                                    <br/><small>@item.Kurum.Sehir</small>
+                                </div>
+                                <div class="col small">
+                                    @item.Tarih.ToString("dd.MM.yyyy")
+                                </div>
+                                <div class="col small">
+                                    @(item.BitisTarihi?.ToString("dd.MM.yyyy") ?? "Devam Ediyor")
+                                </div>
+                                <div class="col-md-2">
+                                    @if (isActive) {
+                                        <span class="badge bg-success">Aktif</span>
+                                    } else {
+                                        <span class="badge bg-secondary">Pasif</span>
+                                    }
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </button>
+                    </button>
+                </div>
             </h2>
             <div id="collapse-@item.Id" class="accordion-collapse collapse">
                 <div class="accordion-body bg-white">
                     <div class="d-flex justify-content-end mb-3">
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning me-2">Düzenle</a>
-                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info me-2">Detay</a>
-                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Sil</a>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning" title="Düzenle"><i class="bi bi-pencil-square"></i></a>
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info text-white" title="Detay"><i class="bi bi-eye"></i></a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger" title="Sil"><i class="bi bi-trash"></i></a>
+                        </div>
                     </div>
                     
                     <div class="row">
@@ -175,7 +326,7 @@
                                                     <i class="fas fa-calendar me-1"></i>@not.Tarih.ToString("dd MMM yyyy HH:mm")
                                                 </small>
                                             </div>
-                                            <button onclick="deleteNote(@not.Id, @item.Id)" class="btn btn-sm text-danger"><i class="fas fa-trash"></i></button>
+                                            <button type="button" class="btn btn-sm text-danger delete-note-btn" data-note-id="@not.Id" data-assignment-id="@item.Id"><i class="fas fa-trash"></i></button>
                                         </div>
                                     }
                                 }
@@ -185,7 +336,7 @@
                                 }
                              </div>
                              
-                             <form id="note-form-@item.Id" onsubmit="event.preventDefault(); addNote(@item.Id);" class="mt-2">
+                             <form id="note-form-@item.Id" class="mt-2 add-note-form" data-assignment-id="@item.Id">
                                  @Html.AntiForgeryToken()
                                  <div class="input-group">
                                      <textarea id="note-input-@item.Id" name="notIcerik" class="form-control" rows="2" placeholder="Yeni not ekle..." required></textarea>
@@ -219,11 +370,11 @@
                             <table class="table table-sm">
                                 <tr>
                                     <th>Başlangıç:</th>
-                                    <td>@item.Tarih.ToShortDateString()</td>
+                                    <td>@item.Tarih.ToString("dd.MM.yyyy")</td>
                                 </tr>
                                 <tr>
                                     <th>Bitiş:</th>
-                                    <td>@(item.BitisTarihi?.ToShortDateString() ?? "Devam Ediyor")</td>
+                                    <td>@(item.BitisTarihi?.ToString("dd.MM.yyyy") ?? "Devam Ediyor")</td>
                                 </tr>
                             </table>
                             
@@ -241,11 +392,11 @@
                                             </tr>
                                             <tr>
                                                 <th>Planlanan Başlangıç:</th>
-                                                <td>@(item.YerineGelisPlanlananTarih?.ToShortDateString() ?? "-")</td>
+                                                <td>@(item.YerineGelisPlanlananTarih?.ToString("dd.MM.yyyy") ?? "-")</td>
                                             </tr>
                                             <tr>
                                                 <th>Planlanan Bitiş:</th>
-                                                <td>@(item.YerineGelisPlanlananBitisTarih?.ToShortDateString() ?? "-")</td>
+                                                <td>@(item.YerineGelisPlanlananBitisTarih?.ToString("dd.MM.yyyy") ?? "-")</td>
                                             </tr>
                                         </table>
                                     </div>
@@ -263,84 +414,94 @@
 <nav class="mt-4">
     <ul class="pagination justify-content-center">
         <li class="page-item @prevDisabled">
-            <a class="page-link" onclick="changePage(@(Model.PageIndex - 1))">Önceki</a>
+            <a class="page-link page-nav-link" href="#" data-page="@(Model.PageIndex - 1)">Önceki</a>
         </li>
        @for (var i = 1; i <= Model.TotalPages; i++)
         {
             <li class="page-item @(i == Model.PageIndex ? "active" : "")">
-                <a class="page-link" onclick="changePage(@i)">@i</a>
+                <a class="page-link page-nav-link" href="#" data-page="@i">@i</a>
             </li>
         }
         <li class="page-item @nextDisabled">
-            <a class="page-link" onclick="changePage(@(Model.PageIndex + 1))">Sonraki</a>
+            <a class="page-link page-nav-link" href="#" data-page="@(Model.PageIndex + 1)">Sonraki</a>
         </li>
     </ul>
 </nav>
 
-@section Scripts {
-    <script>
-        function changePage(pageNum) {
-            var form = document.querySelector('#collapseFilter form');
-            if (form) {
-                var pageInput = document.createElement('input');
-                pageInput.type = 'hidden';
-                pageInput.name = 'page';
-                pageInput.value = pageNum;
-                form.appendChild(pageInput);
-                form.submit();
-            } else {
-                window.location.href = '?page=' + pageNum;
-            }
-        }
-        
-        // Note Management
-        function addNote(gorevlendirmeId) {
-            const form = document.getElementById(`note-form-${gorevlendirmeId}`);
-            const textarea = document.getElementById(`note-input-${gorevlendirmeId}`);
-            const formData = new FormData(form);
-            formData.append('gorevlendirmeId', gorevlendirmeId);
-            
-            fetch('/Gorevlendirme/AddNote', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload(); // Reload to show new note properly
-                } else {
-                    alert('Hata: ' + (data.message || 'Not eklenemedi'));
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        }
+<!-- Dashboard deeplink metadata -->
+<div id="dashboard-deeplink-meta"
+     data-auto-open="@(ViewBag.AutoOpenNewAssignment == true ? "true" : "false")"
+     data-target-id="@(ViewBag.TargetKurumId ?? 0)">
+</div>
 
-        function deleteNote(noteId, gorevlendirmeId) {
-            if(!confirm('Bu notu silmek istediğinize emin misiniz?')) return;
-            
-            const formData = new FormData();
-            formData.append('id', noteId);
-            
-            // Need verification token
-            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
-            if(token) formData.append('__RequestVerificationToken', token);
-            
-            fetch('/Gorevlendirme/DeleteNote', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'RequestVerificationToken': token
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert('Hata: Not silinemedi');
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        }
-    </script>
+<!-- ══════════════════════════════════════════════
+     FLOATING ACTION BAR (Gorevlendirme)
+══════════════════════════════════════════════ -->
+<div id="grvl-action-bar" class="grvl-action-bar">
+    <div class="d-flex align-items-center gap-3">
+        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold" id="grvl-selected-badge">0 Seçili</span>
+
+        <div class="grvl-h-divider"></div>
+
+        <button type="button" class="btn btn-sm btn-success rounded-pill px-3" onclick="grvl_quickExcel()">
+            <i class="bi bi-lightning-fill me-1"></i>Hızlı Excel
+        </button>
+
+        <button type="button" class="btn btn-sm btn-outline-light rounded-pill px-3"
+                data-bs-toggle="modal" data-bs-target="#grvlColModal">
+            <i class="bi bi-gear-fill me-1"></i>Sütun Seç &amp; İndir
+        </button>
+
+        <button type="button" class="btn btn-sm btn-danger rounded-pill px-3" onclick="grvl_bulkDelete()">
+            <i class="bi bi-trash-fill me-1"></i>Seçilenleri Güvenli Sil
+        </button>
+
+        <button type="button" class="btn btn-sm btn-link text-white text-decoration-none ms-2" onclick="grvl_clearAll()">
+            Sıfırla
+        </button>
+    </div>
+</div>
+
+<!-- ══ Column Selection Modal ══ -->
+<div class="modal fade" id="grvlColModal" tabindex="-1" aria-labelledby="grvlColModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius:16px;">
+            <div class="modal-header" style="background:linear-gradient(135deg,#1e40af,#3b82f6);color:#fff;border:none;">
+                <h5 class="modal-title fw-bold" id="grvlColModalLabel">
+                    <i class="bi bi-file-earmark-excel-fill me-2"></i>İndirilecek Sütunları Seçin
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="d-grid gap-2">
+                    @foreach (var col in new[] {
+                        ("BaslangicTarihi","Başlangıç Tarihi"),
+                        ("BitisTarihi","Bitiş Tarihi"),
+                        ("Gorevli","Görevli Adı"),
+                        ("Kurum","Kurum"),
+                        ("KurumTipi","Kurum Tipi"),
+                        ("Sehir","Şehir"),
+                        ("GorevliEmail","E-posta")
+                    })
+                    {
+                        <div class="form-check">
+                            <input class="form-check-input grvl-col-check" type="checkbox"
+                                   id="grvlcol_@col.Item1" value="@col.Item1" checked />
+                            <label class="form-check-label" for="grvlcol_@col.Item1">@col.Item2</label>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                <button type="button" class="btn btn-success" onclick="grvl_columnExcel()">
+                    <i class="bi bi-download me-1"></i>İndir
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 }

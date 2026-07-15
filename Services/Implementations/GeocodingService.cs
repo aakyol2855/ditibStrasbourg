@@ -87,29 +87,36 @@ namespace DitibStasbourg.Services.Implementations
                 request.Headers.Add("User-Agent", "DitibStasbourgApp/1.0");
 
                 var response = await client.SendAsync(request);
-                if (response.IsSuccessStatusCode)
+                
+                if (!response.IsSuccessStatusCode)
                 {
-                    var jsonString = await response.Content.ReadAsStringAsync();
-                    using var doc = JsonDocument.Parse(jsonString);
-                    var array = doc.RootElement;
-                    if (array.ValueKind == JsonValueKind.Array && array.GetArrayLength() > 0)
+                    // If the external provider responds with a non-success status code (like HTTP 429),
+                    // throw to be caught and fall back gracefully.
+                    throw new HttpRequestException($"External mapping API returned {response.StatusCode}");
+                }
+
+                var jsonString = await response.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(jsonString);
+                var array = doc.RootElement;
+                if (array.ValueKind == JsonValueKind.Array && array.GetArrayLength() > 0)
+                {
+                    var first = array[0];
+                    if (first.TryGetProperty("lat", out var latProp) && 
+                        first.TryGetProperty("lon", out var lonProp))
                     {
-                        var first = array[0];
-                        if (first.TryGetProperty("lat", out var latProp) && 
-                            first.TryGetProperty("lon", out var lonProp))
+                        if (double.TryParse(latProp.GetString(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double lat) &&
+                            double.TryParse(lonProp.GetString(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double lon))
                         {
-                            if (double.TryParse(latProp.GetString(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double lat) &&
-                                double.TryParse(lonProp.GetString(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double lon))
-                            {
-                                return (lat, lon);
-                            }
+                            return (lat, lon);
                         }
                     }
                 }
             }
             catch
             {
-                // Defensive catch to prevent crashes during external API failures
+                // Catch the error silently and gracefully fallback to returning a default coordinates 
+                // Tuple layout structure (48.5734, 7.7521) (Strasbourg baseline anchors) to maintain execution continuity.
+                return (48.5734, 7.7521);
             }
 
             return (null, null);

@@ -13,6 +13,7 @@
     <thead>
         <tr>
             <th>Ad</th>
+            <th>Yerel Sözleşme (Türkiye Dışı)</th>
             <th>İşlemler</th>
         </tr>
     </thead>
@@ -20,6 +21,16 @@
 @foreach (var item in Model) {
         <tr>
             <td>@item.Ad</td>
+            <td>
+                @if (item.IsLocalContract)
+                {
+                    <span class="badge bg-success">Evet</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">Hayır</span>
+                }
+            </td>
             <td>
                 <a asp-action="SozlesmeTipEdit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Düzenle</a>
                 <a asp-action="SozlesmeTipDelete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Sil</a>

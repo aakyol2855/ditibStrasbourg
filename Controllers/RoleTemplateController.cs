@@ -107,6 +107,15 @@ namespace DitibStasbourg.Controllers
                     claims[ctrlName] = actions.Select(a => $"{ctrlName}-{a}").ToList();
                 }
             }
+
+            // Explicitly inject custom security tokens into the template configuration matrix
+            if (!claims.ContainsKey("Maliye"))
+            {
+                claims["Maliye"] = new List<string>();
+            }
+            if (!claims["Maliye"].Contains("maliyeRead")) claims["Maliye"].Add("maliyeRead");
+            if (!claims["Maliye"].Contains("maliyeWrite")) claims["Maliye"].Add("maliyeWrite");
+
             return claims;
         }
     }

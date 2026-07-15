@@ -24,6 +24,25 @@ namespace DitibStasbourg.Models.ViewModels
         public int RemainingKurbanShares { get; set; }
         public decimal TotalKurbanCollected { get; set; }
         public decimal TotalKurbanOverdue { get; set; }
+
+        // Immigration & Visa Warnings
+        public List<GorevliImmigrationWarningDto> ImmigrationWarnings { get; set; } = new();
+
+        // Vacancies and expiring assignments
+        public List<Kurum> GorevlisiOlmayanKurumlar { get; set; } = new();
+        public List<Gorevlendirme> SuresiBitenGorevlendirmeler { get; set; } = new();
+
+        /// <summary>Count of institutions whose active assignment ends within 3 months (drives subtitle warning).</summary>
+        public int ExpiringAssignmentsCount => SuresiBitenGorevlendirmeler.Count;
+    }
+
+    public class GorevliImmigrationWarningDto
+    {
+        public int GorevliId { get; set; }
+        public string AdSoyad { get; set; } = null!;
+        public string WarningType { get; set; } = null!; // "Vize", "Pasaport", "Oturum İzni"
+        public DateTime ExpirationDate { get; set; }
+        public int RemainingDays { get; set; }
     }
 
     public class FinancialCampaignSummaryDto

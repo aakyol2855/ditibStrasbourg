@@ -1,0 +1,115 @@
+@model DitibStasbourg.Models.GorevliIzin
+@using DitibStasbourg.Models.Enums
+
+@{
+    ViewData["Title"] = "Yeni İzin Talebi";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-lg" style="border-radius: 1.25rem;">
+            <div class="card-header bg-primary text-white py-3" style="border-top-left-radius: 1.25rem; border-top-right-radius: 1.25rem;">
+                <h4 class="mb-0 fw-bold"><i class="bi bi-calendar-plus me-2"></i>Yeni İzin Talebi Oluştur</h4>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="TalepEt" asp-controller="Izin" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="ToplamGun" id="hiddenToplamGun" value="0" />
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3"></div>
+
+                    <!-- Görevli Selection -->
+                    <div class="mb-3">
+                        <label asp-for="GorevliId" class="form-label fw-semibold">
+                            Görevli <span class="text-danger">*</span>
+                        </label>
+                        <select asp-for="GorevliId" id="izinGorevliSelect" class="form-select" asp-items="@((SelectList)ViewBag.Gorevliler)" required>
+                            <option value="">-- Görevli Seçiniz --</option>
+                        </select>
+                        <span asp-validation-for="GorevliId" class="text-danger small"></span>
+                    </div>
+
+                    <!-- İzin Türü -->
+                    <div class="mb-3">
+                        <label asp-for="IzinTuru" class="form-label fw-semibold">
+                            İzin Türü <span class="text-danger">*</span>
+                        </label>
+                        <select asp-for="IzinTuru" class="form-select" required>
+                            @foreach (IzinTuru tur in Enum.GetValues(typeof(IzinTuru)))
+                            {
+                                var memberInfo = typeof(IzinTuru).GetMember(tur.ToString()).FirstOrDefault();
+                                var display = memberInfo?.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.DisplayAttribute), false)
+                                    .Cast<System.ComponentModel.DataAnnotations.DisplayAttribute>().FirstOrDefault();
+                                var label = display?.Name ?? tur.ToString();
+                                <option value="@((int)tur)">@label</option>
+                            }
+                        </select>
+                        <span asp-validation-for="IzinTuru" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Tarih Aralığı -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="BaslangicTarihi" class="form-label fw-semibold">
+                                Başlangıç Tarihi <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="BaslangicTarihi" type="date" class="form-control" required id="startDate" oninput="updateDayCount()" />
+                            <span asp-validation-for="BaslangicTarihi" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="BitisTarihi" class="form-label fw-semibold">
+                                Bitiş Tarihi <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="BitisTarihi" type="date" class="form-control" required id="endDate" oninput="updateDayCount()" />
+                            <span asp-validation-for="BitisTarihi" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <!-- Otomatik Gün Sayısı (salt okunur, sunucu tarafında hesaplanır) -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Toplam İzin Günü (Tahmini)</label>
+                        <input type="number" class="form-control" min="1" id="totalDays" readonly />
+                        <small class="text-muted">Başlangıç ve bitiş tarihleri seçildiğinde otomatik hesaplanır.</small>
+                    </div>
+
+                    <!-- İzin Adresi ve Telefonu -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="IzinAdresi" class="form-label fw-semibold"></label>
+                            <input asp-for="IzinAdresi" class="form-control" placeholder="İzin adresiniz" />
+                            <span asp-validation-for="IzinAdresi" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="IzinTelefonu" class="form-label fw-semibold"></label>
+                            <input asp-for="IzinTelefonu" id="izinIrtibatTel" class="form-control" placeholder="İzin telefonu" />
+                            <small class="text-muted">Görevli seçilince otomatik dolar, değiştirebilirsiniz.</small>
+                            <span asp-validation-for="IzinTelefonu" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <!-- Açıklama -->
+                    <div class="mb-4">
+                        <label asp-for="Aciklama" class="form-label fw-semibold">Açıklama / Gerekçe</label>
+                        <textarea asp-for="Aciklama" class="form-control" rows="3" placeholder="İzin talebinin gerekçesini buraya yazabilirsiniz..."></textarea>
+                        <span asp-validation-for="Aciklama" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Hidden: default status is Beklemede -->
+                    <input type="hidden" asp-for="OnayDurumu" value="0" />
+
+                    <div class="d-flex justify-content-between">
+                        <a href="@Url.Action("Index", "Izin", new { gorevliId = ViewBag.CurrentGorevliId })" class="btn btn-light px-4">
+                            <i class="bi bi-arrow-left me-1"></i> İptal
+                        </a>
+                        <button type="submit" class="btn btn-primary px-5 fw-semibold">
+                            <i class="bi bi-send me-2"></i> İzin Talebini Gönder
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

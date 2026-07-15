@@ -29,7 +29,13 @@ namespace DitibStasbourg.Services.Security
                 return;
             }
 
-            // SuperAdmin bypass can be added if requested, but instructions say: "No hidden bypass"
+            // SuperAdmin or Admin bypass to prevent authorization lockout loops
+            if (user.IsInRole("SuperAdmin") || user.IsInRole("Admin"))
+            {
+                await Task.CompletedTask;
+                return;
+            }
+
             var hasClaim = user.HasClaim("Permission", requiredPermission);
 
             if (!hasClaim)

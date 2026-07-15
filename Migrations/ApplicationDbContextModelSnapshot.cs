@@ -38,6 +38,56 @@ namespace DitibStasbourg.Migrations
                     b.ToTable("AppSettings");
                 });
 
+            modelBuilder.Entity("DitibStasbourg.Models.BudgetRevision", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("AdditionalAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("ApprovalStatus")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ApprovedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("KurumButceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("RequestedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RequestedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("RevisionType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("KurumButceId");
+
+                    b.ToTable("BudgetRevisions");
+                });
+
             modelBuilder.Entity("DitibStasbourg.Models.Dashboard.DashboardPreference", b =>
                 {
                     b.Property<string>("UserId")
@@ -94,6 +144,88 @@ namespace DitibStasbourg.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("DatabaseAuditLogs");
+                });
+
+            modelBuilder.Entity("DitibStasbourg.Models.DernekGorsel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Aciklama")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DernekId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GorselTipi")
+                        .HasColumnType("int");
+
+                    b.Property<string>("GorselYolu")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("YuklenmeTarihi")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("YukleyenKullanici")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DernekId");
+
+                    b.ToTable("DernekGorselleri");
+                });
+
+            modelBuilder.Entity("DitibStasbourg.Models.DernekNot", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("BitisTarihi")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DernekId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("EkleyenKullanici")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("KayitTarihi")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NotIcerigi")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DernekId");
+
+                    b.ToTable("DernekNotlari");
                 });
 
             modelBuilder.Entity("DitibStasbourg.Models.DernekUye", b =>
@@ -172,6 +304,9 @@ namespace DitibStasbourg.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("BaslangicTarihi")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime?>("BitisTarihi")
                         .HasColumnType("datetime2");
 
@@ -180,6 +315,9 @@ namespace DitibStasbourg.Migrations
 
                     b.Property<int>("GorevliId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -211,32 +349,6 @@ namespace DitibStasbourg.Migrations
                         .HasDatabaseName("IX_Gorevlendirme_Filters");
 
                     b.ToTable("Gorevlendirme");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            GorevliId = 1,
-                            IsDeleted = false,
-                            KurumId = 1,
-                            Tarih = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 2,
-                            GorevliId = 2,
-                            IsDeleted = false,
-                            KurumId = 2,
-                            Tarih = new DateTime(2023, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = 3,
-                            GorevliId = 3,
-                            IsDeleted = false,
-                            KurumId = 3,
-                            Tarih = new DateTime(2023, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        });
                 });
 
             modelBuilder.Entity("DitibStasbourg.Models.GorevlendirmeNot", b =>
@@ -289,6 +401,9 @@ namespace DitibStasbourg.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<decimal?>("Agno")
+                        .HasColumnType("decimal(3,2)");
+
                     b.Property<string>("AnneAdi")
                         .HasColumnType("nvarchar(max)");
 
@@ -313,6 +428,10 @@ namespace DitibStasbourg.Migrations
                     b.Property<string>("Derece")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Diller")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
                     b.Property<DateTime?>("DiyanetGirisTarihi")
                         .HasColumnType("datetime2");
 
@@ -328,17 +447,34 @@ namespace DitibStasbourg.Migrations
                     b.Property<int?>("EgitimDurumuId")
                         .HasColumnType("int");
 
+                    b.Property<string>("EgitimKursBelgeleri")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("EmeklilikTarihi")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("EsDurumu")
+                        .HasColumnType("int");
+
                     b.Property<string>("EvTelefonu")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FotografYolu")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("FransaGirisTarihi")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FrenchNationalId")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("GorevUzatmaBitisTarihi")
+                        .HasColumnType("datetime2");
 
                     b.Property<int?>("GorevliDurumId")
                         .HasColumnType("int");
@@ -352,6 +488,9 @@ namespace DitibStasbourg.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsMerkezPersoneli")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Kademe")
                         .HasColumnType("nvarchar(max)");
 
@@ -361,11 +500,39 @@ namespace DitibStasbourg.Migrations
                     b.Property<int?>("KanGrubuId")
                         .HasColumnType("int");
 
+                    b.Property<string>("LinkedUserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Memleketi")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("MerkezGorevAlani")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("MezuniyetBolum")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MezuniyetOkul")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasaportNo")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int?>("PasaportTuru")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("PassportExpirationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ResidencePermitExpirationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SicilNo")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Soyad")
                         .IsRequired()
@@ -378,8 +545,15 @@ namespace DitibStasbourg.Migrations
                         .HasMaxLength(11)
                         .HasColumnType("nvarchar(11)");
 
+                    b.Property<string>("Universite")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<int?>("UnvanId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("VisaExpirationDate")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -397,6 +571,11 @@ namespace DitibStasbourg.Migrations
 
                     b.HasIndex("KanGrubuId");
 
+                    b.HasIndex("SicilNo")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Gorevli_SicilNo")
+                        .HasFilter("[SicilNo] IS NOT NULL");
+
                     b.HasIndex("SozlesmeTipId");
 
                     b.HasIndex("TCKimlikNo")
@@ -409,35 +588,171 @@ namespace DitibStasbourg.Migrations
                         .HasDatabaseName("IX_Gorevli_Search");
 
                     b.ToTable("Gorevli");
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Ad = "Ahmet",
-                            Durum = 0,
-                            Email = "ahmet.yilmaz@example.com",
-                            IsDeleted = false,
-                            Soyad = "Yılmaz"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Ad = "Mehmet",
-                            Durum = 0,
-                            Email = "mehmet.demir@example.com",
-                            IsDeleted = false,
-                            Soyad = "Demir"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Ad = "Ayşe",
-                            Durum = 0,
-                            Email = "ayse.kaya@example.com",
-                            IsDeleted = false,
-                            Soyad = "Kaya"
-                        });
+            modelBuilder.Entity("DitibStasbourg.Models.GorevliBelge", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Aciklama")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("BelgeTipi")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DosyaYolu")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("GecerlilikTarihi")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("GorevliId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SeriNo")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("YuklenmeTarihi")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("YukleyenKullanici")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GorevliId", "BelgeTipi")
+                        .HasDatabaseName("IX_GorevliBelge_GorevliBelgeTipi");
+
+                    b.ToTable("GorevliBelgeleri");
+                });
+
+            modelBuilder.Entity("DitibStasbourg.Models.GorevliFaaliyetRaporu", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FaaliyetDetayi")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<int>("GorevliId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("KatilimciSayisi")
+                        .HasColumnType("int");
+
+                    b.Property<int>("KursTuru")
+                        .HasColumnType("int");
+
+                    b.Property<int>("KurumId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("RaporTarihi")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GorevliId");
+
+                    b.HasIndex("KurumId");
+
+                    b.ToTable("GorevliFaaliyetRaporlari");
+                });
+
+            modelBuilder.Entity("DitibStasbourg.Models.GorevliIzin", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Aciklama")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime>("BaslangicTarihi")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("BitisTarihi")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("EvrakDosyaYolu")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("EvrakNo")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("GorevliId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsManualEntryByAdmin")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("IzinAdresi")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("IzinTelefonu")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<int>("IzinTuru")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OnayDurumu")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("OnayTarihi")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("OnaylayanKisi")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("TalepTarihi")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ToplamGun")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GorevliId");
+
+                    b.ToTable("GorevliIzinler");
                 });
 
             modelBuilder.Entity("DitibStasbourg.Models.GorevliNot", b =>
@@ -565,6 +880,82 @@ namespace DitibStasbourg.Migrations
                     b.ToTable("Hissedarlar");
                 });
 
+            modelBuilder.Entity("DitibStasbourg.Models.KurbanCampaignRecord", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Bolge")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Cami")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal>("Cek")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Cihaz")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("DigerAdet")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("DigerMiktar")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("FysSorumlusu")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<decimal>("Havale")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("KalanBakiye")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("KurumId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Nakit")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Stripe")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("ToplamOdenen")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("TrAdet")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TrMiktar")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("TutanakNo")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("Yil")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("KurumId");
+
+                    b.ToTable("KurbanCampaignRecords");
+                });
+
             modelBuilder.Entity("DitibStasbourg.Models.Kurbanlik", b =>
                 {
                     b.Property<int>("Id")
@@ -650,7 +1041,23 @@ namespace DitibStasbourg.Migrations
                     b.Property<string>("DinGorevlisiIletisim")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("EkonomiNotu")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("FrenchRegistrationName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("HasCami")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasLojman")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasMustemilat")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("IbanNo")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("IletisimNumarasi")
@@ -669,14 +1076,28 @@ namespace DitibStasbourg.Migrations
                     b.Property<double?>("Latitude")
                         .HasColumnType("float");
 
+                    b.Property<int?>("LojmanKapasite")
+                        .HasColumnType("int");
+
                     b.Property<double?>("Longitude")
                         .HasColumnType("float");
 
                     b.Property<string>("Maili")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("MustemilatKapasite")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RnaNo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Sehir")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("SiretNo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Tip")
                         .HasColumnType("int");
@@ -692,44 +1113,134 @@ namespace DitibStasbourg.Migrations
                         .HasDatabaseName("IX_Kurum_Geo");
 
                     b.ToTable("Kurum");
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Adres = "12 Rue de la Musau",
-                            AktifMi = true,
-                            IsDeleted = false,
-                            Isim = "Strasbourg Yunus Emre Camii",
-                            Latitude = 48.566099999999999,
-                            Longitude = 7.7786,
-                            Sehir = "Strasbourg",
-                            Tip = 0
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Adres = "3 Rue des Écoles",
-                            AktifMi = true,
-                            IsDeleted = false,
-                            Isim = "Bischheim Fatih Camii",
-                            Latitude = 48.6143,
-                            Longitude = 7.7491000000000003,
-                            Sehir = "Bischheim",
-                            Tip = 0
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Adres = "5 Place Kléber",
-                            AktifMi = true,
-                            IsDeleted = false,
-                            Isim = "Strasbourg Türk Kültür Derneği",
-                            Latitude = 48.582999999999998,
-                            Longitude = 7.7477999999999998,
-                            Sehir = "Strasbourg",
-                            Tip = 1
-                        });
+            modelBuilder.Entity("DitibStasbourg.Models.KurumButce", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("DernekContribution")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("DitibContribution")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("KurumId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalBudget")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Yil")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("KurumId");
+
+                    b.ToTable("KurumButceler");
+                });
+
+            modelBuilder.Entity("DitibStasbourg.Models.KurumButcePeriod", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AttachmentPath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsPaid")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("KurumButceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PaidFromSource")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("PaymentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PeriodNumber")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("ScheduledAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("TargetDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TransactionTutanakNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("KurumButceId");
+
+                    b.ToTable("KurumButcePeriods");
+                });
+
+            modelBuilder.Entity("DitibStasbourg.Models.KurumDocument", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("DocumentName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("ExpirationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("FileSizeKb")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("KurumId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UploadedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("KurumId", "Category")
+                        .HasDatabaseName("IX_KurumDocument_KurumCategory");
+
+                    b.ToTable("KurumDocuments");
                 });
 
             modelBuilder.Entity("DitibStasbourg.Models.KurumFinansalDonem", b =>
@@ -766,6 +1277,93 @@ namespace DitibStasbourg.Migrations
                     b.HasIndex("KurumId");
 
                     b.ToTable("KurumFinansalDonemler");
+                });
+
+            modelBuilder.Entity("DitibStasbourg.Models.KurumHavuzTakibi", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("InternalNotes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSettled")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("KurumId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("PaymentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PersonnelGender")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("VariableAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Yil")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("KurumId");
+
+                    b.ToTable("KurumHavuzTakibiSet");
+                });
+
+            modelBuilder.Entity("DitibStasbourg.Models.KurumKasaOdenek", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AllocationType")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("IslemYapan")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("KurumId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TargetGorevliId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TransferDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TutanakNo")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("KurumId");
+
+                    b.HasIndex("TargetGorevliId");
+
+                    b.ToTable("KurumKasaOdenekler");
                 });
 
             modelBuilder.Entity("DitibStasbourg.Models.KurumYonetimKuruluUyesi", b =>
@@ -861,6 +1459,103 @@ namespace DitibStasbourg.Migrations
                     b.HasIndex("LookupTypeId");
 
                     b.ToTable("LookupValues");
+                });
+
+            modelBuilder.Entity("DitibStasbourg.Models.OverdueNotification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("EmailSentAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsEmailSent")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsResolved")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("KurumButcePeriodId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Message")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("NotificationType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("ReadAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("RelatedBudgetPeriodId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RelatedDernekNotId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RelatedGorevliBelgeId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RelatedGorevliId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RelatedKurumId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ResolutionNotes")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("ResolvedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Severity")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("TargetEmail")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("KurumButcePeriodId");
+
+                    b.HasIndex("RelatedBudgetPeriodId");
+
+                    b.HasIndex("RelatedDernekNotId");
+
+                    b.HasIndex("RelatedGorevliBelgeId");
+
+                    b.HasIndex("RelatedGorevliId");
+
+                    b.HasIndex("RelatedKurumId");
+
+                    b.HasIndex("IsRead", "Severity")
+                        .HasDatabaseName("IX_Notification_ReadSeverity");
+
+                    b.ToTable("OverdueNotifications");
                 });
 
             modelBuilder.Entity("DitibStasbourg.Models.Ref_AskerlikDurumu", b =>
@@ -1025,6 +1720,9 @@ namespace DitibStasbourg.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsLocalContract")
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
@@ -1203,8 +1901,17 @@ namespace DitibStasbourg.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("LogType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -1417,6 +2124,39 @@ namespace DitibStasbourg.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("DitibStasbourg.Models.BudgetRevision", b =>
+                {
+                    b.HasOne("DitibStasbourg.Models.KurumButce", "KurumButce")
+                        .WithMany("Revisions")
+                        .HasForeignKey("KurumButceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("KurumButce");
+                });
+
+            modelBuilder.Entity("DitibStasbourg.Models.DernekGorsel", b =>
+                {
+                    b.HasOne("DitibStasbourg.Models.Kurum", "Dernek")
+                        .WithMany("DernekGorselleri")
+                        .HasForeignKey("DernekId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Dernek");
+                });
+
+            modelBuilder.Entity("DitibStasbourg.Models.DernekNot", b =>
+                {
+                    b.HasOne("DitibStasbourg.Models.Kurum", "Dernek")
+                        .WithMany("DernekNotlari")
+                        .HasForeignKey("DernekId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Dernek");
+                });
+
             modelBuilder.Entity("DitibStasbourg.Models.DernekUye", b =>
                 {
                     b.HasOne("DitibStasbourg.Models.Kurum", "Kurum")
@@ -1554,6 +2294,47 @@ namespace DitibStasbourg.Migrations
                     b.Navigation("Unvan");
                 });
 
+            modelBuilder.Entity("DitibStasbourg.Models.GorevliBelge", b =>
+                {
+                    b.HasOne("DitibStasbourg.Models.Gorevli", "Gorevli")
+                        .WithMany("Belgeler")
+                        .HasForeignKey("GorevliId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Gorevli");
+                });
+
+            modelBuilder.Entity("DitibStasbourg.Models.GorevliFaaliyetRaporu", b =>
+                {
+                    b.HasOne("DitibStasbourg.Models.Gorevli", "Gorevli")
+                        .WithMany("FaaliyetRaporlari")
+                        .HasForeignKey("GorevliId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("DitibStasbourg.Models.Kurum", "Kurum")
+                        .WithMany()
+                        .HasForeignKey("KurumId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Gorevli");
+
+                    b.Navigation("Kurum");
+                });
+
+            modelBuilder.Entity("DitibStasbourg.Models.GorevliIzin", b =>
+                {
+                    b.HasOne("DitibStasbourg.Models.Gorevli", "Gorevli")
+                        .WithMany("Izinler")
+                        .HasForeignKey("GorevliId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Gorevli");
+                });
+
             modelBuilder.Entity("DitibStasbourg.Models.GorevliNot", b =>
                 {
                     b.HasOne("DitibStasbourg.Models.Gorevli", "Gorevli")
@@ -1580,6 +2361,15 @@ namespace DitibStasbourg.Migrations
                     b.Navigation("Kurbanlik");
                 });
 
+            modelBuilder.Entity("DitibStasbourg.Models.KurbanCampaignRecord", b =>
+                {
+                    b.HasOne("DitibStasbourg.Models.Kurum", "Kurum")
+                        .WithMany()
+                        .HasForeignKey("KurumId");
+
+                    b.Navigation("Kurum");
+                });
+
             modelBuilder.Entity("DitibStasbourg.Models.Kurum", b =>
                 {
                     b.HasOne("DitibStasbourg.Models.Ref_KurumTuru", "UstKurum")
@@ -1587,6 +2377,39 @@ namespace DitibStasbourg.Migrations
                         .HasForeignKey("UstKurumId");
 
                     b.Navigation("UstKurum");
+                });
+
+            modelBuilder.Entity("DitibStasbourg.Models.KurumButce", b =>
+                {
+                    b.HasOne("DitibStasbourg.Models.Kurum", "Kurum")
+                        .WithMany("Butceler")
+                        .HasForeignKey("KurumId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Kurum");
+                });
+
+            modelBuilder.Entity("DitibStasbourg.Models.KurumButcePeriod", b =>
+                {
+                    b.HasOne("DitibStasbourg.Models.KurumButce", "KurumButce")
+                        .WithMany("Periods")
+                        .HasForeignKey("KurumButceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("KurumButce");
+                });
+
+            modelBuilder.Entity("DitibStasbourg.Models.KurumDocument", b =>
+                {
+                    b.HasOne("DitibStasbourg.Models.Kurum", "Kurum")
+                        .WithMany("Documents")
+                        .HasForeignKey("KurumId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Kurum");
                 });
 
             modelBuilder.Entity("DitibStasbourg.Models.KurumFinansalDonem", b =>
@@ -1598,6 +2421,35 @@ namespace DitibStasbourg.Migrations
                         .IsRequired();
 
                     b.Navigation("Kurum");
+                });
+
+            modelBuilder.Entity("DitibStasbourg.Models.KurumHavuzTakibi", b =>
+                {
+                    b.HasOne("DitibStasbourg.Models.Kurum", "Kurum")
+                        .WithMany("HavuzTakibi")
+                        .HasForeignKey("KurumId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Kurum");
+                });
+
+            modelBuilder.Entity("DitibStasbourg.Models.KurumKasaOdenek", b =>
+                {
+                    b.HasOne("DitibStasbourg.Models.Kurum", "Kurum")
+                        .WithMany()
+                        .HasForeignKey("KurumId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("DitibStasbourg.Models.Gorevli", "TargetGorevli")
+                        .WithMany()
+                        .HasForeignKey("TargetGorevliId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Kurum");
+
+                    b.Navigation("TargetGorevli");
                 });
 
             modelBuilder.Entity("DitibStasbourg.Models.KurumYonetimKuruluUyesi", b =>
@@ -1628,6 +2480,50 @@ namespace DitibStasbourg.Migrations
                         .IsRequired();
 
                     b.Navigation("LookupType");
+                });
+
+            modelBuilder.Entity("DitibStasbourg.Models.OverdueNotification", b =>
+                {
+                    b.HasOne("DitibStasbourg.Models.KurumButcePeriod", "KurumButcePeriod")
+                        .WithMany()
+                        .HasForeignKey("KurumButcePeriodId");
+
+                    b.HasOne("DitibStasbourg.Models.KurumButcePeriod", "RelatedBudgetPeriod")
+                        .WithMany()
+                        .HasForeignKey("RelatedBudgetPeriodId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("DitibStasbourg.Models.DernekNot", "RelatedDernekNot")
+                        .WithMany()
+                        .HasForeignKey("RelatedDernekNotId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("DitibStasbourg.Models.GorevliBelge", "RelatedGorevliBelge")
+                        .WithMany()
+                        .HasForeignKey("RelatedGorevliBelgeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("DitibStasbourg.Models.Gorevli", "RelatedGorevli")
+                        .WithMany()
+                        .HasForeignKey("RelatedGorevliId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("DitibStasbourg.Models.Kurum", "RelatedKurum")
+                        .WithMany()
+                        .HasForeignKey("RelatedKurumId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("KurumButcePeriod");
+
+                    b.Navigation("RelatedBudgetPeriod");
+
+                    b.Navigation("RelatedDernekNot");
+
+                    b.Navigation("RelatedGorevli");
+
+                    b.Navigation("RelatedGorevliBelge");
+
+                    b.Navigation("RelatedKurum");
                 });
 
             modelBuilder.Entity("DitibStasbourg.Models.Security.RoleTemplateClaim", b =>
@@ -1710,11 +2606,17 @@ namespace DitibStasbourg.Migrations
 
             modelBuilder.Entity("DitibStasbourg.Models.Gorevli", b =>
                 {
+                    b.Navigation("Belgeler");
+
+                    b.Navigation("FaaliyetRaporlari");
+
                     b.Navigation("GorevGecmisleri");
 
                     b.Navigation("Gorevlendirmeler");
 
                     b.Navigation("GorevliNotlari");
+
+                    b.Navigation("Izinler");
                 });
 
             modelBuilder.Entity("DitibStasbourg.Models.Kurbanlik", b =>
@@ -1724,13 +2626,30 @@ namespace DitibStasbourg.Migrations
 
             modelBuilder.Entity("DitibStasbourg.Models.Kurum", b =>
                 {
+                    b.Navigation("Butceler");
+
+                    b.Navigation("DernekGorselleri");
+
+                    b.Navigation("DernekNotlari");
+
                     b.Navigation("DernekUyeleri");
+
+                    b.Navigation("Documents");
 
                     b.Navigation("FinansalDonemler");
 
                     b.Navigation("Gorevlendirmeler");
 
+                    b.Navigation("HavuzTakibi");
+
                     b.Navigation("YonetimKuruluUyeleri");
+                });
+
+            modelBuilder.Entity("DitibStasbourg.Models.KurumButce", b =>
+                {
+                    b.Navigation("Periods");
+
+                    b.Navigation("Revisions");
                 });
 
             modelBuilder.Entity("DitibStasbourg.Models.LookupType", b =>

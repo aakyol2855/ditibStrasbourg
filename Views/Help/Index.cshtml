@@ -66,7 +66,7 @@
                             @Html.Raw(topic.Content)
                         </div>
                         <div class="mt-4 text-muted small">
-                            <i class="bi bi-clock me-1"></i> Son güncelleme: @(topic.UpdatedAt?.ToShortDateString() ?? topic.CreatedAt.ToShortDateString())
+                            <i class="bi bi-clock me-1"></i> Son güncelleme: @(topic.UpdatedAt?.ToString("dd.MM.yyyy") ?? topic.CreatedAt.ToString("dd.MM.yyyy"))
                         </div>
                     </div>
                 </div>

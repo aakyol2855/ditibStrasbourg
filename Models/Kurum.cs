@@ -108,15 +108,58 @@ namespace DitibStasbourg.Models
         // Navigation for Members
         public ICollection<DernekUye> DernekUyeleri { get; set; } = new List<DernekUye>();
 
+        // Navigation for Financial Periods
+        public ICollection<KurumFinansalDonem> FinansalDonemler { get; set; } = new List<KurumFinansalDonem>();
+
         // Navigation for Management Board Members
         public ICollection<KurumYonetimKuruluUyesi> YonetimKuruluUyeleri { get; set; } = new List<KurumYonetimKuruluUyesi>();
 
-        // Navigation for Financial Periods
-        public virtual ICollection<KurumFinansalDonem> FinansalDonemler { get; set; } = new List<KurumFinansalDonem>();
+        // Financial metadata
+        [Required]
+        [Display(Name = "IBAN No")]
+        public string IbanNo { get; set; } = string.Empty;
 
-        [Display(Name = "Silindi mi?")]
+        [Required]
+        [Display(Name = "SIRET No")]
+        public string SiretNo { get; set; } = string.Empty;
+
+        [Required]
+        [Display(Name = "RNA No")]
+        public string RnaNo { get; set; } = string.Empty;
+
+        [Display(Name = "Ekonomi Notu")]
+        public string? EkonomiNotu { get; set; }
+
+        // ── Tesis Bilgileri ──────────────────────────────────────────
+        [Display(Name = "Cami var mı?")]
+        public bool HasCami { get; set; } = false;
+
+        [Display(Name = "Lojman var mı?")]
+        public bool HasLojman { get; set; } = false;
+
+        [Display(Name = "Lojman Kapasitesi")]
+        public int? LojmanKapasite { get; set; }
+
+        [Display(Name = "Müştemilat var mı?")]
+        public bool HasMustemilat { get; set; } = false;
+
+        [Display(Name = "Müştemilat Kapasitesi")]
+        public int? MustemilatKapasite { get; set; }
+
+        // Navigation to financial entities
+        public virtual ICollection<KurumButce> Butceler { get; set; } = new List<KurumButce>();
+        public virtual ICollection<KurumHavuzTakibi> HavuzTakibi { get; set; } = new List<KurumHavuzTakibi>();
+
+        // Document Management System (DMS) - Resmi Evrak Arşivi
+        public virtual ICollection<KurumDocument> Documents { get; set; } = new List<KurumDocument>();
+
+        // Dernek Notları (tarihli, soft-deletable)
+        public virtual ICollection<DernekNot> DernekNotlari { get; set; } = new List<DernekNot>();
+
+        // Dernek Görselleri (cami, lojman, müştemilat fotoğrafları)
+        public virtual ICollection<DernekGorsel> DernekGorselleri { get; set; } = new List<DernekGorsel>();
+
         public bool IsDeleted { get; set; } = false;
-
         public DateTime? DeletedAt { get; set; }
     }
 }

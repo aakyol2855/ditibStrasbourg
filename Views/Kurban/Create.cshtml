@@ -1,61 +1,195 @@
-@model DitibStasbourg.Models.Kurbanlik
-
-<!-- Developed by Abdulvahab Akyol (aakyol) -->
+@model DitibStasbourg.Models.KurbanCampaignRecord
 @{
-    ViewData["Title"] = "Yeni Kurbanlık Ekle";
+    ViewData["Title"] = "Yeni Kampanya Girişi Ekle";
 }
 
 <div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card border-0 shadow-lg">
-            <div class="card-header bg-white py-3">
-                <h4 class="mb-0 fw-bold">Yeni Kurbanlık Kaydı</h4>
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-lg" style="border-radius: 1.25rem; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);">
+            <div class="card-header bg-primary text-white py-3" style="border-top-left-radius: 1.25rem; border-top-right-radius: 1.25rem;">
+                <h4 class="mb-0 fw-bold"><i class="bi bi-gift-fill me-2"></i>Yeni Kampanya Girişi Ekle</h4>
             </div>
             <div class="card-body p-4">
-                <form asp-action="Create">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    
-                    <div class="mb-3">
-                        <label asp-for="TagNumber" class="form-label fw-bold">Küpe Numarası</label>
-                        <input asp-for="TagNumber" class="form-control" placeholder="Örn: TR-00123" />
-                        <span asp-validation-for="TagNumber" class="text-danger"></span>
-                    </div>
+                <form asp-action="Create" method="post" id="createForm">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-                    <div class="row mb-3">
+                    <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label asp-for="Species" class="form-label fw-bold">Tür</label>
-                            <select asp-for="Species" class="form-select">
-                                <option value="Büyükbaş">Büyükbaş</option>
-                                <option value="Küçükbaş">Küçükbaş</option>
+                            <label class="form-label fw-bold">Cami / Kurum Seçimi</label>
+                            <select name="KurumId" class="form-select select2-kurum" required>
+                                <option value="">-- Cami / Kurum Seçin --</option>
+                                @foreach (var cami in ViewBag.Camiler)
+                                {
+                                    <option value="@cami.Value">@cami.Text</option>
+                                }
                             </select>
-                            <span asp-validation-for="Species" class="text-danger"></span>
+                            <span class="text-danger small">Kurum seçimi zorunludur.</span>
                         </div>
                         <div class="col-md-6">
-                            <label asp-for="TotalShares" class="form-label fw-bold">Toplam Hisse</label>
-                            <input asp-for="TotalShares" class="form-control" type="number" value="7" />
-                            <span asp-validation-for="TotalShares" class="text-danger"></span>
+                            <label asp-for="FysSorumlusu" class="form-label fw-bold">FYS Sorumlusu</label>
+                            <input asp-for="FysSorumlusu" class="form-control" placeholder="Ad Soyad" required />
+                            <span asp-validation-for="FysSorumlusu" class="text-danger"></span>
                         </div>
                     </div>
 
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <label asp-for="Weight" class="form-label fw-bold">Tahmini Kilo (kg)</label>
-                            <input asp-for="Weight" class="form-control" />
-                            <span asp-validation-for="Weight" class="text-danger"></span>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label asp-for="DigerAdet" class="form-label fw-bold">Diğer Ülkeler Sayısı (DigerUlkeAdet)</label>
+                            <input asp-for="DigerAdet" type="number" class="form-control" min="0" value="0" id="DigerAdet" oninput="updateTotals()" required />
+                            <span asp-validation-for="DigerAdet" class="text-danger"></span>
                         </div>
-                        <div class="col-md-6">
-                            <label asp-for="Price" class="form-label fw-bold">Alış Fiyatı</label>
-                            <input asp-for="Price" class="form-control" />
-                            <span asp-validation-for="Price" class="text-danger"></span>
+                        <div class="col-md-4">
+                            <label asp-for="TrAdet" class="form-label fw-bold">Türkiye Sayısı (TurkiyeAdet)</label>
+                            <input asp-for="TrAdet" type="number" class="form-control" min="0" value="0" id="TrAdet" oninput="updateTotals()" required />
+                            <span asp-validation-for="TrAdet" class="text-danger"></span>
                         </div>
+                        <div class="col-md-4">
+                            <label asp-for="Yil" class="form-label fw-bold">Kampanya Yılı (Yil)</label>
+                            <input asp-for="Yil" type="number" class="form-control" value="2026" required />
+                            <span asp-validation-for="Yil" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold mt-4 mb-3 border-bottom pb-2 text-primary">Ödeme Yöntemleri Dağılımı</h5>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label asp-for="Havale" class="form-label fw-bold">Havale Miktarı (€)</label>
+                            <input asp-for="Havale" type="number" step="0.01" class="form-control" min="0" value="0.00" id="Havale" oninput="updateTotals()" required />
+                            <span asp-validation-for="Havale" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Cek" class="form-label fw-bold">Çek Miktarı (€)</label>
+                            <input asp-for="Cek" type="number" step="0.01" class="form-control" min="0" value="0.00" id="Cek" oninput="updateTotals()" required />
+                            <span asp-validation-for="Cek" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Nakit" class="form-label fw-bold">Nakit Miktarı (€)</label>
+                            <input asp-for="Nakit" type="number" step="0.01" class="form-control" min="0" value="0.00" id="Nakit" oninput="updateTotals()" required />
+                            <span asp-validation-for="Nakit" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label asp-for="Stripe" class="form-label fw-bold">Online Miktarı / Stripe (€)</label>
+                            <input asp-for="Stripe" type="number" step="0.01" class="form-control" min="0" value="0.00" id="Stripe" oninput="updateTotals()" required />
+                            <span asp-validation-for="Stripe" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Cihaz" class="form-label fw-bold">Cihaz / Terminal Miktarı (€)</label>
+                            <input asp-for="Cihaz" type="number" step="0.01" class="form-control" min="0" value="0.00" id="Cihaz" oninput="updateTotals()" required />
+                            <span asp-validation-for="Cihaz" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="TutanakNo" class="form-label fw-bold">Tutanak No</label>
+                            <input asp-for="TutanakNo" class="form-control" placeholder="Örn: TUT-2026-BARR-01" required />
+                            <span asp-validation-for="TutanakNo" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 mt-4 mb-4">
+                        <div class="row text-center font-monospace">
+                            <div class="col-4">
+                                <span class="small text-muted d-block">Toplam Tutar (@ViewBag.HisseFiyati € / Hisse)</span>
+                                <strong id="lblTotalAmount" class="fs-5 text-dark">0.00 €</strong>
+                            </div>
+                            <div class="col-4">
+                                <span class="small text-muted d-block">Toplam Ödenen</span>
+                                <strong id="lblTotalPaid" class="fs-5 text-success">0.00 €</strong>
+                            </div>
+                            <div class="col-4">
+                                <span class="small text-muted d-block">Kalan Bakiye</span>
+                                <strong id="lblRemaining" class="fs-5 text-danger">0.00 €</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="duplicateWarningBanner" class="alert alert-warning d-none" role="alert">
+                        <strong>⚠️ DİKKAT:</strong> Girmekte olduğunuz bilgilere benzer kayıtlar sistemde mevcut. Eğer eminseniz işleme devam edebilirsiniz, sistem yöneticiye doğrulama bildirimi gönderecektir.
                     </div>
 
                     <div class="d-flex justify-content-between pt-3">
                         <a asp-action="Index" class="btn btn-light px-4">İptal</a>
-                        <button type="submit" class="btn btn-primary px-5">Kaydet</button>
+                        <button type="submit" class="btn btn-primary px-5" id="btnSubmit">Kaydet</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        function updateTotals() {
+            const digerAdet = parseInt(document.getElementById('DigerAdet').value) || 0;
+            const trAdet = parseInt(document.getElementById('TrAdet').value) || 0;
+
+            // Dynamic share price resolved server-side
+            const hisseFiyati = @(ViewBag.HisseFiyati ?? 125);
+            const totalAmount = (digerAdet + trAdet) * hisseFiyati;
+
+            const havale = parseFloat(document.getElementById('Havale').value) || 0;
+            const cek = parseFloat(document.getElementById('Cek').value) || 0;
+            const nakit = parseFloat(document.getElementById('Nakit').value) || 0;
+            const stripe = parseFloat(document.getElementById('Stripe').value) || 0;
+            const cihaz = parseFloat(document.getElementById('Cihaz').value) || 0;
+
+            const totalPaid = havale + cek + nakit + stripe + cihaz;
+            const remaining = totalAmount - totalPaid;
+
+            document.getElementById('lblTotalAmount').textContent = totalAmount.toFixed(2) + ' €';
+            document.getElementById('lblTotalPaid').textContent = totalPaid.toFixed(2) + ' €';
+            document.getElementById('lblRemaining').textContent = remaining.toFixed(2) + ' €';
+        }
+
+        $(document).ready(function() {
+            $('.select2-kurum').select2({
+                placeholder: 'Cami / Kurum Seçiniz...',
+                allowClear: true
+            });
+            updateTotals();
+
+            $('#createForm').on('submit', function (e) {
+                if ($(this).data('duplicate-checked')) return;
+                e.preventDefault();
+
+                var $btn = $('#btnSubmit');
+                $btn.prop('disabled', true);
+                $('#duplicateWarningBanner').addClass('d-none');
+
+                var formData = {
+                    KurumId: $('select[name="KurumId"]').val(),
+                    FysSorumlusu: $('#FysSorumlusu').val(),
+                    TutanakNo: $('#TutanakNo').val(),
+                    Yil: $('#Yil').val()
+                };
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/Kurban/CheckDuplicate',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    success: function (res) {
+                        if (res.isDuplicate) {
+                            if (res.type === 'absolute') {
+                                alert(res.message);
+                                $btn.prop('disabled', false);
+                            } else {
+                                $('#duplicateWarningBanner').removeClass('d-none');
+                                $btn.text('Eminim, Kaydet');
+                                $btn.prop('disabled', false);
+                                $('#createForm').data('duplicate-checked', true);
+                            }
+                        } else {
+                            $('#createForm').data('duplicate-checked', true).submit();
+                        }
+                    },
+                    error: function () {
+                        $('#createForm').data('duplicate-checked', true).submit();
+                    }
+                });
+            });
+        });
+    </script>
+}

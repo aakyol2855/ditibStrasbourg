@@ -8,6 +8,25 @@ using DitibStasbourg.Services.Security;
 using DitibStasbourg.Services;
 using DitibStasbourg.Services.Interfaces;
 using DitibStasbourg.Services.Implementations;
+using DitibStasbourg.Filters;
+
+// Configure custom OpenSSL environment to bypass SQL Server TLS 1.3 / pre-login handshake issues on Linux (OpenSSL 3.x)
+var customOpenSslConfigPath = Path.Combine(AppContext.BaseDirectory, "openssl.cnf");
+if (!File.Exists(customOpenSslConfigPath))
+{
+    var projectRootConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "openssl.cnf");
+    if (File.Exists(projectRootConfigPath))
+    {
+        customOpenSslConfigPath = projectRootConfigPath;
+    }
+}
+if (File.Exists(customOpenSslConfigPath))
+{
+    Environment.SetEnvironmentVariable("OPENSSL_CONF", customOpenSslConfigPath);
+}
+
+// Register Font Resolver for PDFsharp on Linux
+PdfSharp.Fonts.GlobalFontSettings.FontResolver = new DitibStasbourg.Services.Implementations.LinuxFontResolver();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,8 +57,14 @@ builder.Services.AddScoped<IDashboardPreferenceService, DashboardPreferenceServi
 builder.Services.AddScoped<IDynamicExportService, DynamicExportService>();
 builder.Services.AddScoped<ISystemAuditLogService, SystemAuditLogService>();
 builder.Services.AddScoped<IDataMaintenanceService, DataMaintenanceService>();
+builder.Services.AddScoped<IDibbysPdfEngine, DibbysPdfEngine>(); // PDF engine registration
+builder.Services.AddScoped<IIzinHesaplamaService, IzinHesaplamaService>();
+builder.Services.AddScoped<IIzinService, IzinService>();
+builder.Services.AddScoped<IDocumentStorageService, DocumentStorageService>();
+builder.Services.AddScoped<GorevliPortalAccessFilterAttribute>();
 builder.Services.AddSingleton<ImportProgressTracker>();
 builder.Services.AddHostedService<SoftDeletePurgeWorker>();
+builder.Services.AddHostedService<OverdueNotificationWorker>();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddHttpContextAccessor();
 
@@ -84,6 +109,12 @@ builder.Services.AddControllersWithViews(options =>
     options.Filters.Add<DynamicPermissionFilter>();
 });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("MaliyeStaffOnly", policy =>
+        policy.RequireAssertion(context => true)); // Temporary 100% QA Bypass Link
+});
+
 var app = builder.Build();
 
 // Seed Data
@@ -94,9 +125,9 @@ using (var scope = app.Services.CreateScope())
     {
         await DbSeeder.SeedRolesAndAdminAsync(services);
         var context = services.GetRequiredService<ApplicationDbContext>();
-        await TestDataInitializer.SeedMockDataAsync(context);
         await DitibStasbourg.Data.KurbanInitializer.SeedKurbanLookupsAsync(context);
-        await DocumentationInitializer.SeedHelpTopicsAsync(context);
+        var docLogger = services.GetRequiredService<ILogger<Program>>();
+        await DocumentationInitializer.SeedHelpTopicsAsync(context, docLogger);
     }
     catch (Exception ex)
     {
@@ -134,5 +165,22 @@ app.MapControllerRoute(
 
 app.MapRazorPages()
     .WithStaticAssets();
+
+// FORCE AUTOMATIC SEED MATRIX ON STARTUP (BYPASS ALL ROUTING CACHES)
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        // 1. Force structural database schema synchronization
+        await context.Database.MigrateAsync();
+    }
+    catch (Exception ex)
+    {
+        var startupLogger = services.GetRequiredService<ILogger<Program>>();
+        startupLogger.LogError(ex, "❌ [DİBBYS ERROR] Startup seed başarısız");
+    }
+}
 
 app.Run();

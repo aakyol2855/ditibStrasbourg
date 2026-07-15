@@ -39,7 +39,20 @@ namespace DitibStasbourg.Services.Implementations
                     query = query.Where(g => g.BitisTarihi != null && g.BitisTarihi < today);
             }
 
-            return query.OrderByDescending(g => g.Tarih);
+            // Dynamic column sorting
+            query = (filter.SortBy?.ToLower(), filter.IsDescending) switch
+            {
+                ("gorevli", false)  => query.OrderBy(g => g.Gorevli!.Ad).ThenBy(g => g.Gorevli!.Soyad),
+                ("gorevli", true)   => query.OrderByDescending(g => g.Gorevli!.Ad).ThenByDescending(g => g.Gorevli!.Soyad),
+                ("kurum", false)    => query.OrderBy(g => g.Kurum!.Isim),
+                ("kurum", true)     => query.OrderByDescending(g => g.Kurum!.Isim),
+                ("bitis", false)    => query.OrderBy(g => g.BitisTarihi),
+                ("bitis", true)     => query.OrderByDescending(g => g.BitisTarihi),
+                // default: başlangıç tarihi azalan
+                _                   => query.OrderByDescending(g => g.Tarih)
+            };
+
+            return query;
         }
 
         public async Task<PaginatedList<Gorevlendirme>> GetFilteredGorevlendirmelerAsync(GorevlendirmeFilterViewModel filter, int pageSize)
@@ -134,6 +147,114 @@ namespace DitibStasbourg.Services.Implementations
                 _context.Entry(not).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
             }
+        }
+
+        /// <inheritdoc />
+        public async Task<string?> CheckOverlapAsync(int gorevliId, DateTime tarih, DateTime? bitisTarihi, int? excludeId = null)
+        {
+            // Treat open-ended assignments (no BitisTarihi) as running forever.
+            var proposedEnd = bitisTarihi ?? DateTime.MaxValue;
+
+            var conflict = await _context.Gorevlendirme
+                .Include(g => g.Kurum)
+                .Where(g => g.GorevliId == gorevliId
+                         && (excludeId == null || g.Id != excludeId)
+                         // Interval overlap: existing.Start <= proposed.End AND proposed.Start <= existing.End
+                         && g.Tarih <= proposedEnd
+                         && tarih <= (g.BitisTarihi ?? DateTime.MaxValue))
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            return conflict?.Kurum?.Isim;
+        }
+
+        public async Task<Dictionary<int, string>> GetActiveAssignmentsLookupAsync()
+        {
+            var today = DateTime.Today;
+            var activeAssignments = await _context.Gorevlendirme
+                .AsNoTracking()
+                .Include(a => a.Kurum)
+                .Where(a => a.Tarih <= today && (a.BitisTarihi == null || a.BitisTarihi >= today))
+                .ToListAsync();
+
+            return activeAssignments
+                .GroupBy(a => a.GorevliId)
+                .ToDictionary(g => g.Key, g => g.First().Kurum?.Isim ?? string.Empty);
+        }
+
+        /// <inheritdoc />
+        public async Task<byte[]> ExportSelectedPlacementsAsync(int[] ids, string[]? columns)
+        {
+            var assignments = await dbSet
+                .Include(g => g.Gorevli)
+                .Include(g => g.Kurum)
+                .AsNoTracking()
+                .Where(g => ids.Contains(g.Id))
+                .OrderByDescending(g => g.Tarih)
+                .ToListAsync();
+
+            var activeColumns = (columns == null || columns.Length == 0)
+                ? new[] { "BaslangicTarihi", "BitisTarihi", "Gorevli", "Kurum", "KurumTipi" }
+                : columns;
+
+            using var workbook = new XLWorkbook();
+            var ws = workbook.Worksheets.Add("Seçili Görevlendirmeler");
+            int col = 1;
+
+            if (activeColumns.Contains("BaslangicTarihi")) ws.Cell(1, col++).Value = "Başlangıç Tarihi";
+            if (activeColumns.Contains("BitisTarihi"))    ws.Cell(1, col++).Value = "Bitiş Tarihi";
+            if (activeColumns.Contains("Gorevli"))        ws.Cell(1, col++).Value = "Görevli";
+            if (activeColumns.Contains("Kurum"))          ws.Cell(1, col++).Value = "Kurum";
+            if (activeColumns.Contains("KurumTipi"))      ws.Cell(1, col++).Value = "Kurum Tipi";
+            if (activeColumns.Contains("Sehir"))          ws.Cell(1, col++).Value = "Şehir";
+            if (activeColumns.Contains("GorevliEmail"))   ws.Cell(1, col++).Value = "Görevli E-posta";
+
+            var headerRange = ws.Range(1, 1, 1, col - 1);
+            headerRange.Style.Font.Bold = true;
+            headerRange.Style.Fill.BackgroundColor = XLColor.FromHtml("#F2F2F2");
+
+            int row = 2;
+            foreach (var item in assignments)
+            {
+                col = 1;
+                if (activeColumns.Contains("BaslangicTarihi")) ws.Cell(row, col++).Value = item.Tarih.ToString("dd.MM.yyyy");
+                if (activeColumns.Contains("BitisTarihi"))    ws.Cell(row, col++).Value = item.BitisTarihi.HasValue ? item.BitisTarihi.Value.ToString("dd.MM.yyyy") : "Devam Ediyor";
+                if (activeColumns.Contains("Gorevli"))        ws.Cell(row, col++).Value = item.Gorevli?.AdSoyad ?? "";
+                if (activeColumns.Contains("Kurum"))          ws.Cell(row, col++).Value = item.Kurum?.Isim ?? "";
+                if (activeColumns.Contains("KurumTipi"))      ws.Cell(row, col++).Value = item.Kurum?.Tip.ToString() ?? "";
+                if (activeColumns.Contains("Sehir"))          ws.Cell(row, col++).Value = item.Kurum?.Sehir ?? "";
+                if (activeColumns.Contains("GorevliEmail"))   ws.Cell(row, col++).Value = item.Gorevli?.Email ?? "";
+                row++;
+            }
+
+            ws.Columns().AdjustToContents();
+
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            return stream.ToArray();
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> BulkSoftDeletePlacementsAsync(int[] ids)
+        {
+            if (ids == null || ids.Length == 0) return false;
+
+            var records = await dbSet
+                .Where(g => ids.Contains(g.Id) && !g.IsDeleted)
+                .ToListAsync();
+
+            if (!records.Any()) return false;
+
+            var now = DateTime.Now;
+            foreach (var rec in records)
+            {
+                rec.IsDeleted = true;
+                rec.DeletedAt = now;
+                _context.Entry(rec).State = EntityState.Modified;
+            }
+
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }
